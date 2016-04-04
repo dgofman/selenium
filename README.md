@@ -81,3 +81,23 @@ pom.xml
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
 ```
+
+log4j.properties
+
+```
+## direct log messages to stdout ###
+log4j.rootLogger=DEBUG, stdout, file
+log4j.logger.org.apache.http=ERROR
+
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.Target=System.out
+log4j.appender.stdout.layout=org.apache.log4j.SimpleLayout
+
+log4j.appender.file=org.apache.log4j.RollingFileAppender
+log4j.appender.file.maxFileSize=100KB
+log4j.appender.file.maxBackupIndex=5
+log4j.appender.file.File=./logs/test.log
+log4j.appender.file.threshold=debug
+log4j.appender.file.layout=org.apache.log4j.PatternLayout
+log4j.appender.file.layout.ConversionPattern=%d{yyyy MMM dd HH:mm:ss,SSS} %5p [%t] (%C) - %m%n
+```
