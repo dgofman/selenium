@@ -25,13 +25,13 @@ public class SeleniumUtils {
 
 	public static boolean acceptNextAlert = true;
 
-	public static WebDriver getDriver(String name, String maximize) {
+	public static WebDriver getDriver(String name, Boolean isFullScreen) {
 		WebDriver diver = null;
 		if (name.equals("Firefox")) {
 			diver = new FirefoxDriver();
 		} else if (name.equals("chrome")) {
 			ChromeOptions options = new ChromeOptions();
-			if ("true".equals(maximize)) {
+			if (isFullScreen) {
 				options.addArguments("--start-maximized");
 			}
 			diver = new ChromeDriver(options);
@@ -41,7 +41,7 @@ public class SeleniumUtils {
 			diver = new InternetExplorerDriver();
 		}
 
-		if ("true".equals(maximize) && !name.equals("chrome")) {
+		if (isFullScreen && !name.equals("chrome")) {
 			diver.manage().window().maximize();
 		}
 		return diver;

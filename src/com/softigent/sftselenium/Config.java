@@ -14,18 +14,21 @@ public class Config extends Properties {
 	private static final long serialVersionUID = 238683884179262164L;
 	static Logger log = Logger.getLogger(Config.class.getName());
 	
-	public Config(String path) {
+	public Config(File propertyFile) {
+		this(propertyFile, "action_delay", "load_timeout");
+	}
+
+	public Config(File propertyFile, String delayKey, String timeoutKey) {
 		super();
-		File file = new File("portal.properties");
-		log.info("File properties path " + file.getAbsolutePath());
+		log.info("File properties path " + propertyFile.getAbsolutePath());
 		try {
-			this.load(new FileInputStream(file));
+			this.load(new FileInputStream(propertyFile));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		this.actionDelay = Integer.parseInt(this.getProperty("action_delay"));
-		this.pageLoadTimeout = Integer.parseInt(this.getProperty("load_timeout"));
+		this.actionDelay = Integer.parseInt(this.getProperty(delayKey));
+		this.pageLoadTimeout = Integer.parseInt(this.getProperty(timeoutKey));
 	}
 
 	public int getActionDelay() {
