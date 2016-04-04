@@ -6,6 +6,7 @@
 	<artifactId>sftselenium</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Selenium Framework</name>
+	<packaging>jar</packaging>
 	<url>https://github.com/dgofman/selenium</url>
 
 	<issueManagement>
