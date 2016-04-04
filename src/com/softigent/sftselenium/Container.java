@@ -26,22 +26,39 @@ public class Container {
 	}
 
 	public Container(WebDriver driver, Config config, String selector) {
+		this(driver, config, selector, By.cssSelector(selector));
+	}
+	
+	public Container(WebDriver driver, Config config, String selector, By locator) {
 		this.driver = driver;
 		this.config = config;
 		this.selector = selector;
-		this.container = By.cssSelector(selector);
-		getElement(this.container);
+		this.container = locator;
+		getElements(this.container);
 	}
-
-	@SuppressWarnings("static-access")
+	
+	public Container find(String selector) {
+		return new Container(driver, config, this.selector + ' ' + selector, getBy(selector));
+	}
+	
+	public Container getIFrame() {
+		driver.switchTo().frame(getElement(this.container));
+		return new Container(driver.switchTo().defaultContent(), config, "body");
+	}
+	
 	public By getBy(String selector) {
+		return getBy(selector, this.container);
+	}
+	
+	@SuppressWarnings("static-access")
+	public By getBy(String selector, By parent) {
 		By locator;
 		if (selector.charAt(0) == '/') {
 			log.debug("Find selector: " + selector);
-			locator = this.container.xpath(selector);
+			locator = parent.xpath(selector);
 		} else {
 			log.debug("Find selector: " + this.selector + ' ' + selector);
-			locator = this.container.cssSelector(selector);
+			locator = parent.cssSelector(this.selector + ' ' + selector);
 		}
 		return locator;
 	}
@@ -63,6 +80,9 @@ public class Container {
 	public WebElement getElement(By locator) {
 		List<WebElement> elements = getElements(locator);
 		if (elements != null && elements.size() > 0) {
+			if (elements.size() > 1) {
+				log.warn("Found elements=" + elements.size() + " for selector: " + locator);
+			}
 			return elements.get(0);
 		}
 		return null;
@@ -180,7 +200,7 @@ public class Container {
 	}
 	
 	public void setAttributeValue(String selector, String name, Object value) {
-		log.debug("Set setAttributeValue name=" + name + ", value=" + value);
+		log.debug("Set setAttributeValue name=" + name + ", value=" + value + ", for selector: " + selector);
 		executeScript(selector, "arguments[0].setAttribute(arguments[1], arguments[2]);", name, value);
 		SeleniumUtils.sleep(config.getActionDelay());
 	}
@@ -192,6 +212,12 @@ public class Container {
 			return element.getCssValue(name);
 		}
 		return null;
+	}
+	
+	public void setCssValue(String selector, String name, Object value) {
+		log.debug("Set setCssValue name=" + name + ", value=" + value + ", for selector: " + selector);
+		executeScript(selector, "arguments[0].style[arguments[1]] = arguments[2]", name, value);
+		SeleniumUtils.sleep(config.getActionDelay());
 	}
 
 	public Boolean validateAttribute(String selector, String name, String value) {
@@ -253,6 +279,33 @@ public class Container {
 		}
 	}
 	
+	public boolean isSelected(String selector) {
+		log.debug("isSelected: " + selector);
+		WebElement element = getElement(selector);
+		if (element != null) {
+			return element.isSelected();
+		}
+		return false;
+	}
+	
+	public boolean isEnabled(String selector) {
+		log.debug("isEnabled: " + selector);
+		WebElement element = getElement(selector);
+		if (element != null) {
+			return element.isEnabled();
+		}
+		return false;
+	}
+	
+	public boolean isDisplayed(String selector) {
+		log.debug("isEnabled: " + selector);
+		WebElement element = getElement(selector);
+		if (element != null) {
+			return element.isDisplayed();
+		}
+		return false;
+	}
+	
 	public void setBrowseFile(String path) {
 		SeleniumUtils.fileBrowseDialog(driver, path);
 	}
@@ -271,11 +324,7 @@ public class Container {
 			if (callback.isTrue(element)) {
 				return;
 			}
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			wait(1000);
 		}
 	}
 
@@ -294,5 +343,17 @@ public class Container {
 		}
 		
 		return isTrue;
+	}
+	
+	public static void print(Object message) {
+		System.out.println(message);
+	}
+	
+	public static void wait(int mlSec) {
+		try {
+			Thread.sleep(mlSec);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 }
