@@ -17,7 +17,8 @@ public class Container {
 	private WebDriver driver;
 	private Config config;
 	private String selector;
-	private By container;
+	private By locator;
+	private WebElement element;
 
 	static Logger log = Logger.getLogger(Container.class.getName());
 
@@ -33,21 +34,57 @@ public class Container {
 		this.driver = driver;
 		this.config = config;
 		this.selector = selector;
-		this.container = locator;
-		getElements(this.container);
+		this.locator = locator;
+		this.element = getElement(locator);
+	}
+	
+	public By findBy(String selector) {
+		return getBy(selector);
+	}
+	
+	public WebElement findElement(String selector) {
+		return getElement(getBy(selector));
+	}
+	
+	public List<WebElement> findElements(String selector) {
+		return getElements(getBy(selector));
+	}
+	
+	public WebElement findElement(String selector, WebElement element) {
+		return element.findElement(getBy(selector));
 	}
 	
 	public Container find(String selector) {
 		return new Container(driver, config, this.selector + ' ' + selector, getBy(selector));
 	}
 	
+	public WebElement getElement() {
+		return element;
+	}
+	
+	public WebElement getParent() {
+		return getParent("..");
+	}
+	
+	public WebElement getParent(String path) {
+		return getParent(element, path);
+	}
+	
+	public WebElement getParent(WebElement node) {
+		return getParent(node, "..");
+	}
+	
+	public WebElement getParent(WebElement node, String path) {
+		return node.findElement(By.xpath(path));
+	}
+	
 	public Container getIFrame() {
-		driver.switchTo().frame(getElement(this.container));
+		driver.switchTo().frame(element);
 		return new Container(driver.switchTo().defaultContent(), config, "body");
 	}
 	
 	public By getBy(String selector) {
-		return getBy(selector, this.container);
+		return getBy(selector, this.locator);
 	}
 	
 	@SuppressWarnings("static-access")
@@ -87,7 +124,7 @@ public class Container {
 		}
 		return null;
 	}
-	
+		
 	public Object executeScript(String selector, String command, String attrName, Object value) {
 		WebElement element = getElement(selector);
 		if (element != null) {
@@ -152,22 +189,31 @@ public class Container {
 	}
 
 	public String getText(String selector) {
-		log.debug("Get for selector: " + selector);
+		log.debug("Get Text for selector: " + selector);
 		WebElement element = getElement(selector);
 		if (element != null) {
 			return element.getText();
 		}
 		return null;
 	}
+	
+	public String getValue(String selector) {
+		log.debug("Get Value for selector: " + selector);
+		WebElement element = getElement(selector);
+		if (element != null) {
+			return element.getAttribute("value");
+		}
+		return null;
+	}
 
 	public Boolean validateText(String selector, String value) {
 		log.debug("Validate Text value=" + value + ", for selector: " + selector);
-		return validateString(getText(selector), value, false);
+		return validateString(getText(selector), value);
 	}
 	
 	public Boolean assertText(String selector, String value) {
 		log.debug("Assert Text value=" + value + ", for selector: " + selector);
-		return validateString(getText(selector), value, true);
+		return assertString(getText(selector), value);
 	}
 	
 	public void setHTML(String selector, String value) {
@@ -182,12 +228,12 @@ public class Container {
 	
 	public Boolean validateHTML(String selector, String value) {
 		log.debug("Validate HTML value=" + value + ", for selector: " + selector);
-		return validateString(getHTML(selector), value, false);
+		return validateString(getHTML(selector), value);
 	}
 	
 	public Boolean assertHTML(String selector, String value) {
 		log.debug("Assert HTML value=" + value + ", for selector: " + selector);
-		return validateString(getHTML(selector), value, true);
+		return assertString(getHTML(selector), value);
 	}
 
 	public String getAttributeValue(String selector, String name) {
@@ -222,22 +268,22 @@ public class Container {
 
 	public Boolean validateAttribute(String selector, String name, String value) {
 		log.debug("Validate attribute=" + name + ", value=" + value + ", for selector: " + selector);
-		return validateString(getAttributeValue(selector, name), value, false);
+		return validateString(getAttributeValue(selector, name), value);
 	}
 	
 	public Boolean assertAttribute(String selector, String name, String value) {
 		log.debug("Assert attribute=" + name + ", value=" + value + ", for selector: " + selector);
-		return validateString(getAttributeValue(selector, name), value, true);
+		return assertString(getAttributeValue(selector, name), value);
 	}
 
 	public Boolean validateCssValue(String selector, String name, String value) {
 		log.debug("Validate CSS=" + name + ", value=" + value + ", for selector: " + selector);
-		return validateString(getCssValue(selector, name), value, false);
+		return validateString(getCssValue(selector, name), value);
 	}
 	
 	public Boolean assertCssValue(String selector, String name, String value) {
 		log.debug("Assert CSS=" + name + ", value=" + value + ", for selector: " + selector);
-		return validateString(getCssValue(selector, name), value, true);
+		return assertString(getCssValue(selector, name), value);
 	}
 	
 	public WebElement getOptionByText(String selector, String text) {
@@ -307,6 +353,7 @@ public class Container {
 	}
 	
 	public void setBrowseFile(String path) {
+		log.debug("Browse File: " + path);
 		SeleniumUtils.fileBrowseDialog(driver, path);
 	}
 
@@ -319,13 +366,24 @@ public class Container {
 	}
 	
 	public void waitWhenTrue(String selector, IWaitCallback callback) {
-		WebElement element = SeleniumUtils.waitAndFindElement(driver, By.cssSelector(selector), config.getPageLoadTimeout());
+		WebElement element = SeleniumUtils.waitAndFindElement(driver, findBy(selector), config.getPageLoadTimeout());
 		for (int i = 0; i < config.getPageLoadTimeout(); i++) {
+			print('.', false);
 			if (callback.isTrue(element)) {
+				print('.');
 				return;
 			}
-			wait(1000);
+			wait(1);
 		}
+		log.error("TIMEOUT");
+	}
+
+	public Boolean assertString(String str1, String str2) {
+		return validateString(str1, str2, true);
+	}
+
+	public Boolean validateString(String str1, String str2) {
+		return validateString(str1, str2, false);
 	}
 
 	public Boolean validateString(String str1, String str2, boolean isAssert) {
@@ -335,7 +393,14 @@ public class Container {
 		if (str1 == null) {
 			isTrue = str2 == null;
 		} else {
-			isTrue = Pattern.compile(str2).matcher(str1).matches();
+			isTrue = str1.equals(str2);
+			if (!isTrue) {
+				isTrue = Pattern.compile(str2).matcher(str1).matches();
+			}
+		}
+		
+		if (!isTrue) {
+			log.error("\n'" + str1 + "' != \n'" + str2 + "'");
 		}
 		
 		if (isAssert) {
@@ -345,15 +410,31 @@ public class Container {
 		return isTrue;
 	}
 	
-	public static void print(Object message) {
-		System.out.println(message);
+	public void waitAndFindElement() {
+		SeleniumUtils.waitAndFindElement(driver, locator, config.getPageLoadTimeout());
 	}
 	
-	public static void wait(int mlSec) {
+	public void wait(int sec) {
+		mlsWait(sec * 1000);
+	}
+		
+	public static void mlsWait(int mlSec) {
 		try {
 			Thread.sleep(mlSec);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	public static void print(Object message) {
+		print(message, true);
+	}
+	
+	public static void print(Object message, boolean isNewLine) {
+		if (isNewLine) {
+			System.out.println(message);
+		} else {
+			System.out.print(message);
 		}
 	}
 }

@@ -15,7 +15,6 @@ public abstract class BaseTest  {
 		}
 		this.connector = connector;
 		log = Logger.getLogger(this.getClass().getName());
-		log.info("Start test: " + log.getName());
 	}
 	
 	public static Connector createConnector(Config config, String driverName) {
@@ -35,6 +34,10 @@ public abstract class BaseTest  {
 	public void openPage(String url) {
 		log.info("Opening " + url);
 		connector.getDriver().get(url);
+	}
+	
+	public void setUp() throws Exception {
+		log.info("Start test: " + log.getName());
 	}
 	
 	public void tearDown(boolean isClose) throws Exception {

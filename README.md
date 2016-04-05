@@ -86,12 +86,49 @@ log4j.properties
 
 ```
 ## direct log messages to stdout ###
-log4j.rootLogger=DEBUG, stdout, file
+log4j.rootLogger=TRACE, StdoutTrace, StdoutDebug, StdoutInfo, StdoutWarn, StdoutErrorFatal, file
 log4j.logger.org.apache.http=ERROR
 
-log4j.appender.stdout=org.apache.log4j.ConsoleAppender
-log4j.appender.stdout.Target=System.out
-log4j.appender.stdout.layout=org.apache.log4j.SimpleLayout
+log4j.appender.StdoutTrace=org.apache.log4j.ConsoleAppender
+log4j.appender.StdoutTrace.layout=org.apache.log4j.PatternLayout
+log4j.appender.StdoutTrace.layout.conversionPattern=\u001b[32;1m%5p %m\n
+log4j.appender.StdoutTrace.threshold=TRACE
+log4j.appender.StdoutTrace.filter.filter1=org.apache.log4j.varia.LevelRangeFilter
+log4j.appender.StdoutTrace.filter.filter1.levelMin=TRACE
+log4j.appender.StdoutTrace.filter.filter1.levelMax=TRACE
+
+log4j.appender.StdoutDebug=org.apache.log4j.ConsoleAppender
+log4j.appender.StdoutDebug.layout=org.apache.log4j.PatternLayout
+log4j.appender.StdoutDebug.layout.conversionPattern=\u001b[0;36m%5p %m\n
+log4j.appender.StdoutDebug.threshold=DEBUG
+log4j.appender.StdoutDebug.filter.filter1=org.apache.log4j.varia.LevelRangeFilter
+log4j.appender.StdoutDebug.filter.filter1.levelMin=DEBUG
+log4j.appender.StdoutDebug.filter.filter1.levelMax=DEBUG
+
+log4j.appender.StdoutInfo=org.apache.log4j.ConsoleAppender
+log4j.appender.StdoutInfo.layout=org.apache.log4j.PatternLayout
+log4j.appender.StdoutInfo.layout.conversionPattern=\u001B[0;31m%5p %m\n
+log4j.appender.StdoutInfo.threshold=INFO
+log4j.appender.StdoutInfo.filter.filter1=org.apache.log4j.varia.LevelRangeFilter
+log4j.appender.StdoutInfo.filter.filter1.levelMin=INFO
+log4j.appender.StdoutInfo.filter.filter1.levelMax=INFO
+
+log4j.appender.StdoutWarn=org.apache.log4j.ConsoleAppender
+log4j.appender.StdoutWarn.layout=org.apache.log4j.PatternLayout
+log4j.appender.StdoutWarn.layout.conversionPattern=\u001b[0;30;1m%5p %m\n
+log4j.appender.StdoutWarn.threshold=WARN
+log4j.appender.StdoutWarn.filter.filter1=org.apache.log4j.varia.LevelRangeFilter
+log4j.appender.StdoutWarn.filter.filter1.levelMin=WARN
+log4j.appender.StdoutWarn.filter.filter1.levelMax=WARN
+
+log4j.appender.StdoutErrorFatal=org.apache.log4j.ConsoleAppender
+log4j.appender.StdoutErrorFatal.layout=org.apache.log4j.PatternLayout
+log4j.appender.StdoutErrorFatal.layout.conversionPattern=\u001b[31;1m%5p %m\n
+log4j.appender.StdoutErrorFatal.threshold=ERROR
+log4j.appender.StdoutWarn.filter.filter1=org.apache.log4j.varia.LevelRangeFilter
+log4j.appender.StdoutWarn.filter.filter1.levelMin=ERROR
+log4j.appender.StdoutWarn.filter.filter1.levelMax=ERROR
+
 
 log4j.appender.file=org.apache.log4j.RollingFileAppender
 log4j.appender.file.maxFileSize=100KB
@@ -99,5 +136,5 @@ log4j.appender.file.maxBackupIndex=5
 log4j.appender.file.File=./logs/test.log
 log4j.appender.file.threshold=debug
 log4j.appender.file.layout=org.apache.log4j.PatternLayout
-log4j.appender.file.layout.ConversionPattern=%d{yyyy MMM dd HH:mm:ss,SSS} %5p [%t] (%C) - %m%n
+log4j.appender.file.layout.ConversionPattern=%d{yyyy MMM dd HH:mm:ss} %5p (%C) - %m%n
 ```
