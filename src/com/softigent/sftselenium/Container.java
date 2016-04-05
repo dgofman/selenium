@@ -20,7 +20,7 @@ public class Container {
 	private By locator;
 	private WebElement element;
 
-	static Logger log = Logger.getLogger(Container.class.getName());
+	static Logger log = Logger.getLogger(Container.class.getCanonicalName());
 
 	public String getSelector() {
 		return selector;
@@ -106,7 +106,11 @@ public class Container {
 
 	public List<WebElement> getElements(By locator) {
 		List<WebElement> elements = driver.findElements(locator);
-		log.debug("Elements (" + (elements == null ? 0 : elements.size()) + ") - " + locator);
+		if (elements.size() > 1) {
+			log.trace("Elements (" + elements.size() + ") - " + locator);
+		} else {
+			log.debug("Elements (" + (elements == null ? 0 : elements.size()) + ") - " + locator);
+		}
 		return elements;
 	}
 
@@ -400,7 +404,7 @@ public class Container {
 		}
 		
 		if (!isTrue) {
-			log.error("\n'" + str1 + "' != \n'" + str2 + "'");
+			log.error("'" + str1 + "' != \n'" + str2 + "'");
 		}
 		
 		if (isAssert) {
