@@ -1,6 +1,7 @@
 package com.softigent.sftselenium;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -90,7 +91,8 @@ public class Container {
 	@SuppressWarnings("static-access")
 	public By getBy(String selector, By parent) {
 		By locator;
-		if (selector.charAt(0) == '/') {
+		if (selector.startsWith("xpath:")) {
+			selector = selector.substring(6);
 			log.debug("Find selector: " + selector);
 			locator = parent.xpath(selector);
 		} else {
@@ -106,7 +108,15 @@ public class Container {
 
 	public List<WebElement> getElements(By locator) {
 		List<WebElement> elements = driver.findElements(locator);
-		log.debug("Elements (" + (elements == null ? 0 : elements.size()) + ") - " + locator);
+		if (elements == null || elements.size() == 0) {
+			log.error("Cannot find an element for locator: " + locator + " [" + driver.getCurrentUrl() + "]");
+			fail();
+		}
+		if (elements.size() > 1) {
+			log.trace("Found elements=" + elements.size() + " for locator: " + locator);
+		} else {
+			log.debug("Elements (" + elements.size() + ") - " + locator);
+		}
 		return elements;
 	}
 
@@ -116,6 +126,10 @@ public class Container {
 
 	public WebElement getElement(By locator) {
 		List<WebElement> elements = getElements(locator);
+		if (elements == null || elements.size() == 0) {
+			log.warn("Cannot find an element for locator: " + locator);
+			fail();
+		}
 		if (elements != null && elements.size() > 0) {
 			if (elements.size() > 1) {
 				log.warn("Found elements=" + elements.size() + " for selector: " + locator);
@@ -173,6 +187,14 @@ public class Container {
 			elements.get(index).sendKeys(value);
 			SeleniumUtils.sleep(config.getActionDelay());
 		}
+	}
+	
+	public void waitText(String selector, String value) {
+		this.waitWhenTrue(selector, new IWaitCallback() {
+			public boolean isTrue(WebElement element) {
+				return element.getText().equals(value);
+			}
+		});
 	}
 	
 	public void sendKeys(String selector, String value) {
@@ -307,20 +329,30 @@ public class Container {
 
 	public void click(String selector) {
 		log.debug("Click on: " + selector);
-		WebElement element = getElement(selector);
+		WebElement element = waitAndFindElement(selector);
 		if (element != null) {
-			element.click();
+			try {
+				element.click();	
+			} catch(Exception e) {
+				log.error("Cannot execute click event for selector: " + selector + " [" + driver.getCurrentUrl() + "]");
+				throw e;
+			}
 			SeleniumUtils.sleep(config.getActionDelay());
 		}
 	}
 
 	public void mouseClickByLocator(String selector) {
 		log.debug("Mouse Click on: " + selector);
-		WebElement element = getElement(selector);
+		WebElement element = waitAndFindElement(selector);
 		if (element != null) {
-			Actions builder = new Actions(driver);
-			builder.moveToElement(element).click(element);
-			builder.perform();
+			try {
+				Actions builder = new Actions(driver);
+				builder.moveToElement(element).click(element);
+				builder.perform();
+			} catch(Exception e) {
+				log.error("Cannot execute click event for selector: " + selector + " [" + driver.getCurrentUrl() + "]");
+				throw e;
+			}
 			SeleniumUtils.sleep(config.getActionDelay());
 		}
 	}
@@ -375,7 +407,7 @@ public class Container {
 			}
 			wait(1);
 		}
-		log.error("TIMEOUT");
+		log.error("TIMEOUT: [" + driver.getCurrentUrl() + "]");
 	}
 
 	public Boolean assertString(String str1, String str2) {
@@ -410,8 +442,12 @@ public class Container {
 		return isTrue;
 	}
 	
-	public void waitAndFindElement() {
-		SeleniumUtils.waitAndFindElement(driver, locator, config.getPageLoadTimeout());
+	public WebElement waitAndFindElement() {
+		return SeleniumUtils.waitAndFindElement(driver, locator, config.getPageLoadTimeout());
+	}
+	
+	public WebElement waitAndFindElement(String selector) {
+		return SeleniumUtils.waitAndFindElement(driver, findBy(selector), config.getPageLoadTimeout());
 	}
 	
 	public void wait(int sec) {

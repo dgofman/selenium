@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 
 public class Config extends Properties {
 	
-	private int actionDelay;
+	private float actionDelay;
 	private int pageLoadTimeout;
 		
 	private static final long serialVersionUID = 238683884179262164L;
@@ -27,11 +27,11 @@ public class Config extends Properties {
 			e.printStackTrace();
 		}
 		
-		this.actionDelay = Integer.parseInt(this.getProperty(delayKey));
+		this.actionDelay = Float.parseFloat(this.getProperty(delayKey));
 		this.pageLoadTimeout = Integer.parseInt(this.getProperty(timeoutKey));
 	}
 
-	public int getActionDelay() {
+	public float getActionDelay() {
 		return actionDelay;
 	}
 

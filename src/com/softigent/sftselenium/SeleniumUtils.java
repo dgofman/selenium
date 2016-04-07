@@ -52,9 +52,9 @@ public class SeleniumUtils {
 		new WebDriverWait(driver, timeoutSec).until(new ExpectedCondition<Boolean>() {
 			public Boolean apply(WebDriver d) {
 				if (urlPath != null) {
-					return urlPath.matcher(driver.getCurrentUrl()).matches();
+					return urlPath.matcher(d.getCurrentUrl()).matches();
 				} else {
-					return !driver.getCurrentUrl().equals(currentUrl);
+					return !d.getCurrentUrl().equals(currentUrl);
 				}
 			}
 		});
@@ -65,9 +65,11 @@ public class SeleniumUtils {
 	  return wait.until(ExpectedConditions.presenceOfElementLocated(locator));
 	}
 
-	public static void sleep(int seconds) {
+	public static void sleep(float seconds) {
 		try {
-			Thread.sleep(seconds * 1000);
+			if (seconds != 0) {
+				Thread.sleep((int)seconds * 1000);
+			}
 		} catch (InterruptedException e) {
 		}
 	}
@@ -110,15 +112,15 @@ public class SeleniumUtils {
 		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, null);
 		try {
 			Thread.sleep(500);
-
+			driver.switchTo().activeElement();
 			Robot robot = new Robot();
 			robot.keyPress(KeyEvent.VK_CONTROL);
 			robot.keyPress(KeyEvent.VK_V);
 			robot.keyRelease(KeyEvent.VK_V);
 			robot.keyRelease(KeyEvent.VK_CONTROL);
+			Thread.sleep(500);
 			robot.keyPress(KeyEvent.VK_ENTER);
 			robot.keyRelease(KeyEvent.VK_ENTER);
-			driver.switchTo().activeElement();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
