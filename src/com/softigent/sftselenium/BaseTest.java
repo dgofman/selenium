@@ -8,13 +8,17 @@ public abstract class BaseTest  {
 	protected  Connector connector;
 
 	protected Logger log;
-	
+	protected String className;
+
+	protected static BaseTest testClass;
+
 	public BaseTest(Connector connector) {
 		if (connector == null) {
 			throw new NullPointerException("Please initialize a default connector.");
 		}
 		this.connector = connector;
-		log = Logger.getLogger(this.getClass().getName());
+		this.className = getClass().getName();
+		log = Logger.getLogger(className);
 	}
 	
 	public static Connector createConnector(Config config, String driverName) {
@@ -37,11 +41,12 @@ public abstract class BaseTest  {
 	}
 	
 	public void setUp() throws Exception {
-		log.info("Start test: " + log.getName());
+		log.info(">>>>> Start test: " + className);
+		testClass = this;
 	}
 	
 	public void tearDown(boolean isClose) throws Exception {
-		log.info("Finish test: " + log.getName());
+		log.info("<<<<< Finish test: " + className);
 		if (isClose) {
 			connector.getDriver().quit();
 		}

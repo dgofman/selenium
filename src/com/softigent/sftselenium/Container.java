@@ -140,13 +140,16 @@ public class Container {
 	}
 		
 	public Object executeScript(String selector, String command, String attrName, Object value) {
-		WebElement element = getElement(selector);
-		if (element != null) {
-			JavascriptExecutor js = (JavascriptExecutor) driver;
-			return js.executeScript(command, element, attrName, value);
-		} else {
-			return null;
-		}
+		return this.executeScript(command, getElement(selector), attrName, value);
+	}
+	
+	public Object executeScript(String command, WebElement element, String attrName, Object value) {
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+		return js.executeScript(command, element, attrName, value);
+	}
+	
+	public Object executeScript(String command, WebElement element) {
+		return this.executeScript(command, element, null, null);
 	}
 	
 	public void clearAllText(String selector) {
@@ -284,7 +287,7 @@ public class Container {
 	
 	public void setCssValue(String selector, String name, Object value) {
 		log.debug("Set setCssValue name=" + name + ", value=" + value + ", for selector: " + selector);
-		executeScript(selector, "arguments[0].style[arguments[1]] = arguments[2]", name, value);
+		executeScript(selector, "arguments[0].style[arguments[1]] = arguments[2];", name, value);
 		SeleniumUtils.sleep(config.getActionDelay());
 	}
 
@@ -332,31 +335,19 @@ public class Container {
 		WebElement element = waitAndFindElement(selector);
 		if (element != null) {
 			try {
-				element.click();	
+				element.click();
 			} catch(Exception e) {
-				log.error("Cannot execute click event for selector: " + selector + " [" + driver.getCurrentUrl() + "]");
-				throw e;
+				log.warn("Cannot execute click event for selector: " + selector + " [" + driver.getCurrentUrl() + "]\n" +
+					" Will try to click again after " + config.getClickDelay() + " seconds");
+				wait(config.getClickDelay());
+				Actions builder = new Actions(driver);
+				builder.moveToElement(element).click(element);
+				builder.perform();
 			}
 			SeleniumUtils.sleep(config.getActionDelay());
 		}
 	}
 
-	public void mouseClickByLocator(String selector) {
-		log.debug("Mouse Click on: " + selector);
-		WebElement element = waitAndFindElement(selector);
-		if (element != null) {
-			try {
-				Actions builder = new Actions(driver);
-				builder.moveToElement(element).click(element);
-				builder.perform();
-			} catch(Exception e) {
-				log.error("Cannot execute click event for selector: " + selector + " [" + driver.getCurrentUrl() + "]");
-				throw e;
-			}
-			SeleniumUtils.sleep(config.getActionDelay());
-		}
-	}
-	
 	public boolean isSelected(String selector) {
 		log.debug("isSelected: " + selector);
 		WebElement element = getElement(selector);
@@ -467,10 +458,12 @@ public class Container {
 	}
 	
 	public static void print(Object message, boolean isNewLine) {
-		if (isNewLine) {
-			System.out.println(message);
-		} else {
-			System.out.print(message);
+		if (log.isDebugEnabled()) {
+			if (isNewLine) {
+				System.out.println(message);
+			} else {
+				System.out.print(message);
+			}
 		}
 	}
 }
