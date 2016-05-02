@@ -1,5 +1,17 @@
 ###SFTSelenium
 
+Example of .properties file
+```
+drivers=Chrome
+chrome_driver_path=drivers/chromedriver.exe
+load_timeout=30
+action_delay=.1
+click_delay=3
+window_dimension=1900x750
+open_fullscreen=false
+close_browser=false
+```
+
 
 pom.xml
 ```
