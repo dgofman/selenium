@@ -1,5 +1,6 @@
 package com.softigent.sftselenium;
 
+import org.openqa.selenium.Dimension;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
@@ -25,26 +26,35 @@ public class SeleniumUtils {
 
 	public static boolean acceptNextAlert = true;
 
-	public static WebDriver getDriver(String name, Boolean isFullScreen) {
-		WebDriver diver = null;
+	public static WebDriver getDriver(String name, Config config) {
+		WebDriver driver = null;
+		boolean isFullScreen = "true".equals(config.getProperty("open_fullscreen"));
 		if (name.equals("Firefox")) {
-			diver = new FirefoxDriver();
-		} else if (name.equals("chrome")) {
+			driver = new FirefoxDriver();
+		} else if (name.equals("Chrome")) {
 			ChromeOptions options = new ChromeOptions();
 			if (isFullScreen) {
 				options.addArguments("--start-maximized");
 			}
-			diver = new ChromeDriver(options);
-		} else if (name.equals("safari")) {
-			diver = new SafariDriver();
+			driver = new ChromeDriver(options);
+		} else if (name.equals("Safari")) {
+			driver = new SafariDriver();
 		} else if (name.equals("ie")) {
-			diver = new InternetExplorerDriver();
+			driver = new InternetExplorerDriver();
 		}
 
-		if (isFullScreen && !name.equals("chrome")) {
-			diver.manage().window().maximize();
+		if (isFullScreen) {
+			if (!name.equals("Chrome")) {
+				driver.manage().window().maximize();
+			}
+		} else if (config.getProperty("window_dimension") != null) {
+			String[] wh = config.getProperty("window_dimension").split("x");
+			if (wh.length == 2) {
+				Dimension d = new Dimension(Integer.parseInt(wh[0]), Integer.parseInt(wh[1]));
+				driver.manage().window().setSize(d);
+			}
 		}
-		return diver;
+		return driver;
 	}
 
 	public static void wait(WebDriver driver, long timeoutSec, Pattern urlPath) {

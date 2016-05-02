@@ -26,17 +26,38 @@ public class Container {
 	public String getSelector() {
 		return selector;
 	}
+	
+	public String getSelector(WebElement element) {
+		String[] s = element.toString().split(" -> ");
+		return s[1].replace("css selector: ", "");
+	}
 
 	public Container(WebDriver driver, Config config, String selector) {
 		this(driver, config, selector, By.cssSelector(selector));
 	}
 	
+	public Container(WebDriver driver, Config config, WebElement element) {
+		this(driver, config, null, null, element);
+		this.selector = getSelector(element);
+		this.locator = By.cssSelector(selector);
+	}
+	
 	public Container(WebDriver driver, Config config, String selector, By locator) {
+		this(driver, config, selector, locator, null);
+		this.element = getElement(locator);
+	}
+	
+	public Container(WebDriver driver, Config config, String selector, By locator, WebElement element) {
 		this.driver = driver;
 		this.config = config;
 		this.selector = selector;
 		this.locator = locator;
-		this.element = getElement(locator);
+		this.element = element;
+	}
+	
+	public Container waitAndFindContainer(String selector) {
+		WebElement element = waitAndFindElement(selector);
+		return new Container(driver, config, selector, locator, element);
 	}
 	
 	public By findBy(String selector) {
@@ -44,7 +65,11 @@ public class Container {
 	}
 	
 	public WebElement findElement(String selector) {
-		return getElement(getBy(selector));
+		return findElement(getBy(selector));
+	}
+	
+	public WebElement findElement(By locator) {
+		return getElement(locator);
 	}
 	
 	public List<WebElement> findElements(String selector) {
@@ -62,7 +87,15 @@ public class Container {
 	public WebElement getElement() {
 		return element;
 	}
-	
+			
+	public static WebElement getParent(WebElement element, String path) {
+		return element.findElement(By.xpath(path));
+	}
+
+	public WebElement getParent(String selector, String path) {
+		return getParent(findElement(selector), path);
+	}
+
 	public WebElement getParent() {
 		return getParent("..");
 	}
@@ -73,10 +106,6 @@ public class Container {
 	
 	public WebElement getParent(WebElement node) {
 		return getParent(node, "..");
-	}
-	
-	public WebElement getParent(WebElement node, String path) {
-		return node.findElement(By.xpath(path));
 	}
 	
 	public Container getIFrame() {
@@ -101,12 +130,22 @@ public class Container {
 		}
 		return locator;
 	}
+	
+	public String getElementName(WebElement element) {
+		String s[] = element.toString().split(" -> ");
+		if (s.length > 2) {
+			return s[1].replaceAll("]]$", "") + " -> " + s[2].replaceAll("]$", "");
+		} else {
+			return s[1].replaceAll("]$", "");
+		}
+	}
 
 	public List<WebElement> getElements(String selector) {
 		return getElements(getBy(selector));
 	}
 
 	public List<WebElement> getElements(By locator) {
+		log.trace("Find element(s) = " + locator);
 		List<WebElement> elements = driver.findElements(locator);
 		if (elements == null || elements.size() == 0) {
 			log.error("Cannot find an element for locator: " + locator + " [" + driver.getCurrentUrl() + "]");
@@ -230,6 +269,11 @@ public class Container {
 		}
 		return null;
 	}
+	
+	public Boolean validateText(String value) {
+		log.debug("Validate Text value=" + value + ", for selector: " + selector);
+		return validateString(element.getText(), value);
+	}
 
 	public Boolean validateText(String selector, String value) {
 		log.debug("Validate Text value=" + value + ", for selector: " + selector);
@@ -261,6 +305,11 @@ public class Container {
 		return assertString(getHTML(selector), value);
 	}
 
+	public String getAttributeValue(String name) {
+		log.debug("Get attribute=" + name + ", for selector: " + selector);
+		return element.getAttribute(name);
+	}
+
 	public String getAttributeValue(String selector, String name) {
 		log.debug("Get attribute=" + name + ", for selector: " + selector);
 		WebElement element = getElement(selector);
@@ -274,6 +323,35 @@ public class Container {
 		log.debug("Set setAttributeValue name=" + name + ", value=" + value + ", for selector: " + selector);
 		executeScript(selector, "arguments[0].setAttribute(arguments[1], arguments[2]);", name, value);
 		SeleniumUtils.sleep(config.getActionDelay());
+	}
+	
+	public boolean hasClass(WebElement element, String className) {
+		log.debug("hasClass, for className: " + className + ", element: " + getElementName(element));
+		if (element != null) {
+			String classes = element.getAttribute("class");
+		    for (String c : classes.split(" ")) {
+		        if (c.equals(className)) {
+		            return true;
+		        }
+		    }
+		}
+	    return false;
+	}
+	
+	public boolean hasClass(String selector, String className) {
+		return hasClass(getElement(selector), className);
+	}
+
+	public boolean hasClass(String className) {
+	    return hasClass(element, className);
+	}
+
+	public String getCssValue(String name) {
+		log.debug("Get CSS=" + name + ", for selector: " + selector);
+		if (element != null) {
+			return element.getCssValue(name);
+		}
+		return null;
 	}
 
 	public String getCssValue(String selector, String name) {
@@ -329,20 +407,27 @@ public class Container {
 			option.click();
 		}
 	}
-
+	
 	public void click(String selector) {
-		log.debug("Click on: " + selector);
-		WebElement element = waitAndFindElement(selector);
+		click(getElement(selector));
+	}
+	
+	public void click() {
+		this.click(element);
+	}
+	
+	public void click(WebElement element) {
+		log.debug("Click on: " + getElementName(element));
 		if (element != null) {
 			try {
 				element.click();
 			} catch(Exception e) {
-				log.warn("Cannot execute click event for selector: " + selector + " [" + driver.getCurrentUrl() + "]\n" +
+				log.warn("Cannot execute click event: " + getElementName(element) + " [" + driver.getCurrentUrl() + "]\n" +
 					" Will try to click again after " + config.getClickDelay() + " seconds");
 				wait(config.getClickDelay());
-				Actions builder = new Actions(driver);
-				builder.moveToElement(element).click(element);
-				builder.perform();
+				Actions action = new Actions(driver);
+				action.moveToElement(element).click(element);
+				action.build().perform();
 			}
 			SeleniumUtils.sleep(config.getActionDelay());
 		}
@@ -365,31 +450,66 @@ public class Container {
 		}
 		return false;
 	}
+
+	public void waitIsEnabled(String selector) {
+		this.waitWhenTrue(selector, new IWaitCallback() {
+			public boolean isTrue(WebElement element) {
+				return element.isEnabled();
+			}
+		});
+	}
 	
 	public boolean isDisplayed(String selector) {
-		log.debug("isEnabled: " + selector);
+		log.debug("isDisplayed: " + selector);
 		WebElement element = getElement(selector);
 		if (element != null) {
+			print(element.isDisplayed() +  " > " + element.getAttribute("style"));
 			return element.isDisplayed();
 		}
 		return false;
+	}
+	
+	public boolean isExists(String selector) {
+		List<WebElement> elements = driver.findElements(getBy(selector));
+		log.debug("isExists (" + elements.size() + "): " + selector);
+		return elements.size() != 0;
+	}
+	
+	public boolean isVisible() {
+		return this.isVisible(element);
+	}
+	
+	public boolean isVisible(String selector) {
+		return this.isVisible(getElement(selector));
+	}
+	
+	public boolean isVisible(WebElement element) {
+		log.debug("isVisible: " + getElementName(element));
+		if (element != null) {
+			return element.getAttribute("style").indexOf("display: none;") == -1;
+		}
+		return false;
+	}
+	
+	public void waitIsDisplayed(String selector) {
+		this.waitWhenTrue(selector, new IWaitCallback() {
+			public boolean isTrue(WebElement element) {
+				print(element.isDisplayed());
+				return element.isDisplayed();
+			}
+		});
 	}
 	
 	public void setBrowseFile(String path) {
 		log.debug("Browse File: " + path);
 		SeleniumUtils.fileBrowseDialog(driver, path);
 	}
-
-	public void waitPageLoad() {
-		SeleniumUtils.wait(driver, config.getPageLoadTimeout(), null);
-	}
-
-	public void waitPageLoad(String urlPath) {
-		SeleniumUtils.wait(driver, config.getPageLoadTimeout(), Pattern.compile(urlPath));
-	}
 	
 	public void waitWhenTrue(String selector, IWaitCallback callback) {
-		WebElement element = SeleniumUtils.waitAndFindElement(driver, findBy(selector), config.getPageLoadTimeout());
+		this.waitWhenTrue(SeleniumUtils.waitAndFindElement(driver, findBy(selector), config.getPageLoadTimeout()), callback);
+	}
+	
+	public void waitWhenTrue(WebElement element, IWaitCallback callback) {
 		for (int i = 0; i < config.getPageLoadTimeout(); i++) {
 			print('.', false);
 			if (callback.isTrue(element)) {
@@ -434,11 +554,20 @@ public class Container {
 	}
 	
 	public WebElement waitAndFindElement() {
-		return SeleniumUtils.waitAndFindElement(driver, locator, config.getPageLoadTimeout());
+		return this.waitAndFindElement(this.locator);
 	}
 	
 	public WebElement waitAndFindElement(String selector) {
-		return SeleniumUtils.waitAndFindElement(driver, findBy(selector), config.getPageLoadTimeout());
+		return this.waitAndFindElement(findBy(selector));
+	}
+	
+	public WebElement waitAndFindElement(By locator) {
+		log.trace("Wait element(s) = " + locator);
+		return SeleniumUtils.waitAndFindElement(driver, locator, config.getPageLoadTimeout());
+	}
+	
+	public void wait(float sec) {
+		mlsWait((int)sec * 1000);
 	}
 	
 	public void wait(int sec) {
@@ -465,5 +594,13 @@ public class Container {
 				System.out.print(message);
 			}
 		}
+	}
+	
+	public void print(WebElement element) {
+		print(executeScript("return arguments[0].outerHTML", element, null, null));
+	}
+	
+	public void print() {
+		this.print(element);
 	}
 }
