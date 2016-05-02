@@ -73,7 +73,7 @@ public class Container {
 	}
 	
 	public List<WebElement> findElements(String selector) {
-		return getElements(getBy(selector));
+		return getElements(getBy(selector), -1);
 	}
 	
 	public WebElement findElement(String selector, WebElement element) {
@@ -108,9 +108,13 @@ public class Container {
 		return getParent(node, "..");
 	}
 	
-	public Container getIFrame() {
-		driver.switchTo().frame(element);
-		return new Container(driver.switchTo().defaultContent(), config, "body");
+	public Container getIFrame(String selector) {
+		WebDriver frameDriver = driver.switchTo().frame(getElement(selector));
+		return new Container(frameDriver, config, "body");
+	}
+	
+	public void releaseIframe() {
+		driver.switchTo().defaultContent();
 	}
 	
 	public By getBy(String selector) {
@@ -141,18 +145,22 @@ public class Container {
 	}
 
 	public List<WebElement> getElements(String selector) {
-		return getElements(getBy(selector));
+		return getElements(selector, 1);
+	}
+	
+	public List<WebElement> getElements(String selector, int expectSize) {
+		return getElements(getBy(selector), expectSize);
 	}
 
-	public List<WebElement> getElements(By locator) {
+	public List<WebElement> getElements(By locator, int expectSize) {
 		log.trace("Find element(s) = " + locator);
 		List<WebElement> elements = driver.findElements(locator);
 		if (elements == null || elements.size() == 0) {
 			log.error("Cannot find an element for locator: " + locator + " [" + driver.getCurrentUrl() + "]");
 			fail();
 		}
-		if (elements.size() > 1) {
-			log.trace("Found elements=" + elements.size() + " for locator: " + locator);
+		if (expectSize == 1 && elements.size() > 1) {
+			log.warn("Found elements=" + elements.size() + " for locator: " + locator);
 		} else {
 			log.debug("Elements (" + elements.size() + ") - " + locator);
 		}
@@ -164,15 +172,12 @@ public class Container {
 	}
 
 	public WebElement getElement(By locator) {
-		List<WebElement> elements = getElements(locator);
+		List<WebElement> elements = getElements(locator, 1);
 		if (elements == null || elements.size() == 0) {
 			log.warn("Cannot find an element for locator: " + locator);
 			fail();
 		}
 		if (elements != null && elements.size() > 0) {
-			if (elements.size() > 1) {
-				log.warn("Found elements=" + elements.size() + " for selector: " + locator);
-			}
 			return elements.get(0);
 		}
 		return null;
@@ -196,19 +201,23 @@ public class Container {
 	}
 	
 	public void clearText(String selector) {
-		clearText(selector, 0);
+		clearText(selector, 1);
 	}
 	
 	public void clearText(String selector, int index) {
-		List<WebElement> elements = getElements(selector);
+		List<WebElement> elements = getElements(selector, index);
 		if (elements != null) {
 			for (int i = 0; i < elements.size(); i++) {
-				if (index == -1 || index == i) {
+				if (index == -1 || i == index -1) {
 					WebElement element = elements.get(i);
 					element.clear();
 				}
 			}
 		}
+	}
+	
+	public void clearText() {
+		element.clear();
 	}
 
 	public void setText(String selector, String value) {
@@ -229,6 +238,11 @@ public class Container {
 			elements.get(index).sendKeys(value);
 			SeleniumUtils.sleep(config.getActionDelay());
 		}
+	}
+	
+	public void setText(String value) {
+		element.sendKeys(value);
+		SeleniumUtils.sleep(config.getActionDelay());
 	}
 	
 	public void waitText(String selector, String value) {
@@ -390,25 +404,36 @@ public class Container {
 	}
 	
 	public WebElement getOptionByText(String selector, String text) {
+		return getOptionByText(selector, text, "option");
+	}
+
+	public WebElement getOptionByText(String selector, String text, String tagName) {
 		log.debug("OptionByText text=" + text + ", for selector: " + selector);
 		WebElement select = getElement(selector);
-		List<WebElement> options = select.findElements(By.tagName("option"));
-		for(WebElement option : options){
-	        if(option.getText().equals(text)) {
-	            return option;
+		List<WebElement> elements = select.findElements(By.tagName(tagName));
+		for(WebElement element : elements) {
+	        if(element.getText().equals(text)) {
+	            return element;
 	        }
 	    }
 		return null;
 	}
 	
 	public void selectOptionByText(String selector, String text) {
-		WebElement option = getOptionByText(selector, text);
+		selectOptionByText(selector, text, "option");
+	}
+	
+	public void selectOptionByText(String selector, String text, String tagName) {
+		WebElement option = getOptionByText(selector, text, tagName);
 		if (option != null) {
 			option.click();
+		} else {
+			fail("Cannot find option: '" + text + "' in: " + selector);
 		}
 	}
 	
 	public void click(String selector) {
+		waitIsEnabled(selector);
 		click(getElement(selector));
 	}
 	
@@ -452,6 +477,7 @@ public class Container {
 	}
 
 	public void waitIsEnabled(String selector) {
+		log.debug("waitIsEnabled: " + selector);
 		this.waitWhenTrue(selector, new IWaitCallback() {
 			public boolean isTrue(WebElement element) {
 				return element.isEnabled();
@@ -494,7 +520,6 @@ public class Container {
 	public void waitIsDisplayed(String selector) {
 		this.waitWhenTrue(selector, new IWaitCallback() {
 			public boolean isTrue(WebElement element) {
-				print(element.isDisplayed());
 				return element.isDisplayed();
 			}
 		});
