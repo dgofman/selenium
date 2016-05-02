@@ -100,6 +100,7 @@ log4j.properties
 ## direct log messages to stdout ###
 log4j.rootLogger=TRACE, StdoutTrace, StdoutDebug, StdoutInfo, StdoutWarn, StdoutErrorFatal, file
 log4j.logger.org.apache.http=ERROR
+log4j.logger.com.softigent.sftselenium=TRACE
 
 log4j.appender.StdoutTrace=org.apache.log4j.ConsoleAppender
 log4j.appender.StdoutTrace.layout=org.apache.log4j.PatternLayout
@@ -137,9 +138,9 @@ log4j.appender.StdoutErrorFatal=org.apache.log4j.ConsoleAppender
 log4j.appender.StdoutErrorFatal.layout=org.apache.log4j.PatternLayout
 log4j.appender.StdoutErrorFatal.layout.conversionPattern=\u001b[31;1m%5p [%C:%L]\n%m\n
 log4j.appender.StdoutErrorFatal.threshold=ERROR
-log4j.appender.StdoutWarn.filter.filter1=org.apache.log4j.varia.LevelRangeFilter
-log4j.appender.StdoutWarn.filter.filter1.levelMin=ERROR
-log4j.appender.StdoutWarn.filter.filter1.levelMax=ERROR
+log4j.appender.StdoutErrorFatal.filter.filter1=org.apache.log4j.varia.LevelRangeFilter
+log4j.appender.StdoutErrorFatal.filter.filter1.levelMin=ERROR
+log4j.appender.StdoutErrorFatal.filter.filter1.levelMax=ERROR
 
 
 log4j.appender.file=org.apache.log4j.RollingFileAppender
