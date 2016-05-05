@@ -308,17 +308,17 @@ public class Container {
 	
 	public Boolean validateText(String value) {
 		log.debug("Validate Text value=" + value + ", for selector: " + selector);
-		return validateString(element.getText(), value);
+		return validateString(getHTML(element), value);
 	}
 
 	public Boolean validateText(String selector, String value) {
 		log.debug("Validate Text value=" + value + ", for selector: " + selector);
-		return validateString(getText(selector), value);
+		return validateString(getHTML(selector), value);
 	}
 	
 	public Boolean assertText(String selector, String value) {
 		log.debug("Assert Text value=" + value + ", for selector: " + selector);
-		return assertString(getText(selector), value);
+		return assertString(getHTML(selector), value);
 	}
 	
 	public void setHTML(String selector, String value) {
@@ -328,7 +328,11 @@ public class Container {
 	}
 	
 	public String getHTML(String selector) {
-		return getAttributeValue(selector, "innerHTML");
+		return getHTML(getElement(selector));
+	}
+	
+	public String getHTML(WebElement element) {
+		return getAttributeValue(element, "innerHTML");
 	}
 	
 	public Boolean validateHTML(String selector, String value) {
@@ -347,8 +351,11 @@ public class Container {
 	}
 
 	public String getAttributeValue(String selector, String name) {
-		log.debug("Get attribute=" + name + ", for selector: " + selector);
-		WebElement element = getElement(selector);
+		return getAttributeValue(getElement(selector), name);
+	}
+	
+	public String getAttributeValue(WebElement element, String name) {
+		log.debug("Get attribute=" + name + ", for element: " + getElementName(element));
 		if (element != null) {
 			return element.getAttribute(name);
 		}
@@ -468,8 +475,9 @@ public class Container {
 	}
 	
 	public void click(String selector, int x, int y) {
-		waitIsEnabled(selector);
-		click(getElement(selector), x, y);
+		WebElement element = waitAndFindElement(selector);
+		waitIsDisplayed(selector);
+		click(element, x, y);
 	}
 	
 	public void click() {
@@ -623,6 +631,7 @@ public class Container {
 	public void waitIsDisplayed(String selector) {
 		this.waitWhenTrue(selector, new IWaitCallback() {
 			public boolean isTrue(WebElement element) {
+				print('.', false);
 				return element.isDisplayed();
 			}
 		});
@@ -686,7 +695,7 @@ public class Container {
 	}
 	
 	public WebElement waitAndFindElement(String selector) {
-		return this.waitAndFindElement(findBy(selector));
+		return this.waitAndFindElement(getBy(selector));
 	}
 	
 	public WebElement waitAndFindElement(By locator) {
