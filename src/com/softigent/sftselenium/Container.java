@@ -287,14 +287,17 @@ public class Container {
 			SeleniumUtils.sleep(config.getActionDelay());
 		}
 	}
-
-	public String getText(String selector) {
-		log.debug("Get Text for selector: " + selector);
-		WebElement element = getElement(selector);
+	
+	public String getText(WebElement element) {
+		log.debug("Get Text for selector: " + getElementName(element));
 		if (element != null) {
 			return element.getText();
 		}
 		return null;
+	}
+
+	public String getText(String selector) {
+		return getText(getElement(selector));
 	}
 	
 	public String getValue(String selector) {
@@ -308,17 +311,17 @@ public class Container {
 	
 	public Boolean validateText(String value) {
 		log.debug("Validate Text value=" + value + ", for selector: " + selector);
-		return validateString(getHTML(element), value);
+		return validateString(getText(element), value);
 	}
 
 	public Boolean validateText(String selector, String value) {
 		log.debug("Validate Text value=" + value + ", for selector: " + selector);
-		return validateString(getHTML(selector), value);
+		return validateString(getText(selector), value);
 	}
 	
 	public Boolean assertText(String selector, String value) {
 		log.debug("Assert Text value=" + value + ", for selector: " + selector);
-		return assertString(getHTML(selector), value);
+		return assertString(getText(selector), value);
 	}
 	
 	public void setHTML(String selector, String value) {
@@ -627,7 +630,11 @@ public class Container {
 	public boolean isVisible(WebElement element) {
 		log.debug("isVisible: " + getElementName(element));
 		if (element != null) {
-			return element.getAttribute("style").indexOf("display: none;") == -1;
+			try {
+				return element.getAttribute("style").indexOf("display: none;") == -1;
+			} catch (Exception e) {
+				return false;
+			}
 		}
 		return false;
 	}

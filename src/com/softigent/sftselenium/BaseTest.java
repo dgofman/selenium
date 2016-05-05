@@ -1,5 +1,6 @@
 package com.softigent.sftselenium;
 
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
@@ -79,6 +80,32 @@ public abstract class BaseTest  {
 		connector.getDriver().navigate().to(uri + pageName);
 	}
 	
+	public void closeBrowser() {
+		connector.getDriver().quit();
+	}
+	
+	public void closeOtherTabs() {
+		String currentTab = connector.getDriver().getWindowHandle();
+		for(String winHandle : connector.getDriver().getWindowHandles()) {
+			if (!winHandle.equals(currentTab)) {
+				connector.getDriver().switchTo().window(winHandle).close();
+			}
+		}
+		connector.getDriver().switchTo().window(currentTab);
+	}
+	
+	public Set<String> getWindowHandles() {
+		return connector.getDriver().getWindowHandles();
+	}
+	
+	public String getWindowHandle() {
+		return connector.getDriver().getWindowHandle();
+	}
+
+	public WebDriver switchTab(String winHandle) {
+		return connector.getDriver().switchTo().window(winHandle);
+	}
+	
 	public static void print(Object message) {
 		System.out.println(message);
 	}
@@ -91,7 +118,7 @@ public abstract class BaseTest  {
 	public void tearDown(boolean isClose) throws Exception {
 		log.info("<<<<< Finish test: " + className);
 		if (isClose) {
-			connector.getDriver().quit();
+			closeBrowser();
 		}
 	}
 }
