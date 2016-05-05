@@ -466,8 +466,12 @@ public class Container {
 	}
 	
 	public void enter(String selector) {
-		log.debug("Enter on: " + selector);
-		getElement(selector).sendKeys(Keys.ENTER);
+		enter(getElement(selector));
+	}
+	
+	public void enter(WebElement element) {
+		log.debug("Enter on: " + getElementName(element));
+		element.sendKeys(Keys.ENTER);
 	}
 	
 	public void click(String selector) {
