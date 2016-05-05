@@ -3,12 +3,17 @@ package com.softigent.sftselenium;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.InputEvent;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -27,9 +32,9 @@ public class Container {
 		return selector;
 	}
 	
-	public String getSelector(WebElement element) {
+	public static String getSelector(WebElement element) {
 		String[] s = element.toString().split(" -> ");
-		return s[1].replace("css selector: ", "");
+		return s[1].replace("css selector: ", "").replace("]", "");
 	}
 
 	public Container(WebDriver driver, Config config, String selector) {
@@ -60,10 +65,6 @@ public class Container {
 		return new Container(driver, config, selector, locator, element);
 	}
 	
-	public By findBy(String selector) {
-		return getBy(selector);
-	}
-	
 	public WebElement findElement(String selector) {
 		return findElement(getBy(selector));
 	}
@@ -78,6 +79,10 @@ public class Container {
 	
 	public WebElement findElement(String selector, WebElement element) {
 		return element.findElement(getBy(selector));
+	}
+	
+	public static WebElement findElement(WebElement parentElement, String path) {
+		return parentElement.findElement(findBy(path));
 	}
 	
 	public Container find(String selector) {
@@ -135,6 +140,19 @@ public class Container {
 		return locator;
 	}
 	
+	public static By findBy(String selector) {
+		By locator;
+		if (selector.startsWith("xpath:")) {
+			selector = selector.substring(6);
+			log.debug("Find selector: " + selector);
+			locator = By.xpath(selector);
+		} else {
+			log.debug("Find selector: " + selector);
+			locator = By.cssSelector(selector);
+		}
+		return locator;
+	}
+	
 	public String getElementName(WebElement element) {
 		String s[] = element.toString().split(" -> ");
 		if (s.length > 2) {
@@ -153,7 +171,7 @@ public class Container {
 	}
 
 	public List<WebElement> getElements(By locator, int expectSize) {
-		log.trace("Find element(s) = " + locator);
+		log.trace("Find element(s) " + locator);
 		List<WebElement> elements = driver.findElements(locator);
 		if (elements == null || elements.size() == 0) {
 			log.error("Cannot find an element for locator: " + locator + " [" + driver.getCurrentUrl() + "]");
@@ -193,6 +211,10 @@ public class Container {
 	}
 	
 	public Object executeScript(String command, WebElement element) {
+		return this.executeScript(command, element, null, null);
+	}
+	
+	public Object executeScript(String command) {
 		return this.executeScript(command, element, null, null);
 	}
 	
@@ -407,12 +429,16 @@ public class Container {
 		return getOptionByText(selector, text, "option");
 	}
 
-	public WebElement getOptionByText(String selector, String text, String tagName) {
-		log.debug("OptionByText text=" + text + ", for selector: " + selector);
+	public WebElement getOptionByText(String selector, String value, String tagName) {
+		log.debug("OptionByText text=" + value + ", for selector: " + selector);
 		WebElement select = getElement(selector);
 		List<WebElement> elements = select.findElements(By.tagName(tagName));
 		for(WebElement element : elements) {
-	        if(element.getText().equals(text)) {
+			String text = element.getText();
+			if (text == null || text.equals("")) {
+				text = element.getAttribute("innerHTML");
+			}
+	        if(text != null && text.equals(value)) {
 	            return element;
 	        }
 	    }
@@ -424,17 +450,26 @@ public class Container {
 	}
 	
 	public void selectOptionByText(String selector, String text, String tagName) {
-		WebElement option = getOptionByText(selector, text, tagName);
-		if (option != null) {
-			option.click();
+		WebElement element = getOptionByText(selector, text, tagName);
+		if (element != null) {
+			element.click();
 		} else {
-			fail("Cannot find option: '" + text + "' in: " + selector);
+			fail("Cannot find " + tagName + ": '" + text + "' in: " + selector);
 		}
 	}
 	
+	public void enter(String selector) {
+		log.debug("Enter on: " + selector);
+		getElement(selector).sendKeys(Keys.ENTER);
+	}
+	
 	public void click(String selector) {
+		this.click(selector, 0, 0);
+	}
+	
+	public void click(String selector, int x, int y) {
 		waitIsEnabled(selector);
-		click(getElement(selector));
+		click(getElement(selector), x, y);
 	}
 	
 	public void click() {
@@ -442,20 +477,75 @@ public class Container {
 	}
 	
 	public void click(WebElement element) {
-		log.debug("Click on: " + getElementName(element));
+		this.click(element, 0, 0);
+	}
+	
+	public void click(WebElement parentElement, String path) {
+		this.click(findElement(parentElement, path), 0, 0);
+	}
+	
+	public void click(WebElement parentElement, String path, int x, int y) {
+		this.click(parentElement.findElement(findBy(path)), x, y);
+	}
+
+	public void click(WebElement element, int x, int y) {
 		if (element != null) {
-			try {
-				element.click();
-			} catch(Exception e) {
-				log.warn("Cannot execute click event: " + getElementName(element) + " [" + driver.getCurrentUrl() + "]\n" +
-					" Will try to click again after " + config.getClickDelay() + " seconds");
-				wait(config.getClickDelay());
-				Actions action = new Actions(driver);
-				action.moveToElement(element).click(element);
-				action.build().perform();
+			if (x != 0 || y != 0) {
+				try {
+					log.trace("Robot click on: " + getElementName(element));
+					Robot robot = new Robot();
+					robot.mouseMove(element.getLocation().x + x, element.getLocation().y + y);
+					robot.mousePress(InputEvent.BUTTON1_MASK);
+					robot.mouseRelease(InputEvent.BUTTON1_MASK);
+					SeleniumUtils.sleep(config.getActionDelay());
+				} catch (AWTException e) {
+					e.printStackTrace();
+				}
+			} else {
+				try {
+					log.debug("Click on: " + getElementName(element));
+					element.click();
+					SeleniumUtils.sleep(config.getActionDelay());
+				} catch(Exception e) {
+					log.warn("Cannot execute click event: " + getElementName(element) + " [" + driver.getCurrentUrl() + "]\n" +
+						" Will try to click again after " + config.getClickDelay() + " seconds");
+					wait(config.getClickDelay());
+					mouseClick(element);
+				}
 			}
-			SeleniumUtils.sleep(config.getActionDelay());
 		}
+	}
+	
+	public void mouseClick(String selector) {
+		mouseClick(getElement(selector));
+	}
+	
+	public void mouseClick(WebElement element) {
+		this.mouseClick(element, 0, 0);
+	}
+	
+	public void mouseClick(WebElement element, int x, int y) {
+		log.debug("Mouse Click (" + x + 'x' + y + ") on: " + getElementName(element));
+		Actions action = new Actions(driver);
+		action.moveToElement(element, x, y).click();
+		action.build().perform();
+		SeleniumUtils.sleep(config.getActionDelay());
+	}
+	
+	public void mouseMove(String selector) {
+		mouseMove(getElement(selector));
+	}
+	
+	public void mouseMove(WebElement element) {
+		this.mouseMove(element, 0, 0);
+	}
+	
+	public void mouseMove(WebElement element, int x, int y) {
+		log.debug("Mouse Move (" + x + 'x' + y + ") on: " + getElementName(element));
+		Actions action = new Actions(driver);
+		action.moveToElement(element, x, y);
+		action.build().perform();
+		SeleniumUtils.sleep(config.getActionDelay());
 	}
 
 	public boolean isSelected(String selector) {
@@ -474,6 +564,19 @@ public class Container {
 			return element.isEnabled();
 		}
 		return false;
+	}
+	
+	public Alert alertWindow(int state) {
+		Alert alert = driver.switchTo().alert();
+		switch (state) {
+			case 1:
+				alert.accept(); //for two buttons, choose the affirmative one
+				break;
+			case 2:
+				alert.dismiss();
+				break;
+		}
+	    return alert;
 	}
 
 	public void waitIsEnabled(String selector) {
@@ -531,7 +634,7 @@ public class Container {
 	}
 	
 	public void waitWhenTrue(String selector, IWaitCallback callback) {
-		this.waitWhenTrue(SeleniumUtils.waitAndFindElement(driver, findBy(selector), config.getPageLoadTimeout()), callback);
+		this.waitWhenTrue(SeleniumUtils.waitAndFindElement(driver, getBy(selector), config.getPageLoadTimeout()), callback);
 	}
 	
 	public void waitWhenTrue(WebElement element, IWaitCallback callback) {
