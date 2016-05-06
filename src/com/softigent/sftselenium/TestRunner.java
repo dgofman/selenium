@@ -26,7 +26,8 @@ public class TestRunner {
 	protected int totalTests = 0;
 	protected int failed = 0;
 	protected int ignored = 0;
-	protected int succeed = 0;
+	protected int countSucceed = 0;
+	protected int countFailed = 0;
 	
 	public TestRunner(String fileName, String title, Class testSuite) throws IOException {
 		this.title = title;
@@ -71,12 +72,15 @@ public class TestRunner {
 				failed += result.getFailureCount();
 				ignored += result.getIgnoreCount();
 				if (result.wasSuccessful()) {
-					succeed++;
+					countSucceed++;
+				} else {
+					countFailed++;
 				}
 			}
 		}
 		log.trace("COMPLETED in : " + getTime(new Date().getTime() - startTime.getTime()) 
-				+ "\nTotal TestCases:" + totalTestCases + "\nTotal Succeed: " + succeed
+				+ "\nTotal TestCases:" + totalTestCases
+				+ "\nTotal Succeed: " + countSucceed + "\nTotal Failed: " + countFailed
 				+ "\nTotal Tests: " + totalTests + "\nTotal Failed: " + failed
 				+ "\nTotal Ignored: " + ignored);
 
@@ -113,10 +117,11 @@ public class TestRunner {
 		writer.println("<div style='background:lightskyblue; margin-top: 40px;'>");
 		writer.println("<p><b>Total Time</b>: " + getTime(new Date().getTime() - startTime.getTime()) + "</p>");
 		writer.println("<p><b>Total TestCases</b>: " + totalTestCases + "</p>");
-		writer.println("<p><b>Total Succeed</b>: " + succeed + "</p>");
-		writer.println("<p><b>Total Tests</b>: " + totalTests + "</p>");
-		writer.println("<p><b>Total Failed</b>: " + failed + "</p>");
-		writer.println("<p><b>Total Ignored</b>: " + ignored + "</p>");
+		writer.println("<p><b>Total TestCases Succeed</b>: " + countSucceed + "</p>");
+		writer.println("<p><b>Total TestCases Failed</b>: " + countSucceed + "</p>");
+		writer.println("<p><b>Total Run Tests</b>: " + totalTests + "</p>");
+		writer.println("<p><b>Total Test Failed</b>: " + failed + "</p>");
+		writer.println("<p><b>Total Test Ignored</b>: " + ignored + "</p>");
 		writer.println("</div>");
 	}
 
