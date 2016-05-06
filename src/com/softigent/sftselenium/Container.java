@@ -32,6 +32,14 @@ public class Container {
 		return selector;
 	}
 	
+	public WebDriver getDriver() {
+		return driver;
+	}
+	
+	public WebElement getElement() {
+		return element;
+	}
+	
 	public static String getSelector(WebElement element) {
 		String[] s = element.toString().split(" -> ");
 		return s[1].replace("css selector: ", "").replace("]", "");
@@ -88,10 +96,6 @@ public class Container {
 	public Container find(String selector) {
 		return new Container(driver, config, this.selector + ' ' + selector, getBy(selector));
 	}
-	
-	public WebElement getElement() {
-		return element;
-	}
 			
 	public static WebElement getParent(WebElement element, String path) {
 		return element.findElement(By.xpath(path));
@@ -114,8 +118,9 @@ public class Container {
 	}
 	
 	public Container getIFrame(String selector) {
-		WebDriver frameDriver = driver.switchTo().frame(getElement(selector));
-		return new Container(frameDriver, config, "body");
+		WebElement element = getElement(selector);
+		WebDriver frameDriver = driver.switchTo().frame(element);
+		return new Container(frameDriver, config, "body", By.cssSelector("body"), element);
 	}
 	
 	public void releaseIframe() {
@@ -507,7 +512,7 @@ public class Container {
 		if (element != null) {
 			if (x != 0 || y != 0) {
 				try {
-					log.trace("Robot click on: " + getElementName(element));
+					log.trace("Robot click (" + x + 'x' + y + ") on: " + getElementName(element));
 					Robot robot = new Robot();
 					robot.mouseMove(element.getLocation().x + x, element.getLocation().y + y);
 					robot.mousePress(InputEvent.BUTTON1_MASK);
@@ -532,11 +537,15 @@ public class Container {
 	}
 	
 	public void mouseClick(String selector) {
-		mouseClick(getElement(selector));
+		mouseClick(selector, 0, 0);
 	}
 	
 	public void mouseClick(WebElement element) {
 		this.mouseClick(element, 0, 0);
+	}
+	
+	public void mouseClick(String selector, int x, int y) {
+		mouseClick(getElement(selector), x, y);
 	}
 	
 	public void mouseClick(WebElement element, int x, int y) {
