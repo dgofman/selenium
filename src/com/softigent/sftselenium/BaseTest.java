@@ -1,5 +1,6 @@
 package com.softigent.sftselenium;
 
+import java.io.File;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -29,6 +30,16 @@ public abstract class BaseTest  {
 	}
 	
 	public static Connector createConnector(Config config, String driverName) {
+		String driverPath = config.getProperty("chrome_driver_path");
+		if (driverPath != null) {
+			System.setProperty("webdriver.chrome.driver", new File(driverPath).getAbsolutePath());
+		}
+		
+		driverPath = config.getProperty("ie_driver_path");
+		if (driverPath != null) {
+			System.setProperty("webdriver.ie.driver", new File(driverPath).getAbsolutePath());
+		}
+
 		WebDriver driver = SeleniumUtils.getDriver(driverName, config);
 		return new Connector(driver, config);
 	}
