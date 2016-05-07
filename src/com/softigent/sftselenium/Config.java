@@ -15,17 +15,22 @@ public class Config extends Properties {
 	private static final long serialVersionUID = 238683884179262164L;
 	static Logger log = Logger.getLogger(Config.class.getName());
 	
-	public Config(File propertyFile) {
+	public Config(String propertyFile) {
 		this(propertyFile, "action_delay", "click_delay", "load_timeout");
 	}
 
-	public Config(File propertyFile, String delayKey, String clickDelay,  String timeoutKey) {
+	public Config(String propertyFile, String delayKey, String clickDelay,  String timeoutKey) {
 		super();
-		log.info("File properties path " + propertyFile.getAbsolutePath());
 		try {
-			this.load(new FileInputStream(propertyFile));
-		} catch (Exception e) {
-			e.printStackTrace();
+			log.info("File properties path " + Config.class.getResource('/' + propertyFile).getPath());
+			this.load(Config.class.getResourceAsStream('/' + propertyFile));
+		} catch (Exception e1) {
+			try {
+				log.info("File properties path " + new File(propertyFile).getAbsolutePath());
+				this.load(new FileInputStream(propertyFile));
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
 		}
 		
 		this.actionDelay = Float.parseFloat(this.getProperty(delayKey) != null ? this.getProperty(delayKey) : "0.5");
