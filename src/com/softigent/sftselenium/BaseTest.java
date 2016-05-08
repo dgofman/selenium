@@ -128,8 +128,5 @@ public abstract class BaseTest  {
 	
 	public void tearDown(boolean isClose) throws Exception {
 		log.info("<<<<< Finish test: " + className);
-		if (isClose) {
-			closeBrowser();
-		}
 	}
 }

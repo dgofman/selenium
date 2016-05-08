@@ -22,12 +22,12 @@ public class Config extends Properties {
 	public Config(String propertyFile, String delayKey, String clickDelay,  String timeoutKey) {
 		super();
 		try {
-			log.info("File properties path " + Config.class.getResource('/' + propertyFile).getPath());
-			this.load(Config.class.getResourceAsStream('/' + propertyFile));
+			log.info("File properties path " + new File(propertyFile).getAbsolutePath());
+			this.load(new FileInputStream(propertyFile));
 		} catch (Exception e1) {
 			try {
-				log.info("File properties path " + new File(propertyFile).getAbsolutePath());
-				this.load(new FileInputStream(propertyFile));
+				log.info("File properties path " + Config.class.getResource('/' + propertyFile).getPath());
+				this.load(Config.class.getResourceAsStream('/' + propertyFile));
 			} catch (Exception e2) {
 				e2.printStackTrace();
 			}

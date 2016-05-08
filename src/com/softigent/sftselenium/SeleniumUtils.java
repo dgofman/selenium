@@ -17,6 +17,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -39,8 +40,10 @@ public class SeleniumUtils {
 			driver = new ChromeDriver(options);
 		} else if (name.equals("Safari")) {
 			driver = new SafariDriver();
-		} else if (name.equals("ie")) {
-			driver = new InternetExplorerDriver();
+		} else if (name.equals("IE")) {
+			DesiredCapabilities dc = DesiredCapabilities.internetExplorer();
+			dc.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
+			driver = new InternetExplorerDriver(dc);
 		}
 
 		if (isFullScreen) {

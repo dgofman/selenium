@@ -19,6 +19,7 @@ public class TestRunner {
 
 	private static final Logger log = Logger.getLogger(TestRunner.class);
 	
+	private String fileName;
 	private String title;
 	private Class testSuite;
 	
@@ -33,6 +34,7 @@ public class TestRunner {
 	protected Map<Class<?>, Result> failResults;
 	
 	public TestRunner(String fileName, String title, Class testSuite) throws IOException {
+		this.fileName = fileName;
 		this.title = title;
 		this.testSuite = testSuite;
 		this.writer = new PrintWriter(fileName, "UTF-8");
@@ -70,34 +72,47 @@ public class TestRunner {
 			totalTestCases = suiteClassLst.length;
 			for (Class<?> testCase : suiteClassLst) {
 				log.info("Start: " + testCase.getName());
-				Result result = JUnitCore.runClasses(testCase);
-				for (Failure failure : result.getFailures()) {
-					log.info(failure.toString());
-				}
-				log.info("End: " + testCase.getName() + " in " + getTime(result.getRunTime()) + "\nTests: "
-						+ result.getRunCount() + "\nFailed: " + result.getFailureCount() 
-						+ "\nIgnored: " + result.getIgnoreCount());
-
-				addResult(testCase, result);
-
-				totalTests += result.getRunCount();
-				failed += result.getFailureCount();
-				ignored += result.getIgnoreCount();
-				if (result.wasSuccessful()) {
-					countSucceed++;
-				} else {
-					failResults.put(testCase, result);
-					countFailed++;
+				try {
+					Result result = JUnitCore.runClasses(testCase);
+					for (Failure failure : result.getFailures()) {
+						log.info(failure.toString());
+					}
+					log.info("End: " + testCase.getName() + " in " + getTime(result.getRunTime()) + "\nTests: "
+							+ result.getRunCount() + "\nFailed: " + result.getFailureCount() 
+							+ "\nIgnored: " + result.getIgnoreCount());
+	
+					addResult(testCase, result);
+	
+					totalTests += result.getRunCount();
+					failed += result.getFailureCount();
+					ignored += result.getIgnoreCount();
+					if (result.wasSuccessful()) {
+						countSucceed++;
+					} else {
+						failResults.put(testCase, result);
+						countFailed++;
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 		}
+		
+		Connector con = Connector.instance;
+		if (con != null && con.getConfig() != null && con.getDriver() != null) {
+			if ("true".equals(con.getConfig().getProperty("close_browser"))) {
+				con.getDriver().close();
+			}
+		}
+		
 		log.trace("COMPLETED in : " + getTime(new Date().getTime() - startTime.getTime()) 
 				+ "\nTotal TestCases: " + totalTestCases
 				+ "\nTotal TestCases Succeed: " + countSucceed 
 				+ "\nTotal TestCases Failed: " + countFailed
 				+ "\nTotal Tests: " + totalTests 
 				+ "\nTotal Tests Failed: " + failed
-				+ "\nTotal Tests Ignored: " + ignored);
+				+ "\nTotal Tests Ignored: " + ignored
+				+ "\nReport File: " + fileName);
 
 		writer.println("</ul>");
 
