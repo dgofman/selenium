@@ -25,6 +25,7 @@ public class Container {
 	private String selector;
 	private By locator;
 	private WebElement element;
+	private WebElement iframeElement;
 
 	static Logger log = Logger.getLogger(Container.class.getName());
 
@@ -38,6 +39,10 @@ public class Container {
 	
 	public WebElement getElement() {
 		return element;
+	}
+	
+	public WebElement getIFrameElement() {
+		return iframeElement;
 	}
 	
 	public static String getSelector(WebElement element) {
@@ -120,7 +125,9 @@ public class Container {
 	public Container getIFrame(String selector) {
 		WebElement element = getElement(selector);
 		WebDriver frameDriver = driver.switchTo().frame(element);
-		return new Container(frameDriver, config, "body", By.cssSelector("body"), element);
+		Container iframe = new Container(frameDriver, config, "body", By.cssSelector("body"));
+		iframe.iframeElement = element;
+		return iframe;
 	}
 	
 	public void releaseIframe() {
