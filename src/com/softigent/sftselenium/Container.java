@@ -692,8 +692,21 @@ public class Container {
 	public Boolean validateString(String str1, String str2) {
 		return validateString(str1, str2, false);
 	}
-
+	
 	public Boolean validateString(String str1, String str2, boolean isAssert) {
+		boolean isTrue = compareString(str1, str2);
+		if (!isTrue) {
+			log.error("\n'" + str1 + "' != \n'" + str2 + "'");
+		}
+
+		if (isAssert) {
+			assertTrue(isTrue);
+		}
+		
+		return isTrue;
+	}
+
+	public Boolean compareString(String str1, String str2) {
 		log.debug("validateString: '" + str1 + "' = '" + str2 + "'");
 		boolean isTrue;
 		
@@ -705,18 +718,9 @@ public class Container {
 				isTrue = Pattern.compile(str2).matcher(str1).matches();
 			}
 		}
-		
-		if (!isTrue) {
-			log.error("\n'" + str1 + "' != \n'" + str2 + "'");
-		}
-		
-		if (isAssert) {
-			assertTrue(isTrue);
-		}
-		
 		return isTrue;
 	}
-	
+
 	public WebElement waitAndFindElement() {
 		return this.waitAndFindElement(this.locator);
 	}
