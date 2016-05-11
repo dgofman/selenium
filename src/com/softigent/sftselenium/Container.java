@@ -130,8 +130,8 @@ public class Container {
 		return iframe;
 	}
 	
-	public void releaseIframe() {
-		driver.switchTo().defaultContent();
+	public WebDriver switchToDefault() {
+		return driver.switchTo().defaultContent();
 	}
 	
 	public By getBy(String selector) {
@@ -319,6 +319,16 @@ public class Container {
 			return element.getAttribute("value");
 		}
 		return null;
+	}
+	
+	public Boolean compareText(String value) {
+		log.debug("Compare Text value=" + value + ", for selector: " + selector);
+		return compareString(getText(element), value);
+	}
+	
+	public Boolean compareText(String selector, String value) {
+		log.debug("Compare Text value=" + value + ", for selector: " + selector);
+		return compareString(getText(selector), value);
 	}
 	
 	public Boolean validateText(String value) {
@@ -629,6 +639,10 @@ public class Container {
 		return false;
 	}
 	
+	public boolean isExists() {
+		return element != null;
+	}
+	
 	public boolean isExists(String selector) {
 		List<WebElement> elements = driver.findElements(getBy(selector));
 		log.debug("isExists (" + elements.size() + "): " + selector);
@@ -692,8 +706,21 @@ public class Container {
 	public Boolean validateString(String str1, String str2) {
 		return validateString(str1, str2, false);
 	}
-
+	
 	public Boolean validateString(String str1, String str2, boolean isAssert) {
+		boolean isTrue = compareString(str1, str2);
+		if (!isTrue) {
+			log.error("\n'" + str1 + "' != \n'" + str2 + "'");
+		}
+
+		if (isAssert) {
+			assertTrue(isTrue);
+		}
+		
+		return isTrue;
+	}
+
+	public Boolean compareString(String str1, String str2) {
 		log.debug("validateString: '" + str1 + "' = '" + str2 + "'");
 		boolean isTrue;
 		
@@ -702,21 +729,13 @@ public class Container {
 		} else {
 			isTrue = str1.equals(str2);
 			if (!isTrue) {
-				isTrue = Pattern.compile(str2).matcher(str1).matches();
+				str2 = str2.replaceAll("\\(", "\\\\(").replaceAll("\\)", "\\\\)");
+				isTrue = Pattern.compile(str2, Pattern.DOTALL).matcher(str1).matches();
 			}
 		}
-		
-		if (!isTrue) {
-			log.error("\n'" + str1 + "' != \n'" + str2 + "'");
-		}
-		
-		if (isAssert) {
-			assertTrue(isTrue);
-		}
-		
 		return isTrue;
 	}
-	
+
 	public WebElement waitAndFindElement() {
 		return this.waitAndFindElement(this.locator);
 	}

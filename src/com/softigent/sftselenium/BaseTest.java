@@ -43,7 +43,7 @@ public abstract class BaseTest  {
 		WebDriver driver = SeleniumUtils.getDriver(driverName, config);
 		return new Connector(driver, config);
 	}
-
+	
 	public Container createContainer(String selector) {
 		return new Container(connector.getDriver(), connector.getConfig(), selector);
 	}
@@ -58,6 +58,10 @@ public abstract class BaseTest  {
 	
 	public Container createContainer(WebElement element, String xpath) {
 		return new Container(connector.getDriver(), connector.getConfig(), Container.getParent(element, xpath));
+	}
+	
+	public Container createWindowContainer(String windowTitle) {
+		return new Container(switchWindow(windowTitle), connector.getConfig(), "body");
 	}
 	
 	public void waitPageLoad() {
@@ -113,10 +117,10 @@ public abstract class BaseTest  {
 		return connector.getDriver().getWindowHandle();
 	}
 
-	public WebDriver switchTab(String winHandle) {
+	public WebDriver switchWindow(String winHandle) {
 		return connector.getDriver().switchTo().window(winHandle);
 	}
-	
+
 	public static void print(Object message) {
 		System.out.println(message);
 	}
