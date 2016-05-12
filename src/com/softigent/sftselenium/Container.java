@@ -185,7 +185,7 @@ public class Container {
 	public List<WebElement> getElements(By locator, int expectSize) {
 		log.trace("Find element(s) " + locator);
 		List<WebElement> elements = driver.findElements(locator);
-		if (elements == null || elements.size() == 0) {
+		if (expectSize != -1 && (elements == null || elements.size() == 0)) {
 			log.error("Cannot find an element for locator: " + locator + " [" + driver.getCurrentUrl() + "]");
 			fail();
 		}
@@ -697,6 +697,10 @@ public class Container {
 			wait(1);
 		}
 		log.error("TIMEOUT: [" + driver.getCurrentUrl() + "]");
+	}
+	
+	public static void assertFail(String message) {
+		fail(message);
 	}
 
 	public Boolean assertString(String str1, String str2) {
