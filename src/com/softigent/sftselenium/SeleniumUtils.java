@@ -11,6 +11,7 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -74,8 +75,22 @@ public class SeleniumUtils {
 	}
 	
 	public static WebElement waitAndFindElement(WebDriver driver, By locator, long timeoutSec) {
+		return waitAndFindElement(driver, locator, timeoutSec, true);
+	}
+	
+	public static WebElement waitAndFindElement(WebDriver driver, By locator, long timeoutSec, boolean isVisible) {
 	  WebDriverWait wait = new WebDriverWait(driver, timeoutSec);
-	  return wait.until(ExpectedConditions.presenceOfElementLocated(locator));
+	  try {
+		  if (isVisible) {
+			  return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+		  } else {
+			  return wait.until(ExpectedConditions.presenceOfElementLocated(locator));
+		  }
+		} catch(NoSuchElementException nsee) {
+	        throw new NoSuchElementException("NoSuchElementException: Locator not found:" + locator);
+	    } catch(TimeoutException toe) {
+	    	throw new TimeoutException("TimeoutException: Locator not visible:" + locator);
+	    }
 	}
 
 	public static void sleep(float seconds) {

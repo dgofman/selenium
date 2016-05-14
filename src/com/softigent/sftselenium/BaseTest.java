@@ -5,6 +5,9 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.junit.Rule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -15,8 +18,6 @@ public abstract class BaseTest  {
 	protected Logger log;
 	protected String className;
 
-	protected static BaseTest testClass;
-	
 	public final Container body;
 
 	public BaseTest(Connector connector) {
@@ -124,13 +125,16 @@ public abstract class BaseTest  {
 	public static void print(Object message) {
 		System.out.println(message);
 	}
-
-	public void setUp() throws Exception {
-		log.info(">>>>> Start test: " + className);
-		testClass = this;
-	}
 	
-	public void tearDown(boolean isClose) throws Exception {
-		log.info("<<<<< Finish test: " + className);
-	}
+	@Rule
+    public TestWatcher testWatcher = new TestWatcher() {
+        @Override
+        protected void starting(final Description description) {
+        	log.info(">>>>> Start " + description.getClassName() + "::" + description.getMethodName());
+        }
+        @Override
+        protected void finished(final Description description) {
+        	log.info(">>>>> End " + description.getClassName() + "::" + description.getMethodName());
+        }
+    };
 }

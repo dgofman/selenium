@@ -588,6 +588,21 @@ public class Container {
 		action.build().perform();
 		SeleniumUtils.sleep(config.getActionDelay());
 	}
+	
+	public void mouseDragAndDrop(String source, String target) {
+		mouseDragAndDrop(getElement(source), getElement(target));
+	}
+	
+	public void mouseDragAndDrop(WebElement source, WebElement target) {
+		log.debug("Mouse DragAndDrop: source=" + getElementName(source) + ", target=" + getElementName(target));
+		Actions action = new Actions(driver);
+		/*action.clickAndHold(source)
+			   .moveToElement(target)
+			   .release(target);*/
+		action.dragAndDrop(source, target);
+		action.build().perform();
+		SeleniumUtils.sleep(config.getActionDelay());
+	}
 
 	public boolean isSelected(String selector) {
 		log.debug("isSelected: " + selector);
