@@ -629,11 +629,9 @@ public class Container {
 		System.out.println(targetPoint);
 		// drag
 		robot.mouseMove(sourcePoint.x + offsetX, sourcePoint.y + offsetY);
-		wait(2);
 		robot.mousePress(InputEvent.BUTTON1_MASK);
 		// drop
 		robot.mouseMove(targetPoint.x + offsetX, targetPoint.y + offsetY);
-		wait(2);
 		robot.mouseRelease(InputEvent.BUTTON1_MASK);
 		SeleniumUtils.sleep(config.getActionDelay());
 	}
