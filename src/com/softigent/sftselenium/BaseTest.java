@@ -127,14 +127,15 @@ public abstract class BaseTest  {
 	}
 	
 	@Rule
-    public TestWatcher testWatcher = new TestWatcher() {
-        @Override
-        protected void starting(final Description description) {
-        	log.info(">>>>> Start " + description.getClassName() + "::" + description.getMethodName());
-        }
-        @Override
-        protected void finished(final Description description) {
-        	log.info(">>>>> End " + description.getClassName() + "::" + description.getMethodName());
-        }
-    };
+	public TestWatcher testWatcher = new TestWatcher() {
+		@Override
+		protected void starting(final Description description) {
+			log.info(">>>>> Start " + description.getClassName() + "::" + description.getMethodName());
+		}
+
+		@Override
+		protected void finished(final Description description) {
+			log.info(">>>>> End " + description.getClassName() + "::" + description.getMethodName());
+		}
+	};
 }
