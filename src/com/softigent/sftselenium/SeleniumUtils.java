@@ -17,6 +17,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.safari.SafariDriver;
@@ -32,7 +33,9 @@ public class SeleniumUtils {
 		WebDriver driver = null;
 		boolean isFullScreen = "true".equals(config.getProperty("open_fullscreen"));
 		if (name.equals("Firefox")) {
-			driver = new FirefoxDriver();
+			FirefoxProfile ffProfile = new FirefoxProfile();
+			ffProfile.setPreference("layout.css.devPixelsPerPx", "1.0");
+			driver = new FirefoxDriver(ffProfile);
 		} else if (name.equals("Chrome")) {
 			ChromeOptions options = new ChromeOptions();
 			if (isFullScreen) {

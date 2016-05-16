@@ -223,10 +223,11 @@ public class Container {
 		return rect;
 	}
 
+	//Be sure the Developer Tool is closed or dock to right, otherwise vertical calculation will be failed. 
 	public Point getElementLocation(WebElement element) {
 		@SuppressWarnings("unchecked")
 		ArrayList<Number> o = (ArrayList<Number>) executeScript(
-				"return (function(o) { var l = [screenLeft, screenTop + ((screen.height - window.innerHeight) - (screen.height - window.outerHeight))]; "
+				"return (function(o) { var l = [screenX || screenLeft, (screenY || screenTop) + ((screen.height - innerHeight) - (screen.height - outerHeight))]; "
 						+ "while(o) { l[0] += + o.offsetLeft; l[1] += + o.offsetTop; o = o.offsetParent; } return l;})(arguments[0])",
 				element, null, null);
 		return new Point(o.get(0).intValue(), o.get(1).intValue());
@@ -630,8 +631,10 @@ public class Container {
 		// drag
 		robot.mouseMove(sourcePoint.x + offsetX, sourcePoint.y + offsetY);
 		robot.mousePress(InputEvent.BUTTON1_MASK);
+		wait(1);
 		// drop
 		robot.mouseMove(targetPoint.x + offsetX, targetPoint.y + offsetY);
+		wait(1);
 		robot.mouseRelease(InputEvent.BUTTON1_MASK);
 		SeleniumUtils.sleep(config.getActionDelay());
 	}
