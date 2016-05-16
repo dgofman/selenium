@@ -626,8 +626,6 @@ public class Container {
 		Robot robot = new Robot();
 		Point sourcePoint = getElementLocation(source);
 		Point targetPoint = getElementLocation(target);
-		System.out.println(sourcePoint);
-		System.out.println(targetPoint);
 		// drag
 		robot.mouseMove(sourcePoint.x + offsetX, sourcePoint.y + offsetY);
 		robot.mousePress(InputEvent.BUTTON1_MASK);
