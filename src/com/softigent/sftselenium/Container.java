@@ -144,13 +144,18 @@ public class Container {
 	@SuppressWarnings("static-access")
 	public By getBy(String selector, By parent) {
 		By locator;
-		if (selector.startsWith("xpath:")) {
-			selector = selector.substring(6);
-			log.debug("Find selector: " + selector);
-			locator = parent.xpath(selector);
-		} else {
+		if (iframeElement != null && "body".equals(selector)) {
 			log.debug("Find selector: " + this.selector + ' ' + selector);
-			locator = parent.cssSelector(this.selector + ' ' + selector);
+			locator = parent;
+		} else {
+			if (selector.startsWith("xpath:")) {
+				selector = selector.substring(6);
+				log.debug("Find selector: " + selector);
+				locator = parent.xpath(selector);
+			} else {
+				log.debug("Find selector: " + this.selector + ' ' + selector);
+				locator = parent.cssSelector(this.selector + ' ' + selector);
+			}
 		}
 		return locator;
 	}
@@ -351,14 +356,19 @@ public class Container {
 		return compareString(getText(selector), value);
 	}
 
-	public Boolean validateText(String value) {
+	public int validateText(String value) {
 		log.debug("Validate Text value=" + value + ", for selector: " + selector);
-		return validateString(getText(element), value);
+		return validateString(getText(element), value)  ? 0 : 1;
 	}
 
-	public Boolean validateText(String selector, String value) {
+	public int validateText(String selector, String value) {
 		log.debug("Validate Text value=" + value + ", for selector: " + selector);
-		return validateString(getText(selector), value);
+		return validateString(getText(selector), value) ? 0 : 1;
+	}
+
+	public Boolean assertText(String value) {
+		log.debug("Assert Text value=" + value + ", for selector: " + selector);
+		return assertString(getText(selector), value);
 	}
 
 	public Boolean assertText(String selector, String value) {
@@ -764,15 +774,30 @@ public class Container {
 		fail(message);
 	}
 
-	public Boolean assertString(String str1, String str2) {
+	public static Boolean assertString(String str1, String str2) {
 		return validateString(str1, str2, true);
 	}
+	
+	public static Boolean assertObject(Object obj1, Object obj2) {
+		boolean isTrue = validateObject(obj1, obj2);
+		assertTrue(isTrue);
+		return isTrue;
+	}
+	
+	public static Boolean validateObject(Object obj1, Object obj2) {
+		log.debug("compareString: '" + obj1 + "' = '" + obj2 + "'");
+		boolean isTrue = obj1 == obj2;
+		if (!isTrue) {
+			log.error("\n'" + obj1 + "' != \n'" + obj2 + "'");
+		}
+		return isTrue;
+	}
 
-	public Boolean validateString(String str1, String str2) {
+	public static Boolean validateString(String str1, String str2) {
 		return validateString(str1, str2, false);
 	}
 
-	public Boolean validateString(String str1, String str2, boolean isAssert) {
+	public static Boolean validateString(String str1, String str2, boolean isAssert) {
 		boolean isTrue = compareString(str1, str2);
 		if (!isTrue) {
 			log.error("\n'" + str1 + "' != \n'" + str2 + "'");
@@ -785,8 +810,8 @@ public class Container {
 		return isTrue;
 	}
 
-	public Boolean compareString(String str1, String str2) {
-		log.debug("validateString: '" + str1 + "' = '" + str2 + "'");
+	public static Boolean compareString(String str1, String str2) {
+		log.debug("compareString: '" + str1 + "' = '" + str2 + "'");
 		boolean isTrue;
 
 		if (str1 == null) {
