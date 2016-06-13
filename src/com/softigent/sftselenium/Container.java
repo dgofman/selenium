@@ -9,6 +9,7 @@ import java.awt.event.InputEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
@@ -824,6 +825,15 @@ public class Container {
 			}
 		}
 		return isTrue;
+	}
+	
+	public static List<String> find(String regex, String str) {
+		List<String> matches = new ArrayList<String>();
+		Matcher m = Pattern.compile(regex).matcher(str);
+		while (m.find()) {
+			matches.add(m.group());
+		}
+		return matches;
 	}
 
 	public WebElement waitAndFindElement() {
