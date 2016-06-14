@@ -105,6 +105,10 @@ public class Container {
 	public Container find(String selector) {
 		return new Container(driver, config, this.selector + ' ' + selector, getBy(selector));
 	}
+	
+	public Container find(WebElement element) {
+		return new Container(driver, config, element);
+	}
 
 	public static WebElement getParent(WebElement element, String path) {
 		return element.findElement(By.xpath(path));
@@ -278,6 +282,24 @@ public class Container {
 
 	public void clearText() {
 		element.clear();
+	}
+	
+	public void keyDown(String key) {
+		new Actions(driver).sendKeys(key).keyDown(element, Keys.SHIFT).perform();
+	}
+	
+	public void keyDown(String selector, String key) {
+		WebElement element = getElement(selector);
+		new Actions(driver).sendKeys(key).keyDown(element, Keys.SHIFT).perform();
+	}
+	
+	public void keyUp(String key) {
+		new Actions(driver).sendKeys(key).keyUp(element, Keys.SHIFT).perform();
+	}
+	
+	public void keyUp(String selector, String key) {
+		WebElement element = getElement(selector);
+		new Actions(driver).sendKeys(key).keyUp(element, Keys.SHIFT).perform();
 	}
 
 	public void setText(String selector, String value) {
