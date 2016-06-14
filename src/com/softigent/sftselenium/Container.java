@@ -284,22 +284,38 @@ public class Container {
 		element.clear();
 	}
 	
-	public void keyDown(String key) {
-		new Actions(driver).sendKeys(key).keyDown(element, Keys.SHIFT).perform();
+	public void keyDown(String str) {
+		this.keyDown(element, str, Keys.COMMAND);
 	}
 	
-	public void keyDown(String selector, String key) {
-		WebElement element = getElement(selector);
-		new Actions(driver).sendKeys(key).keyDown(element, Keys.SHIFT).perform();
+	public void keyDown(String selector, String str) {
+		this.keyDown(getElement(selector), str, Keys.COMMAND);
 	}
 	
-	public void keyUp(String key) {
-		new Actions(driver).sendKeys(key).keyUp(element, Keys.SHIFT).perform();
+	public void keyDown(WebElement element, String str, Keys key) {
+		log.debug("keyDown on: " + getElementName(element));
+		if (str != null) {
+			new Actions(driver).sendKeys(element, str).perform();
+		}
+		new Actions(driver).keyDown(element, key).perform();
+		SeleniumUtils.sleep(config.getActionDelay());
 	}
 	
-	public void keyUp(String selector, String key) {
-		WebElement element = getElement(selector);
-		new Actions(driver).sendKeys(key).keyUp(element, Keys.SHIFT).perform();
+	public void keyUp(String str) {
+		this.keyUp(element, str, Keys.COMMAND);
+	}
+	
+	public void keyUp(String selector, String str) {
+		this.keyUp(getElement(selector), str, Keys.COMMAND);
+	}
+	
+	public void keyUp(WebElement element, String str, Keys key) {
+		log.debug("keyUp on: " + getElementName(element));
+		if (str != null) {
+			new Actions(driver).sendKeys(element, str).perform();
+		}
+		new Actions(driver).keyUp(element, key).perform();
+		SeleniumUtils.sleep(config.getActionDelay());
 	}
 
 	public void setText(String selector, String value) {
