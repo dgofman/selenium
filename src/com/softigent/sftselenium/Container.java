@@ -363,6 +363,10 @@ public class Container {
 			SeleniumUtils.sleep(config.getActionDelay());
 		}
 	}
+	
+	public String getText() {
+		return getText(element);
+	}
 
 	public String getText(WebElement element) {
 		log.debug("Get Text for selector: " + getElementName(element));
