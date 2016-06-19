@@ -5,12 +5,17 @@ import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -76,30 +81,40 @@ public class SeleniumUtils {
 			}
 		});
 	}
-	
+
 	public static WebElement waitAndFindElement(WebDriver driver, By locator, long timeoutSec) {
 		return waitAndFindElement(driver, locator, timeoutSec, true);
 	}
-	
+
 	public static WebElement waitAndFindElement(WebDriver driver, By locator, long timeoutSec, boolean isVisible) {
-	  WebDriverWait wait = new WebDriverWait(driver, timeoutSec);
-	  try {
-		  if (isVisible) {
-			  return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-		  } else {
-			  return wait.until(ExpectedConditions.presenceOfElementLocated(locator));
-		  }
-		} catch(NoSuchElementException nsee) {
-	        throw new NoSuchElementException("NoSuchElementException: Locator not found:" + locator);
-	    } catch(TimeoutException toe) {
-	    	throw new TimeoutException("TimeoutException: Locator not visible:" + locator);
-	    }
+		WebDriverWait wait = new WebDriverWait(driver, timeoutSec);
+		try {
+			if (isVisible) {
+				return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+			} else {
+				return wait.until(ExpectedConditions.presenceOfElementLocated(locator));
+			}
+		} catch (NoSuchElementException nsee) {
+			throw new NoSuchElementException("NoSuchElementException: Locator not found:" + locator);
+		} catch (TimeoutException toe) {
+			throw new TimeoutException("TimeoutException: Locator not visible:" + locator);
+		}
+	}
+
+	public static File screenshot(WebDriver driver, String fileName) {
+		File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+		try {
+			FileUtils.copyFile(scrFile, new File(fileName));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return scrFile;
 	}
 
 	public static void sleep(float seconds) {
 		try {
 			if (seconds != 0) {
-				Thread.sleep((int)seconds * 1000);
+				Thread.sleep((int) seconds * 1000);
 			}
 		} catch (InterruptedException e) {
 		}
@@ -137,7 +152,7 @@ public class SeleniumUtils {
 			acceptNextAlert = true;
 		}
 	}
-	
+
 	public static void fileBrowseDialog(WebDriver driver, String path) {
 		StringSelection ss = new StringSelection(path);
 		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, null);
