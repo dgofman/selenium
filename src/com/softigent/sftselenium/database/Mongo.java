@@ -7,8 +7,11 @@ import org.bson.Document;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 
 public class Mongo {
@@ -62,24 +65,41 @@ public class Mongo {
 		return new Document(key, value);
 	}
 
-	public UpdateResult update(Document filter, Document update) {
-		return update(collection, filter, update);
+	public FindIterable<Document> find(String filterKey, Object filterValue) throws Exception {
+		return this.find(collection, filterKey, filterValue);
+	}
+	
+	public FindIterable<Document> find(MongoCollection<Document> collection, String filterKey, Object filterValue) throws Exception {
+		return collection.find(Filters.eq(filterKey, filterValue));
 	}
 	
 	public UpdateResult update(String filterKey, Object filterValue, String updateKey, Object updateValue) throws Exception {
 		return update(collection, filterKey, filterValue, updateKey, updateValue);
 	}
 	
-	public UpdateResult update(MongoCollection<Document> collection, Document filter, Document update) {
-		return collection.updateOne(filter, new Document("$set", update));
-	}
-
 	public UpdateResult update(MongoCollection<Document> collection, String filterKey, Object filterValue,
 			String updateKey, Object updateValue) throws Exception {
 		return collection.updateOne(getDocument(filterKey, filterValue),
 				new Document("$set", getDocument(updateKey, updateValue)));
 	}
+	
+	public void insert(String filterKey, Object filterValue, String updateKey, Object updateValue) throws Exception {
+		insert(collection, filterKey, filterValue, updateKey, updateValue);
+	}
+	
+	public void insert(MongoCollection<Document> collection, String filterKey, Object filterValue,
+			String updateKey, Object updateValue) throws Exception {
+		collection.insertOne(getDocument(filterKey, filterValue));
+	}
 
+	public DeleteResult delete(String filterKey, Object filterValue) throws Exception {
+		return this.delete(collection, filterKey, filterValue);
+	}
+	
+	public DeleteResult delete(MongoCollection<Document> collection, String filterKey, Object filterValue) throws Exception {
+		return collection.deleteOne(Filters.eq(filterKey, filterValue));
+	}
+	
 	public void close() {
 		mongoClient.close();
 		mongoClient = null;
