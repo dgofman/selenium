@@ -13,6 +13,7 @@ import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.openqa.selenium.WebDriver;
 
 @SuppressWarnings("rawtypes")
 public class TestRunner {
@@ -66,6 +67,8 @@ public class TestRunner {
 		writer.println("<ul>");
 
 		failResults = new LinkedHashMap<Class<?>, Result>();
+		
+		WebDriver driver;
 
 		if (annotation != null) {
 			Class<?>[] suiteClassLst = annotation.value();
@@ -99,10 +102,8 @@ public class TestRunner {
 		}
 		
 		Connector con = Connector.instance;
-		if (con != null && con.getConfig() != null && con.getDriver() != null) {
-			if ("true".equals(con.getConfig().getProperty("close_browser"))) {
-				con.getDriver().close();
-			}
+		if ((driver = getDriver()) != null && "true".equals(con.getConfig().getProperty("close_browser"))) {
+			driver.close();
 		}
 		
 		log.trace("COMPLETED in : " + getTime(new Date().getTime() - startTime.getTime()) 
@@ -124,6 +125,14 @@ public class TestRunner {
 		writer.println("</html>");
 
 		writer.close();
+	}
+	
+	protected WebDriver getDriver() {
+		Connector con = Connector.instance;
+		if (con != null && con.getConfig() != null && con.getDriver() != null) {
+			return con.getDriver();
+		}
+		return null;
 	}
 	
 	protected void addTitle(String title) {

@@ -42,6 +42,11 @@ public class Container extends Element {
 	public Container find(WebElement element) {
 		return new Container(driver, config, element);
 	}
+	
+	public Container find(WebElement element, int index) {
+		String selector = getSelector(element);
+		return new Container(driver, config, selector + ":nth-child(" + (index + 1) + ")");
+	}
 
 	public Container getIFrame(String selector) {
 		WebElement element = getElement(selector);
