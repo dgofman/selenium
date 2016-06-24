@@ -116,7 +116,7 @@ public class Element {
 		return getParent(element, path);
 	}
 
-	public WebElement getParent(WebElement node) {
+	public static WebElement getParent(WebElement node) {
 		return getParent(node, "..");
 	}
 
