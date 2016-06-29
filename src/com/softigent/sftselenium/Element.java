@@ -775,15 +775,27 @@ public class Element {
 	}
 
 	public void waitWhenTrue(WebElement element, IWaitCallback callback) {
+		this.waitWhenTrue(element, callback, true);
+	}
+	
+	public void waitWhenTrue(WebElement element, IWaitCallback callback, boolean isPrint) {
 		for (int i = 0; i < config.getPageLoadTimeout(); i++) {
-			print('.', false);
+			if (isPrint) {
+				print('.', false);
+			}
 			if (callback.isTrue(element)) {
-				print('.');
+				if (isPrint) {
+					print('.');
+				}
 				return;
 			}
 			wait(1);
 		}
 		log.error("TIMEOUT: [" + driver.getCurrentUrl() + "]");
+	}
+	
+	public void waitWhenTrue(IWaitCallback callback) {
+		this.waitWhenTrue(null, callback, true);
 	}
 	
 	public static void isTrue(Boolean bool, String message) {
