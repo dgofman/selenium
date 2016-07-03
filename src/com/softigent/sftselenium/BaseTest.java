@@ -5,12 +5,15 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
+import org.junit.runners.MethodSorters;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+@FixMethodOrder(MethodSorters.JVM)
 public abstract class BaseTest  {
 	
 	protected  Connector connector;
