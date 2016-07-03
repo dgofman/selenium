@@ -7,6 +7,9 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
@@ -170,5 +173,18 @@ public class SeleniumUtils {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static List<String> getVMArguments() {
+		return ManagementFactory.getRuntimeMXBean().getInputArguments();
+	}
+	
+	public static String[] getCmdArguments() {
+		String command = System.getProperty("sun.java.command");
+		Matcher m = Pattern.compile("^(.*?) (.*?)-(.*)").matcher(command);
+		while(m.find()) {
+		    return m.group(2).split(" ");
+		}
+		return new String[]{};
 	}
 }
