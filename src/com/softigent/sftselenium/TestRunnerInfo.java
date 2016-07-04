@@ -1,15 +1,14 @@
 package com.softigent.sftselenium;
 
-@SuppressWarnings("rawtypes")
 public class TestRunnerInfo {
 	
 	private String fileName;
-	private String title;
-	private Class testSuite;
+	private String description;
+	private Class<?> testSuite;
 	
-	public TestRunnerInfo (String fileName, String title, Class testSuite) {
+	public TestRunnerInfo (String fileName, String description, Class<?> testSuite) {
 		this.fileName = fileName;
-		this.title = title;
+		this.description = description;
 		this.testSuite = testSuite;
 	}
 
@@ -17,11 +16,11 @@ public class TestRunnerInfo {
 		return fileName;
 	}
 
-	public String getTitle() {
-		return title;
+	public String getDescription() {
+		return description;
 	}
 
-	public Class getTestSuite() {
+	public Class<?> getTestSuite() {
 		return testSuite;
 	}
 }
