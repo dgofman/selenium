@@ -10,6 +10,7 @@ import org.junit.Rule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runners.MethodSorters;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -27,6 +28,11 @@ public abstract class BaseTest  {
 		if (connector == null) {
 			throw new NullPointerException("Please initialize a default connector.");
 		}
+		try {
+			//close alert window
+			Alert alert = connector.getDriver().switchTo().alert();
+			alert.accept();
+		} catch (Exception e) {}
 		this.connector = connector;
 		this.className = getClass().getName();
 		this.body = createContainer("body");
