@@ -509,6 +509,7 @@ public class Element {
 
 	public WebElement getOptionByText(String selector, String value, String tagName) {
 		log.debug("OptionByText text=" + value + ", for selector: " + selector);
+		waitIsDisplayed(selector);
 		WebElement select = getElement(selector);
 		List<WebElement> elements = select.findElements(By.tagName(tagName));
 		for (WebElement element : elements) {
@@ -629,7 +630,7 @@ public class Element {
 		log.debug("Mouse Move (" + x + 'x' + y + ") on: " + getElementName(element));
 		Actions action = new Actions(driver);
 		action.moveToElement(element, x, y);
-		action.build().perform();
+		action.click().build().perform();
 		SeleniumUtils.sleep(config.getActionDelay());
 	}
 
