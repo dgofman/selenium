@@ -10,6 +10,7 @@ import org.junit.Rule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runners.MethodSorters;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -78,6 +79,30 @@ public abstract class BaseTest  {
 
 	public void waitPageLoad(String urlPath) {
 		SeleniumUtils.wait(connector.getDriver(), connector.getConfig().getPageLoadTimeout(), Pattern.compile(urlPath));
+	}
+
+	/*
+	 * script - FakeDate.prototype.__proto__.getTimezoneOffset = function() { return 0; }
+	 */
+	public Object execFakeDate(String script) {
+		return executeScript("function FakeDate() {" +
+			"var args = Array.prototype.slice.call(arguments); " +
+			"args.unshift(null); return new (Function.prototype.bind.apply(FakeDate.originalDate, args));} " +
+			"FakeDate.prototype.__proto__ = Date.prototype; FakeDate.originalDate = Date; Date = FakeDate; " + 
+			script);
+	}
+
+	public Object executeScript(String command) {
+		return this.executeScript(command, null);
+	}
+
+	public Object executeScript(String command, Object element) {
+		JavascriptExecutor js = (JavascriptExecutor) body.getDriver();
+		if (element == null) {
+			return js.executeScript(command);
+		} else {
+			return js.executeScript(command, element);
+		}
 	}
 	
 	public String getCurrentURL() {
