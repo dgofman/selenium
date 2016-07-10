@@ -748,7 +748,8 @@ public class Element {
 		log.debug("isVisible: " + getElementName(element));
 		if (element != null) {
 			try {
-				return element.getAttribute("style").indexOf("display: none;") == -1;
+				String style = element.getAttribute("style");
+				return style.indexOf("display: block;") != -1;
 			} catch (Exception e) {
 				return false;
 			}
