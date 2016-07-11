@@ -149,6 +149,24 @@ public abstract class BaseTest  {
 	public String getWindowHandle() {
 		return connector.getDriver().getWindowHandle();
 	}
+	
+	public String getWindowHandleByURL(String regex) {
+		WebDriver driver = connector.getDriver();
+        Set<String> windows = driver.getWindowHandles();
+
+        for (String window : windows) {
+            try {
+                driver.switchTo().window(window);
+                Boolean isTrue = Container.compareString(regex, driver.getCurrentUrl());
+                if (isTrue) {
+                    return window;
+                }
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+	}
 
 	public WebDriver switchWindow(String winHandle) {
 		return connector.getDriver().switchTo().window(winHandle);
