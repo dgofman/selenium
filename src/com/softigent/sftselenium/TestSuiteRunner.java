@@ -22,7 +22,7 @@ public class TestSuiteRunner {
 	
 	private List<TestRunnerInfo> suites;
 		
-	public TestSuiteRunner(List<TestRunnerInfo> suites) throws IOException {
+	public TestSuiteRunner(List<TestRunnerInfo> suites) {
 		this.suites = suites;
 	}
 

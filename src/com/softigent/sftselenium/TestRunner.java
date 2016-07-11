@@ -32,7 +32,7 @@ public abstract class TestRunner extends Runner {
 		}
 	}
 	
-	public TestSuiteRunner getTestSuiteRunner(List<TestRunnerInfo> suites) throws Exception {
+	public TestSuiteRunner getTestSuiteRunner(List<TestRunnerInfo> suites) {
 		return new com.softigent.sftselenium.TestSuiteRunner(suites);
 	}
 
