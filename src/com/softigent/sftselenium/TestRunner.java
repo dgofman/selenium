@@ -26,10 +26,14 @@ public abstract class TestRunner extends Runner {
 	public TestRunner(String[] args) {
 		List<TestRunnerInfo> suites = this.initialize(args);
 		try {
-			new com.softigent.sftselenium.TestSuiteRunner(suites).run();
+			getTestSuiteRunner(suites).run();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public TestSuiteRunner getTestSuiteRunner(List<TestRunnerInfo> suites) throws Exception {
+		return new com.softigent.sftselenium.TestSuiteRunner(suites);
 	}
 
 	//JUnit Contractor
