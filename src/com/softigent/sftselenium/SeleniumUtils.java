@@ -8,6 +8,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -50,14 +51,15 @@ public class SeleniumUtils {
 			driver = new FirefoxDriver(ffProfile);
 		} else if (name.equals("Chrome")) {
 			ChromeOptions options = new ChromeOptions();
+			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 			if (isFullScreen) {
 				options.addArguments("--start-maximized");
 			}
 			if (isPrivate) {
-				options.addArguments("--incognito");
-				options.addArguments("--ignore-certificate-errors");
+				capabilities.setCapability("chrome.switches", Arrays.asList("--incognito"));
 			}
-			driver = new ChromeDriver(options);
+			capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+			driver = new ChromeDriver(capabilities);
 		} else if (name.equals("Safari")) {
 			driver = new SafariDriver();
 		} else if (name.equals("IE")) {
