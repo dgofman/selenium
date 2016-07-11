@@ -39,15 +39,23 @@ public class SeleniumUtils {
 
 	public static WebDriver getDriver(String name, Config config) {
 		WebDriver driver = null;
+		boolean isPrivate = "true".equals(config.getProperty("open_as_private"));
 		boolean isFullScreen = "true".equals(config.getProperty("open_fullscreen"));
 		if (name.equals("Firefox")) {
 			FirefoxProfile ffProfile = new FirefoxProfile();
 			ffProfile.setPreference("layout.css.devPixelsPerPx", "1.0");
+			if (isPrivate) {
+				ffProfile.setPreference("browser.privatebrowsing.autostart", true);
+			}
 			driver = new FirefoxDriver(ffProfile);
 		} else if (name.equals("Chrome")) {
 			ChromeOptions options = new ChromeOptions();
 			if (isFullScreen) {
 				options.addArguments("--start-maximized");
+			}
+			if (isPrivate) {
+				options.addArguments("--incognito");
+				options.addArguments("--ignore-certificate-errors");
 			}
 			driver = new ChromeDriver(options);
 		} else if (name.equals("Safari")) {
@@ -55,6 +63,10 @@ public class SeleniumUtils {
 		} else if (name.equals("IE")) {
 			DesiredCapabilities dc = DesiredCapabilities.internetExplorer();
 			dc.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
+			if (isPrivate) {
+				dc.setCapability(InternetExplorerDriver.FORCE_CREATE_PROCESS, true); 
+				dc.setCapability(InternetExplorerDriver.IE_SWITCHES, "-private");
+			}
 			driver = new InternetExplorerDriver(dc);
 		}
 
