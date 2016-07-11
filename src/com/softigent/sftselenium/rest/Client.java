@@ -38,10 +38,11 @@ import com.mashape.unirest.http.options.Options;
 import com.mashape.unirest.http.utils.ClientFactory;
 import com.mashape.unirest.request.BaseRequest;
 import com.mashape.unirest.request.HttpRequest;
+import com.softigent.sftselenium.CacheLogger;
 
 public class Client {
 
-	private static Logger logger = Logger.getLogger(Client.class);
+	private static Logger logger = CacheLogger.getLogger(Client.class);
 	
 	private static final String CONTENT_TYPE = "content-type";
 	private static final String ACCEPT_ENCODING_HEADER = "accept-encoding";

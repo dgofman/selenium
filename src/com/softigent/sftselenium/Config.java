@@ -15,7 +15,7 @@ public class Config extends Properties {
 	private IConfig iConfig;
 		
 	private static final long serialVersionUID = 238683884179262164L;
-	static Logger log = Logger.getLogger(Config.class.getName());
+	static Logger log = CacheLogger.getLogger(Config.class.getName());
 	
 	public Config(String propertyFile) {
 		this(propertyFile, "action_delay", "click_delay", "load_timeout");

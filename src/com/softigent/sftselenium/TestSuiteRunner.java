@@ -18,7 +18,7 @@ import org.openqa.selenium.WebDriver;
 
 public class TestSuiteRunner {
 
-	private static final Logger log = Logger.getLogger(TestSuiteRunner.class);
+	private static final Logger log = CacheLogger.getLogger(TestSuiteRunner.class);
 	
 	private List<TestRunnerInfo> suites;
 		

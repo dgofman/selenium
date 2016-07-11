@@ -30,7 +30,7 @@ public class Element {
 	protected By locator;
 	protected WebElement element;
 
-	static Logger log = Logger.getLogger(Element.class.getName());
+	static Logger log = CacheLogger.getLogger(Element.class.getName());
 
 	public String getSelector() {
 		return selector;

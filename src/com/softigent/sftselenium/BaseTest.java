@@ -15,13 +15,21 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 @FixMethodOrder(MethodSorters.JVM)
-public abstract class BaseTest  {
+public abstract class BaseTest {
 	
-	protected  Connector connector;
+	protected Connector connector;
 
 	protected Logger log;
 	protected String className;
 
+	@Rule
+	public TestWatcher testWatchThis = new TestWatcher() {
+		@Override
+		protected void failed(Throwable e, Description description) {
+			doFailed(e, description);
+		}
+	};
+	
 	public final Container body;
 
 	public BaseTest(Connector connector) {
@@ -31,11 +39,20 @@ public abstract class BaseTest  {
 		this.connector = connector;
 		this.className = getClass().getName();
 		this.body = createContainer("body");
+		
+		String logger_stack = connector.getConfig().getProperty("logger_stack_size");
+		if (logger_stack != null && !Double.isNaN(Double.valueOf(logger_stack))) {
+			CacheLogger.MAX_STACK_SIZE = Integer.parseInt(logger_stack);
+		}
 		initialize();
+	}
+
+	protected String doFailed(Throwable e, Description description) {
+		return String.join("\n", CacheLogger.getLastMessages());
 	}
 	
 	protected void initialize() {
-		log = Logger.getLogger(className);
+		log = CacheLogger.getLogger(className);
 	}
 	
 	public static Connector createConnector(Config config, String driverName) {
@@ -152,20 +169,20 @@ public abstract class BaseTest  {
 	
 	public String getWindowHandleByURL(String regex) {
 		WebDriver driver = connector.getDriver();
-        Set<String> windows = driver.getWindowHandles();
-
-        for (String window : windows) {
-            try {
-                driver.switchTo().window(window);
-                Boolean isTrue = Container.compareString(regex, driver.getCurrentUrl());
-                if (isTrue) {
-                    return window;
-                }
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
+		Set<String> windows = driver.getWindowHandles();
+	
+		for (String window : windows) {
+			try {
+				driver.switchTo().window(window);
+				Boolean isTrue = Container.compareString(regex, driver.getCurrentUrl());
+				if (isTrue) {
+					return window;
+				}
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
 	}
 
 	public WebDriver switchWindow(String winHandle) {

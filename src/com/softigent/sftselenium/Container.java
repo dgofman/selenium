@@ -9,7 +9,7 @@ public class Container extends Element {
 
 	protected WebElement iframeElement;
 	
-	static Logger log = Logger.getLogger(Container.class.getName());
+	static Logger log = CacheLogger.getLogger(Container.class.getName());
 
 	public Container(WebDriver driver, Config config, String selector) {
 		this(driver, config, selector, By.cssSelector(selector));
