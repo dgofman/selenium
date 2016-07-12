@@ -3,6 +3,8 @@ package com.softigent.sftselenium;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Category;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggerFactory;
 import org.apache.log4j.spi.LoggingEvent;
@@ -28,6 +30,15 @@ public class CacheLogger extends Logger {
 		super.callAppenders(event);
 		if (lastMessages.size() == MAX_STACK_SIZE) {
 			lastMessages.removeFirst();
+		}
+		for(Category c = this; c != null; c=c.getParent()) {
+			AppenderSkeleton app = (AppenderSkeleton)c.getAppender("file");
+			if (app != null) {
+				if(app.isAsSevereAsThreshold(event.getLevel())) {
+					lastMessages.offer(app.getLayout().format(event));
+					return;
+				}
+			}
 		}
 		lastMessages.offer(event.getLevel() + ": " + event.getMessage());
 	}
