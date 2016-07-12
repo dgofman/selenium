@@ -17,6 +17,9 @@ public class CacheLogger extends Logger {
 	
 	private static final Deque<String> lastMessages = new ArrayDeque<String>();
 	
+	private AppenderSkeleton fileAppender;
+	private boolean searchAppender = true;
+	
 	public CacheLogger(String name) {
 		super(name);
 	}
@@ -31,16 +34,24 @@ public class CacheLogger extends Logger {
 		if (lastMessages.size() == MAX_STACK_SIZE) {
 			lastMessages.removeFirst();
 		}
-		for(Category c = this; c != null; c=c.getParent()) {
-			AppenderSkeleton app = (AppenderSkeleton)c.getAppender("file");
-			if (app != null) {
-				if(app.isAsSevereAsThreshold(event.getLevel())) {
-					lastMessages.offer(app.getLayout().format(event));
-					return;
+		if (searchAppender && fileAppender == null) {
+			searchAppender = false;
+			for(Category c = this; c != null; c=c.getParent()) {
+				synchronized(c) {
+					fileAppender = (AppenderSkeleton)c.getAppender("file");
+					if (fileAppender != null) {
+						break;
+					}
 				}
 			}
 		}
-		lastMessages.offer(event.getLevel() + ": " + event.getMessage());
+		if (fileAppender != null) {
+			if(fileAppender.isAsSevereAsThreshold(event.getLevel())) {
+				lastMessages.offer(fileAppender.getLayout().format(event));
+			}
+		} else {
+			lastMessages.offer(event.getLevel() + ": " + event.getMessage());
+		}
 	}
 	
 	public static Deque<String> getLastMessages() {
