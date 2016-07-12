@@ -52,6 +52,7 @@ public class TestSuiteRunner {
 			writer.println("<style>");
 			writer.println("li, div {padding: 2px 5px; margin: 2px 0}");
 			writer.println("p, h3 {padding: 3px; margin: 0;}");
+			writer.println("pre { white-space: pre-wrap;}");
 			writer.println(".accordion input {display: none;}");
 			writer.println(".accordion label {background: #eee; cursor: pointer; display: block; margin-bottom: .125em; padding: .25em 1em;}");
 			writer.println(".accordion label:hover {background: #ccc;}");
