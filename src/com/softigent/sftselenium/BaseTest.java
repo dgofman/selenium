@@ -174,7 +174,7 @@ public abstract class BaseTest {
 		for (String window : windows) {
 			try {
 				driver.switchTo().window(window);
-				Boolean isTrue = Container.compareString(regex, driver.getCurrentUrl());
+				Boolean isTrue = Container.compareString(driver.getCurrentUrl(), regex);
 				if (isTrue) {
 					return window;
 				}
