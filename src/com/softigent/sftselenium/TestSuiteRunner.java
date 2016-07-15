@@ -150,6 +150,7 @@ public class TestSuiteRunner {
 		writer.println("<p><b>Tests Failed</b>: " + result.getFailureCount() + "</p>");
 		writer.println("<p><b>Tests Ignored</b>: " + result.getIgnoreCount() + "</p>");
 		writer.println("</li>");
+		writer.flush();
 	}
 	
 	protected void addReport(PrintWriter writer, Date startTime, int totalTestCases, int countSucceed, int countFailed, int totalTests, int failed, int ignored) {
