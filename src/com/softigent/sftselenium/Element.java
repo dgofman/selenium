@@ -765,6 +765,22 @@ public class Element {
 			}
 		});
 	}
+	
+	public void waitIsDisplayed(String selector, int count) {
+		List<WebElement> els = this.getElements(selector);
+		this.waitWhenTrue(new IWaitCallback() {
+			public boolean isTrue(WebElement element) {
+				print('.', false);
+				int displayed = 0;
+				for (WebElement el : els) {
+					if (el.isDisplayed()) {
+						displayed++;
+					}
+				}
+				return displayed == count;
+			}
+		});
+	}
 
 	public void setBrowseFile(String path) {
 		log.debug("Browse File: " + path);
@@ -797,7 +813,7 @@ public class Element {
 	}
 	
 	public void waitWhenTrue(IWaitCallback callback) {
-		this.waitWhenTrue(null, callback, true);
+		this.waitWhenTrue(element, callback, true);
 	}
 	
 	public static void isTrue(Boolean bool, String message) {
@@ -835,14 +851,9 @@ public class Element {
 
 	public static Boolean validateString(String str1, String str2, boolean isAssert) {
 		boolean isTrue = compareString(str1, str2);
-		if (!isTrue) {
-			log.error("\n'" + str1 + "' != \n'" + str2 + "'");
-		}
-
 		if (isAssert) {
 			assertTrue(isTrue);
 		}
-
 		return isTrue;
 	}
 
