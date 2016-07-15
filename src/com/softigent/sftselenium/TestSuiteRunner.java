@@ -143,6 +143,7 @@ public class TestSuiteRunner {
 	}
 	
 	protected void addResult(PrintWriter writer, Class<?> testCase, Result result) {
+		log.trace("<<<<<<<<<<<<<<<<<<<<<<<<<<<< ADD RESULT >>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 		writer.println("<li style='background: " + (result.wasSuccessful() ? "lightgreen" : "lightcoral") + "'>");
 		writer.println("<h3>" + testCase.getName() + "</h3>");
 		writer.println("<p><b>Run Time</b>: " + getTime(result.getRunTime()) + "</p>");
