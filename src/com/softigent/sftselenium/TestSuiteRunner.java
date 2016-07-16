@@ -60,9 +60,17 @@ public class TestSuiteRunner {
 			writer.println(".accordion article {background: #f7f7f7; height:0px;overflow:hidden;}");
 			writer.println(".accordion input:checked ~ article {height: auto;}");
 			writer.println("</style>");
+			writer.println("<script>function reload() { ");
+			writer.println("	if (window.complete != true) {");
+			writer.println("		if (window.new_test) window.scrollBy(0, 130);");
+			writer.println("		location.reload();");
+			writer.println("	}");
+			writer.println("}setTimeout(reload, 3000);");
+			writer.println("</script>");
 			writer.println("</head>\n");
 			writer.println("<body>");
 			addHeader(writer, description, startTime);
+			writer.flush();
 			writer.println("<ul>");
 			
 			WebDriver driver;
@@ -118,6 +126,7 @@ public class TestSuiteRunner {
 	
 			addFailures(writer, failResults);
 	
+			writer.println("<script>window.complete = true;</script>");
 			writer.println("</body>");
 			writer.println("</html>");
 	
@@ -151,6 +160,7 @@ public class TestSuiteRunner {
 		writer.println("<p><b>Tests Failed</b>: " + result.getFailureCount() + "</p>");
 		writer.println("<p><b>Tests Ignored</b>: " + result.getIgnoreCount() + "</p>");
 		writer.println("</li>");
+		writer.println("<script>window.new_test=true</script>");
 		writer.flush();
 	}
 	
