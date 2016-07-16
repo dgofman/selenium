@@ -12,6 +12,7 @@ import org.apache.log4j.spi.LoggingEvent;
 public class CacheLogger extends Logger {
 	
 	public static int MAX_STACK_SIZE = 5;
+	public static boolean SKIP_LOGS = false;
 
 	private static final CacheLoggerFactory loggerFactory = new CacheLoggerFactory();
 	
@@ -22,6 +23,7 @@ public class CacheLogger extends Logger {
 	
 	public CacheLogger(String name) {
 		super(name);
+		SKIP_LOGS = false;
 	}
 
 	public static Logger getLogger(String name) {
@@ -30,27 +32,29 @@ public class CacheLogger extends Logger {
 
 	@Override
 	public void callAppenders(LoggingEvent event) {
-		super.callAppenders(event);
-		if (lastMessages.size() == MAX_STACK_SIZE) {
-			lastMessages.removeFirst();
-		}
-		if (searchAppender && fileAppender == null) {
-			searchAppender = false;
-			for(Category c = this; c != null; c=c.getParent()) {
-				synchronized(c) {
-					fileAppender = (AppenderSkeleton)c.getAppender("file");
-					if (fileAppender != null) {
-						break;
+		if (SKIP_LOGS) {
+			super.callAppenders(event);
+			if (lastMessages.size() == MAX_STACK_SIZE) {
+				lastMessages.removeFirst();
+			}
+			if (searchAppender && fileAppender == null) {
+				searchAppender = false;
+				for(Category c = this; c != null; c=c.getParent()) {
+					synchronized(c) {
+						fileAppender = (AppenderSkeleton)c.getAppender("file");
+						if (fileAppender != null) {
+							break;
+						}
 					}
 				}
 			}
-		}
-		if (fileAppender != null) {
-			if(fileAppender.isAsSevereAsThreshold(event.getLevel())) {
-				lastMessages.offer(fileAppender.getLayout().format(event));
+			if (fileAppender != null) {
+				if(fileAppender.isAsSevereAsThreshold(event.getLevel())) {
+					lastMessages.offer(fileAppender.getLayout().format(event));
+				}
+			} else {
+				lastMessages.offer(event.getLevel() + ": " + event.getMessage());
 			}
-		} else {
-			lastMessages.offer(event.getLevel() + ": " + event.getMessage());
 		}
 	}
 	
