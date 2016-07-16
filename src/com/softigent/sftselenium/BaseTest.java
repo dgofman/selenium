@@ -56,8 +56,10 @@ public abstract class BaseTest {
 		WebDriver driver = connector.getDriver();
 		try {
 			driver.getCurrentUrl();
-		} catch (Exception e) {
-			driver.switchTo().alert().accept();
+		} catch (Exception e1) {
+			try {
+				driver.switchTo().alert().accept();
+			} catch (Exception e2) {}
 		}
 	}
 	
