@@ -49,6 +49,7 @@ public abstract class BaseTest {
 	}
 
 	protected String doFailed(Throwable e, Description description) {
+		log.error(e.getMessage());
 		return String.join("\n", CacheLogger.getLastMessages());
 	}
 	
