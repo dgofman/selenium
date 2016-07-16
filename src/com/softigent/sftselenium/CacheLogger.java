@@ -32,7 +32,7 @@ public class CacheLogger extends Logger {
 
 	@Override
 	public void callAppenders(LoggingEvent event) {
-		if (SKIP_LOGS) {
+		if (!SKIP_LOGS) {
 			super.callAppenders(event);
 			if (lastMessages.size() == MAX_STACK_SIZE) {
 				lastMessages.removeFirst();
