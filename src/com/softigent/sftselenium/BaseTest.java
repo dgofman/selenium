@@ -36,6 +36,7 @@ public abstract class BaseTest {
 		if (connector == null) {
 			throw new NullPointerException("Please initialize a default connector.");
 		}
+		preInitialize(connector);
 		this.connector = connector;
 		this.className = getClass().getName();
 		this.body = createContainer("body");
@@ -49,6 +50,15 @@ public abstract class BaseTest {
 
 	protected String doFailed(Throwable e, Description description) {
 		return String.join("\n", CacheLogger.getLastMessages());
+	}
+	
+	protected void preInitialize(Connector connector) {
+		WebDriver driver = connector.getDriver();
+		try {
+			driver.getCurrentUrl();
+		} catch (Exception e) {
+			driver.switchTo().alert().accept();
+		}
 	}
 	
 	protected void initialize() {

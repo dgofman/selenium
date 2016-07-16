@@ -170,7 +170,13 @@ public class Element {
 
 	public List<WebElement> getElements(By locator, int expectSize) {
 		log.trace("Find element(s) " + locator);
-		List<WebElement> elements = driver.findElements(locator);
+		List<WebElement> elements = null;
+		try {
+			elements = driver.findElements(locator);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			fail();
+		}
 		if (expectSize != -1 && (elements == null || elements.size() == 0)) {
 			log.error("Cannot find an element for locator: " + locator + " [" + driver.getCurrentUrl() + "]");
 			fail();
