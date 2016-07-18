@@ -10,6 +10,7 @@ import org.junit.Rule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runners.MethodSorters;
+import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -141,23 +142,35 @@ public abstract class BaseTest {
 		return connector.getDriver().getCurrentUrl();
 	}
 	
+	public String getURL(String url) {
+		return url;
+	}
+	
 	public void openPage(String url) {
 		log.info("Opening " + url);
-		connector.getDriver().get(url);
+		connector.getDriver().get(getURL(url));
 	}
 	
 	public void gotoURL(String path) {
 		String url = getCurrentURL();
-		String host = url.substring(0,  url.indexOf('/', url.indexOf("//") + 2));
-		log.info("To URL " + host + path);
-		connector.getDriver().navigate().to(host + path);
+		url = getURL(url.substring(0,  url.indexOf('/', url.indexOf("//") + 2)) + path);
+		log.info("To URL " + url);
+		connector.getDriver().navigate().to(url);
 	}
 	
 	public void gotoPage(String pageName) {
 		String url = getCurrentURL();
-		String uri = url.substring(0,  url.lastIndexOf('/'));
-		log.info("To Page " + uri + pageName);
-		connector.getDriver().navigate().to(uri + pageName);
+		url = getURL(url.substring(0,  url.lastIndexOf('/')) + pageName);
+		log.info("To Page " + url);
+		connector.getDriver().navigate().to(url);
+	}
+	
+	public void addCookies(String name, String value) {
+		connector.getDriver().manage().addCookie(new Cookie(name, value));
+	}
+	
+	public void deleteCookie(String name) {
+		connector.getDriver().manage().deleteCookieNamed(name);
 	}
 	
 	public void closeBrowser() {
