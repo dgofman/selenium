@@ -323,9 +323,13 @@ public class Element {
 	}
 
 	public void waitText(String selector, String value) {
+		log.debug("waitText: " + value + " in selector=" + selector);
 		this.waitWhenTrue(selector, new IWaitCallback() {
 			public boolean isTrue(WebElement element) {
-				return element.getText().equals(value);
+				CacheLogger.SKIP_LOGS = true;
+				boolean isTrue = Element.compareString(element.getText(), value);
+				CacheLogger.SKIP_LOGS = false;
+				return isTrue;
 			}
 		});
 	}
