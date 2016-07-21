@@ -323,9 +323,10 @@ public class Element {
 	}
 
 	public void waitText(String selector, String value) {
+		log.debug("waitText: " + value + " in selector=" + selector);
 		this.waitWhenTrue(selector, new IWaitCallback() {
 			public boolean isTrue(WebElement element) {
-				return element.getText().equals(value);
+				return Element.regExpString(element.getText(), value);
 			}
 		});
 	}
@@ -865,15 +866,19 @@ public class Element {
 
 	public static Boolean compareString(String str1, String str2) {
 		log.debug("compareString: '" + str1 + "' = '" + str2 + "'");
+		return regExpString(str1, str2);
+	}
+	
+	public static Boolean regExpString(String str, String regExp) {
 		boolean isTrue;
 
-		if (str1 == null) {
-			isTrue = str2 == null;
+		if (str == null) {
+			isTrue = regExp == null;
 		} else {
-			isTrue = str1.equals(str2);
+			isTrue = str.equals(regExp);
 			if (!isTrue) {
-				str2 = str2.replaceAll("\\(", "\\\\(").replaceAll("\\)", "\\\\)");
-				isTrue = Pattern.compile(str2, Pattern.DOTALL).matcher(str1).matches();
+				regExp = regExp.replaceAll("\\(", "\\\\(").replaceAll("\\)", "\\\\)");
+				isTrue = Pattern.compile(regExp, Pattern.DOTALL).matcher(str).matches();
 			}
 		}
 		return isTrue;
