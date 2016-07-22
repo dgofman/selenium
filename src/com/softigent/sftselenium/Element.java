@@ -795,8 +795,7 @@ public class Element {
 	}
 
 	public void waitWhenTrue(String selector, IWaitCallback callback) {
-		this.waitWhenTrue(SeleniumUtils.waitAndFindElement(driver, getBy(selector), config.getPageLoadTimeout()),
-				callback);
+		this.waitWhenTrue(SeleniumUtils.waitAndFindElement(driver, getBy(selector), config.getPageLoadTimeout()), callback);
 	}
 
 	public void waitWhenTrue(WebElement element, IWaitCallback callback) {
@@ -816,7 +815,7 @@ public class Element {
 			}
 			wait(1);
 		}
-		log.error("TIMEOUT: [" + driver.getCurrentUrl() + "]");
+		fail("TIMEOUT: [" + driver.getCurrentUrl() + "]");
 	}
 	
 	public void waitWhenTrue(IWaitCallback callback) {
