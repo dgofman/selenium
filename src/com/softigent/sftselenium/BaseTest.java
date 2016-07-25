@@ -66,7 +66,7 @@ public abstract class BaseTest {
 			} catch (Exception e2) {}
 		}
 	}
-	
+
 	protected void initialize() {
 		log = CacheLogger.getLogger(className);
 	}
@@ -215,6 +215,19 @@ public abstract class BaseTest {
 
 	public WebDriver switchWindow(String winHandle) {
 		return connector.getDriver().switchTo().window(winHandle);
+	}
+	
+	/**
+		startThread(new Runnable() {
+			public void run() {
+				//TO DO
+			}
+		});
+	 */
+	public void startThread(Runnable runnable) {
+		Thread thread = new Thread(runnable);
+		thread.setName("com.softigent.sftselenium::BaseTest");
+		thread.start();
 	}
 
 	public static void print(Object message) {

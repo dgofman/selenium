@@ -58,6 +58,7 @@ public class SeleniumUtils {
 			if (isPrivate) {
 				capabilities.setCapability("chrome.switches", Arrays.asList("--incognito"));
 			}
+			options.addArguments("--disable-extensions");
 			capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 			driver = new ChromeDriver(capabilities);
 		} else if (name.equals("Safari")) {
