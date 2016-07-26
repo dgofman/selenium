@@ -510,25 +510,8 @@ public class Element {
 		return assertString(getCssValue(selector, name), value);
 	}
 
-	public WebElement getOptionByText(String selector, String text) {
-		return getOptionByText(selector, text, "option");
-	}
-
-	public WebElement getOptionByText(String selector, String value, String tagName) {
-		log.debug("OptionByText text=" + value + ", for selector: " + selector);
-		waitIsDisplayed(selector);
-		WebElement select = getElement(selector);
-		List<WebElement> elements = select.findElements(By.tagName(tagName));
-		for (WebElement element : elements) {
-			String text = element.getText();
-			if (text == null || text.equals("")) {
-				text = element.getAttribute("innerHTML");
-			}
-			if (text != null && text.equals(value)) {
-				return element;
-			}
-		}
-		return null;
+	public WebElement getOptionByText(String selector, String value) {
+		return findElementByText(selector, value, "option");
 	}
 
 	public void selectOptionByText(String selector, String text) {
@@ -536,12 +519,48 @@ public class Element {
 	}
 
 	public void selectOptionByText(String selector, String text, String tagName) {
-		WebElement element = getOptionByText(selector, text, tagName);
+		WebElement element = findElementByText(selector, text, tagName);
 		if (element != null) {
 			element.click();
 		} else {
 			fail("Cannot find " + tagName + ": '" + text + "' in: " + selector);
 		}
+	}
+	
+	public WebElement findElementByText(String selector, String value) {
+		return findElementByText(selector, value, "li");
+	}
+	
+	public WebElement findElementByText(String selector, String value, String tagName) {
+		int index = findIndexByText(selector, value, tagName);
+		if (index != -1) {
+			WebElement parent = getElement(selector);
+			return parent.findElements(By.tagName(tagName)).get(index);
+		} else {
+			return null;
+		}
+	}
+	
+	public int findIndexByText(String selector, String value) {
+		return findIndexByText(selector, value, "li");
+	}
+	
+	public int findIndexByText(String selector, String value, String tagName) {
+		log.debug("findIndexByText text=" + value + ", for selector: " + selector);
+		waitIsDisplayed(selector);
+		WebElement parent = getElement(selector);
+		List<WebElement> elements = parent.findElements(By.tagName(tagName));
+		for (int i = 0; i < elements.size(); i++) {
+			WebElement element = elements.get(i);
+			String text = element.getText();
+			if (text == null || text.equals("")) {
+				text = element.getAttribute("innerHTML");
+			}
+			if (text != null && text.equals(value)) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	public void enter(String selector) {
