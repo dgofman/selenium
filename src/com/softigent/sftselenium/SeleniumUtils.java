@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -201,5 +202,22 @@ public class SeleniumUtils {
 		    return m.group(2).split(" ");
 		}
 		return new String[]{};
+	}
+	
+	public static String fillString(int repeatTimes) {
+		return fillString(repeatTimes, null);
+	}
+
+	public static String fillString(int repeatTimes, String pattern) {
+		StringBuffer sf = new StringBuffer();
+		Random ran = new Random();
+		for (int i = 0; i < repeatTimes; i++) {
+			if (pattern == null) {
+				sf.append(ran.nextInt(10));
+			} else {
+				sf.append(pattern);
+			}
+		}
+		return sf.toString();
 	}
 }
