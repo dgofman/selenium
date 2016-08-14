@@ -351,7 +351,8 @@ public class Element {
 	public String getText(WebElement element) {
 		log.debug("Get Text for selector: " + getElementName(element));
 		if (element != null) {
-			if (element.getTagName().toUpperCase().equals("INPUT")) {
+			if (element.getTagName().toUpperCase().equals("INPUT") ||
+				element.getTagName().toUpperCase().equals("TEXTAREA")) {
 				return element.getAttribute("value");
 			}
 			return element.getText();
