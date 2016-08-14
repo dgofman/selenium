@@ -613,16 +613,19 @@ public class Element {
 					e.printStackTrace();
 				}
 			} else {
-				try {
-					log.debug("Click on: " + getElementName(element));
+				log.debug("Click on: " + getElementName(element));
+				this.waitWhenTrue(element, new IWaitCallback() {
+					public boolean isTrue(WebElement element) {
+						return element.isDisplayed();
+					}
+				});
+				if (config.isJqueryClick()) {
+					//try to execute JQuery click
+					executeScript("arguments[0].click();", element);
+				} else {
 					element.click();
-					SeleniumUtils.sleep(config.getActionDelay());
-				} catch (Exception e) {
-					log.warn("Cannot execute click event: " + getElementName(element) + " [" + driver.getCurrentUrl()
-							+ "]\n" + " Will try to click again after " + config.getClickDelay() + " seconds");
-					wait(config.getClickDelay());
-					mouseClick(element);
 				}
+				SeleniumUtils.sleep(config.getActionDelay());
 			}
 		}
 	}
@@ -703,6 +706,9 @@ public class Element {
 		action.dragAndDrop(source, target);
 		action.build().perform();
 		SeleniumUtils.sleep(config.getActionDelay());
+		
+		/*action.clickAndHold(element).build().perform();
+		action.release(element).build().perform();*/
 	}
 
 	public boolean isSelected(String selector) {
