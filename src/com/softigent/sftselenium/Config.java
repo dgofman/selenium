@@ -11,7 +11,6 @@ public class Config extends Properties {
 	private float actionDelay;
 	private int pageLoadTimeout;
 	private int clickButtonDelay;
-	private boolean isJqueryClick;
 
 	private IConfig iConfig;
 		
@@ -39,7 +38,6 @@ public class Config extends Properties {
 		this.actionDelay = Float.parseFloat(this.getProperty(delayKey) != null ? this.getProperty(delayKey) : "0.5");
 		this.pageLoadTimeout = Integer.parseInt(this.getProperty(timeoutKey) != null ? this.getProperty(timeoutKey) : "30");
 		this.clickButtonDelay = Integer.parseInt(this.getProperty(clickDelay) != null ? this.getProperty(clickDelay) : "3");
-		this.isJqueryClick = "true".equals(this.getProperty("use_jquery_click"));
 	}
 
 	@Override
@@ -72,9 +70,5 @@ public class Config extends Properties {
 
 	public void setiConfig(IConfig iConfig) {
 		this.iConfig = iConfig;
-	}
-
-	public boolean isJqueryClick() {
-		return isJqueryClick;
 	}
 }

@@ -581,9 +581,7 @@ public class Element {
 	}
 
 	public void click(String selector, int x, int y) {
-		WebElement element = waitAndFindElement(selector);
-		waitIsDisplayed(selector);
-		click(element, x, y);
+		click(waitAndFindElement(selector), x, y);
 	}
 
 	public void click() {
@@ -620,15 +618,24 @@ public class Element {
 						return element.isDisplayed();
 					}
 				});
-				if (config.isJqueryClick()) {
-					//try to execute JQuery click
-					executeScript("arguments[0].click();", element);
-				} else {
+				try {
 					element.click();
+				} catch (Exception e) {
+					mouseClick(element);
 				}
 				SeleniumUtils.sleep(config.getActionDelay());
 			}
 		}
+	}
+	
+	public void jsClick(String selector) {
+		jsClick(waitAndFindElement(selector));
+	}
+	
+	public void jsClick(WebElement element) {
+		log.debug("jsClick on: " + getElementName(element));
+		executeScript("arguments[0].click();", element);
+		SeleniumUtils.sleep(config.getActionDelay());
 	}
 
 	public void mouseClick(String selector) {
