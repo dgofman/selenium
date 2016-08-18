@@ -12,13 +12,13 @@ public class Container extends Element {
 	static Logger log = CacheLogger.getLogger(Container.class.getName());
 
 	public Container(WebDriver driver, Config config, String selector) {
-		this(driver, config, selector, By.cssSelector(selector));
+		this(driver, config, selector, findBy(selector));
 	}
 
 	public Container(WebDriver driver, Config config, WebElement element) {
 		this(driver, config, null, null, element);
 		this.selector = getSelector(element);
-		this.locator = By.cssSelector(selector);
+		this.locator = findBy(selector);
 	}
 
 	public Container(WebDriver driver, Config config, String selector, By locator) {

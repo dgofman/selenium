@@ -50,13 +50,13 @@ public class Element {
 	}
 
 	public Element(WebDriver driver, Config config, String selector) {
-		this(driver, config, selector, By.cssSelector(selector));
+		this(driver, config, selector, findBy(selector));
 	}
 
 	public Element(WebDriver driver, Config config, WebElement element) {
 		this(driver, config, null, null, element);
 		this.selector = getSelector(element);
-		this.locator = By.cssSelector(selector);
+		this.locator = findBy(selector);
 	}
 
 	public Element(WebDriver driver, Config config, String selector, By locator) {
@@ -67,7 +67,7 @@ public class Element {
 	public Element(WebDriver driver, Config config, String selector, By locator, WebElement element) {
 		this.driver = driver;
 		this.config = config;
-		this.selector = selector;
+		this.selector = fixSelector(selector);
 		this.locator = locator;
 		this.element = element;
 	}
@@ -127,28 +127,43 @@ public class Element {
 	@SuppressWarnings("static-access")
 	public By getBy(String selector, By parent) {
 		By locator;
+		String fixSelector = fixSelector(selector);
+		log.debug("Find selector: " + this.selector + ' ' + fixSelector);
 		if (selector.startsWith("xpath:")) {
-			selector = selector.substring(6);
-			log.debug("Find selector: " + selector);
-			locator = parent.xpath(selector);
+			locator = parent.xpath(fixSelector);
 		} else {
-			log.debug("Find selector: " + this.selector + ' ' + selector);
-			locator = parent.cssSelector(this.selector + ' ' + selector);
+			locator = parent.cssSelector(this.selector + ' ' + fixSelector);
 		}
 		return locator;
 	}
 
 	public static By findBy(String selector) {
 		By locator;
+		String fixSelector = fixSelector(selector);
+		log.debug("Find selector: " + fixSelector);
 		if (selector.startsWith("xpath:")) {
-			selector = selector.substring(6);
-			log.debug("Find selector: " + selector);
-			locator = By.xpath(selector);
+			locator = By.xpath(fixSelector);
 		} else {
-			log.debug("Find selector: " + selector);
-			locator = By.cssSelector(selector);
+			locator = By.cssSelector(fixSelector);
 		}
 		return locator;
+	}
+	
+	public static String fixSelector(String selector) {
+		if (selector.startsWith("xpath:")) {
+			selector = selector.substring(6);
+		} else {
+			if (selector.indexOf("#") != -1) {
+				String[] array = selector.split(" ");
+				for (int i = 0; i < array.length; i++) {
+					if (array[i].charAt(0) == '#') {
+						array[i] = "[id='" + array[i].substring(1) + "']";
+					}
+				}
+				selector = String.join(" ", array);
+			}
+		}
+		return selector;
 	}
 
 	public String getElementName(WebElement element) {
