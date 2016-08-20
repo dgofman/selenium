@@ -157,7 +157,11 @@ public class Element {
 				String[] array = selector.split(" ");
 				for (int i = 0; i < array.length; i++) {
 					if (array[i].charAt(0) == '#') {
-						array[i] = "[id='" + array[i].substring(1) + "']";
+						String[] childred = array[i].split(">"); //Validate on child selector: #a>b
+						array[i] = "[id='" + childred[0].substring(1) + "']";
+						for (int j = 1; j < childred.length; j++) {
+							array[i] += ">" + childred[j];
+						}
 					}
 				}
 				selector = String.join(" ", array);
