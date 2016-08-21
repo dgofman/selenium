@@ -791,11 +791,19 @@ public class Element {
 	public boolean isExists() {
 		return element != null;
 	}
+	
+	public boolean isNotExists() {
+		return element == null;
+	}
 
 	public boolean isExists(String selector) {
 		List<WebElement> elements = driver.findElements(getBy(selector));
 		log.debug("isExists (" + elements.size() + "): " + selector);
 		return elements.size() != 0;
+	}
+	
+	public boolean isNotExists(String selector) {
+		return !isExists(selector);
 	}
 
 	public boolean isVisible() {
