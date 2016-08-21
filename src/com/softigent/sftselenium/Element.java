@@ -887,7 +887,7 @@ public class Element {
 	
 	public static void isTrue(Boolean bool, String message) {
 		if (!bool) {
-			fail(message);
+			fail("<<<<<<<<<<[" + message + "]>>>>>>>>>>");
 		}
 	}
 
