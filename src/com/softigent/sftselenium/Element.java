@@ -71,6 +71,10 @@ public class Element {
 		this.locator = locator;
 		this.element = element;
 	}
+	
+	public Actions getActions() {
+		return new Actions(driver);
+	}
 
 	public WebElement findElement(String selector) {
 		return findElement(getBy(selector));
@@ -656,7 +660,17 @@ public class Element {
 		executeScript("arguments[0].click();", element);
 		SeleniumUtils.sleep(config.getActionDelay());
 	}
-
+	
+	public Actions contextClick(String selector) {
+		return this.contextClick(waitAndFindElement(selector));
+	}
+	
+	public Actions contextClick(WebElement element) {
+		Actions action = new Actions(driver).contextClick(element);
+		action.build().perform();
+		return action;
+	}
+	
 	public void mouseClick(String selector) {
 		mouseClick(selector, 0, 0);
 	}
