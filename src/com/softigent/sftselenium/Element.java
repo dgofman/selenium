@@ -45,8 +45,8 @@ public class Element {
 	}
 
 	public static String getSelector(WebElement element) {
-		String[] s = element.toString().split(" -> ");
-		return s[1].replace("css selector: ", "").substring(0, s[1].length() - 1);
+ 		String[] s = element.toString().split(" -> ");
+		return s[1].replace("css selector: ", "").replaceFirst("]$","");
 	}
 
 	public Element(WebDriver driver, Config config, String selector) {
