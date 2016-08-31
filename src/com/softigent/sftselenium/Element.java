@@ -84,6 +84,10 @@ public class Element {
 		return getElement(locator);
 	}
 
+	public List<WebElement> findElements(WebElement parent, String path) {
+		return parent.findElements(By.xpath(path));
+	}
+	
 	public List<WebElement> findElements(String selector) {
 		return getElements(getBy(selector), -1);
 	}
