@@ -903,6 +903,10 @@ public class Element {
 		this.waitWhenTrue(element, callback, true);
 	}
 	
+	public static void isFalse(Boolean bool, String message) {
+		Element.isTrue(bool == false, message);
+	}
+	
 	public static void isTrue(Boolean bool, String message) {
 		if (!bool) {
 			fail("<<<<<<<<<<[" + message + "]>>>>>>>>>>");
