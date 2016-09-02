@@ -776,13 +776,15 @@ public class Element {
 
 	public Alert alertWindow(int state) {
 		Alert alert = driver.switchTo().alert();
-		switch (state) {
-		case 1:
-			alert.accept(); // for two buttons, choose the affirmative one
-			break;
-		case 2:
-			alert.dismiss();
-			break;
+		if (alert !=  null) {
+			switch (state) {
+				case 1:
+					alert.accept(); // for two buttons, choose the affirmative one
+					break;
+				case 2:
+					alert.dismiss();
+					break;
+			}
 		}
 		return alert;
 	}
