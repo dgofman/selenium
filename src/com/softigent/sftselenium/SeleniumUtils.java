@@ -125,10 +125,11 @@ public class SeleniumUtils {
 	}
 
 	public static File screenshot(WebDriver driver, String fileName) {
-		File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+		File scrFile = null;
 		try {
+			scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 			FileUtils.copyFile(scrFile, new File(fileName));
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return scrFile;

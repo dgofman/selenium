@@ -773,19 +773,26 @@ public class Element {
 		}
 		return false;
 	}
+	
+	public WebElement activeElement() {
+		return driver.switchTo().activeElement();
+	}
 
 	public Alert alertWindow(int state) {
-		Alert alert = driver.switchTo().alert();
-		if (alert !=  null) {
-			switch (state) {
-				case 1:
-					alert.accept(); // for two buttons, choose the affirmative one
-					break;
-				case 2:
-					alert.dismiss();
-					break;
+		Alert alert = null;
+		try {
+			alert = driver.switchTo().alert();
+			if (alert !=  null) {
+				switch (state) {
+					case 1:
+						alert.accept(); // for two buttons, choose the affirmative one
+						break;
+					case 2:
+						alert.dismiss();
+						break;
+				}
 			}
-		}
+		} catch (Exception e) {}
 		return alert;
 	}
 
