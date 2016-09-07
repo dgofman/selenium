@@ -239,14 +239,16 @@ public class Element {
 		return rect;
 	}
 
-	//Be sure the Developer Tool is closed or dock to right, otherwise vertical calculation will be failed. 
+	//Be sure the Developer Tool is closed or dock to right, otherwise vertical calculation will be failed.
+	//Chrome download bar must be closed. See: SeleniumUtils.resetWindow();
 	public Point getElementLocation(WebElement element) {
 		@SuppressWarnings("unchecked")
 		ArrayList<Number> o = (ArrayList<Number>) executeScript(
 				"return (function(o) { var l = [screenX || screenLeft, (screenY || screenTop) + ((screen.height - innerHeight) - (screen.height - outerHeight))]; "
 						+ "while(o) { l[0] += + o.offsetLeft; l[1] += + o.offsetTop; o = o.offsetParent; } return l;})(arguments[0])",
 				element, null, null);
-		return new Point(o.get(0).intValue(), o.get(1).intValue());
+		Point offset = config.getWindowOffset();
+		return new Point(o.get(0).intValue() + offset.x, o.get(1).intValue() - offset.y);
 	}
 
 	public Object executeScript(String selector, String command, String attrName, Object value) {
@@ -577,9 +579,12 @@ public class Element {
 	}
 	
 	public int findIndexByText(String selector, String value, String tagName) {
-		log.debug("findIndexByText text=" + value + ", for selector: " + selector);
 		waitIsDisplayed(selector);
-		WebElement parent = getElement(selector);
+		return findIndexByText(getElement(selector), value, tagName);
+	}
+
+	public int findIndexByText(WebElement parent, String value, String tagName) {
+		log.debug("findIndexByText text=" + value + ", for element: " + getElementName(parent));
 		List<WebElement> elements = parent.findElements(By.tagName(tagName));
 		for (int i = 0; i < elements.size(); i++) {
 			WebElement element = elements.get(i);
@@ -595,66 +600,43 @@ public class Element {
 	}
 
 	public void enter(String selector) {
-		enter(getElement(selector));
+		enter(waitAndFindElement(selector));
 	}
 
 	public void enter(WebElement element) {
 		log.debug("Enter on: " + getElementName(element));
 		element.sendKeys(Keys.ENTER);
 	}
-
+	
 	public void click(String selector) {
-		this.click(selector, 0, 0);
-	}
-
-	public void click(String selector, int x, int y) {
-		click(waitAndFindElement(selector), x, y);
+		click(waitAndFindElement(selector));
 	}
 
 	public void click() {
 		this.click(element);
 	}
 
-	public void click(WebElement element) {
-		this.click(element, 0, 0);
-	}
-
 	public void click(WebElement parentElement, String path) {
-		this.click(findElement(parentElement, path), 0, 0);
+		this.click(parentElement.findElement(findBy(path)));
 	}
 
-	public void click(WebElement parentElement, String path, int x, int y) {
-		this.click(parentElement.findElement(findBy(path)), x, y);
-	}
-
-	public void click(WebElement element, int x, int y) {
+	public void click(WebElement element) {
 		if (element != null) {
-			if (x != 0 || y != 0) {
-				try {
-					log.trace("Robot click (" + x + 'x' + y + ") on: " + getElementName(element));
-					robotMouseMove(element.getLocation().x + x, element.getLocation().y + y);
-					robotMouseClick();
-					SeleniumUtils.sleep(config.getActionDelay());
-				} catch (AWTException e) {
-					e.printStackTrace();
+			log.debug("Click on: " + getElementName(element));
+			this.waitWhenTrue(element, new IWaitCallback() {
+				public boolean isTrue(WebElement element) {
+					return element.isDisplayed();
 				}
-			} else {
-				log.debug("Click on: " + getElementName(element));
-				this.waitWhenTrue(element, new IWaitCallback() {
-					public boolean isTrue(WebElement element) {
-						return element.isDisplayed();
-					}
-				});
-				try {
-					element.click();
-				} catch (Exception e) {
-					mouseClick(element);
-				}
-				SeleniumUtils.sleep(config.getActionDelay());
+			});
+			try {
+				element.click();
+			} catch (Exception e) {
+				mouseClick(element);
 			}
+			SeleniumUtils.sleep(config.getActionDelay());
 		}
 	}
-	
+
 	public void jsClick(String selector) {
 		jsClick(waitAndFindElement(selector));
 	}
@@ -675,51 +657,114 @@ public class Element {
 		return action;
 	}
 	
-	public void mouseClick(String selector) {
-		mouseClick(selector, 0, 0);
+	public Actions mouseClick(String selector) {
+		return mouseClick(selector, 0, 0);
 	}
 
-	public void mouseClick(WebElement element) {
-		this.mouseClick(element, 0, 0);
+	public Actions mouseClick(WebElement element) {
+		return this.mouseClick(element, 0, 0);
 	}
 
-	public void mouseClick(String selector, int x, int y) {
-		mouseClick(getElement(selector), x, y);
+	public Actions mouseClick(String selector, int x, int y) {
+		return mouseClick(waitAndFindElement(selector), x, y);
 	}
 
-	public void mouseClick(WebElement element, int x, int y) {
+	public Actions mouseClick(WebElement element, int x, int y) {
 		log.debug("Mouse Click (" + x + 'x' + y + ") on: " + getElementName(element));
 		Actions action = new Actions(driver);
 		action.moveToElement(element, x, y).click();
 		action.build().perform();
 		SeleniumUtils.sleep(config.getActionDelay());
+		return action;
 	}
 
-	public void mouseMove(String selector) {
-		mouseMove(getElement(selector));
+	public Actions mouseMove(String selector) {
+		return mouseMove(selector, 0, 0);
 	}
 
-	public void mouseMove(WebElement element) {
-		this.mouseMove(element, 0, 0);
+	public Actions mouseMove(String selector, int x, int y) {
+		return this.mouseMove(waitAndFindElement(selector), x, y);
+	}
+	
+	public Actions mouseMove(WebElement element) {
+		return this.mouseMove(element, 0, 0);
 	}
 
-	public void mouseMove(WebElement element, int x, int y) {
+	public Actions mouseMove(WebElement element, int x, int y) {
 		log.debug("Mouse Move (" + x + 'x' + y + ") on: " + getElementName(element));
 		Actions action = new Actions(driver);
 		action.moveToElement(element, x, y);
-		action.click().build().perform();
+		action.build().perform();
 		SeleniumUtils.sleep(config.getActionDelay());
+		return action;
+	}
+	
+	public void robotMouseMove(String selector) {
+		robotMouseMove(selector, 0, 0);
+	}
+	
+	public void robotMouseMove(String selector, int offsetX, int offsetY) {
+		robotMouseMove(waitAndFindElement(selector), offsetX, offsetY);
+	}
+	
+	public void robotMouseMove(WebElement element) {
+		robotMouseMove(element, 0, 0);
 	}
 
-	public void robotMouseMove(int x, int y) throws AWTException {
-		Robot robot = new Robot();
-		robot.mouseMove(x, y);
+	public void robotMouseMove(WebElement element, int offsetX, int offsetY) {
+		executeScript("return arguments[0].scrollIntoView(true);", element);
+		WebElement body = driver.findElement(By.tagName("body"));
+		@SuppressWarnings("unchecked")
+		ArrayList<Number> a = (ArrayList<Number>) executeScript(
+				"return (function(o) { var l = [o.scrollLeft, o.scrollTop]; return l;})(arguments[0])", body);
+		wait(.2f);
+		Point point = getElementLocation(element);
+		log.info("robotMouseMove: " + (point.x + offsetX) + 'x' + (point.y + offsetY) + " - " + a.get(0).intValue() + 'x' + a.get(1).intValue());
+		robotMouseMove(point.x + offsetX - a.get(0).intValue(), point.y + offsetY - a.get(1).intValue());
 	}
 
-	public void robotMouseClick() throws AWTException {
-		Robot robot = new Robot();
-		robot.mousePress(InputEvent.BUTTON1_MASK);
-		robot.mouseRelease(InputEvent.BUTTON1_MASK);
+	public void robotMouseMove(int x, int y) {
+		try {
+			Robot robot = new Robot();
+			robot.mouseMove(x, y);
+		} catch (AWTException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void robotMouseClick(String selector) {
+		robotMouseClick(selector, 0, 0);
+	}
+	
+	public void robotMouseClick(String selector, int offsetX, int offsetY) {
+		robotMouseClick(waitAndFindElement(selector), offsetX, offsetY);
+	}
+
+	public void robotMouseClick(WebElement element) {
+		robotMouseClick(element, 0, 0);
+	}
+
+	public void robotMouseClick(WebElement element, int offsetX, int offsetY) {
+		robotMouseMove(element, offsetX, offsetY);
+		wait(.2f);
+		robotMouseClick();
+	}
+
+	public void robotMouseClick() {
+		robotMouseClick(true);
+	}
+
+	public void robotMouseClick(boolean moveMouseOut) {
+		try {
+			Robot robot = new Robot();
+			robot.mousePress(InputEvent.BUTTON1_MASK);
+			robot.mouseRelease(InputEvent.BUTTON1_MASK);
+			if (moveMouseOut) {
+				robotMouseMove(0, 0);
+			}
+		} catch (AWTException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void robotMouseDragAndDrop(WebElement source, WebElement target) throws AWTException {
@@ -728,15 +773,15 @@ public class Element {
 
 	public void robotMouseDragAndDrop(WebElement source, WebElement target, int offsetX, int offsetY) throws AWTException {
 		Robot robot = new Robot();
+		robot.setAutoDelay(500);
 		Point sourcePoint = getElementLocation(source);
 		Point targetPoint = getElementLocation(target);
 		// drag
 		robot.mouseMove(sourcePoint.x + offsetX, sourcePoint.y + offsetY);
 		robot.mousePress(InputEvent.BUTTON1_MASK);
-		wait(1);
+		robot.mouseMove(sourcePoint.x, sourcePoint.y - 5); //register drag event
 		// drop
 		robot.mouseMove(targetPoint.x + offsetX, targetPoint.y + offsetY);
-		wait(1);
 		robot.mouseRelease(InputEvent.BUTTON1_MASK);
 		SeleniumUtils.sleep(config.getActionDelay());
 	}
@@ -751,10 +796,20 @@ public class Element {
 		action.dragAndDrop(source, target);
 		action.build().perform();
 		SeleniumUtils.sleep(config.getActionDelay());
-		
-		/*action.clickAndHold(element).build().perform();
-		action.release(element).build().perform();*/
 	}
+
+	public void clickAndHoldDrag(WebElement source, WebElement target) {
+		clickAndHoldDrag(source, target);
+	}
+
+	public void clickAndHoldDrag(WebElement source, WebElement target, int offsetX, int offsetY) {
+		log.debug("Mouse clickAndHold: source=" + getElementName(source) + ", target=" + getElementName(target));
+		Actions action = new Actions(driver);
+		action.moveToElement(source, offsetX, offsetY).clickAndHold(source).moveToElement(target).release(source);
+		action.build().perform();
+		SeleniumUtils.sleep(config.getActionDelay());
+	}
+
 
 	public boolean isSelected(String selector) {
 		log.debug("isSelected: " + selector);
@@ -903,7 +958,11 @@ public class Element {
 				}
 				return;
 			}
-			wait(1);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 		fail("TIMEOUT: [" + driver.getCurrentUrl() + "]");
 	}
@@ -952,7 +1011,7 @@ public class Element {
 	public static Boolean validateString(String str1, String str2, boolean isAssert) {
 		boolean isTrue = compareString(str1, str2);
 		if (isAssert) {
-			assertTrue(isTrue);
+			isTrue(isTrue, "\n'" + str1 + "' !=\n'" + str2 + "'\n");
 		}
 		return isTrue;
 	}
@@ -1000,16 +1059,16 @@ public class Element {
 	}
 
 	public void wait(float sec) {
-		mlsWait((int) sec * 1000);
+		mlsWait(sec * 1000);
 	}
 
 	public void wait(int sec) {
 		mlsWait(sec * 1000);
 	}
 
-	public static void mlsWait(int mlSec) {
+	public static void mlsWait(float mlSec) {
 		try {
-			Thread.sleep(mlSec);
+			Thread.sleep((int)mlSec);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -1030,7 +1089,7 @@ public class Element {
 	}
 
 	public void print(WebElement element) {
-		print(executeScript("return arguments[0].outerHTML", element, null, null));
+		print(executeScript("return arguments[0].outerHTML", element));
 	}
 
 	public void print() {

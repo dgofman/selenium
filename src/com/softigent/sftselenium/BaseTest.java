@@ -14,6 +14,8 @@ import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 @FixMethodOrder(MethodSorters.JVM)
 public abstract class BaseTest {
@@ -50,9 +52,7 @@ public abstract class BaseTest {
 	}
 
 	protected String doFailed(Throwable e, Description description) {
-		if (e.getMessage() != null) {
-			log.error(e.getMessage());
-		}
+		log.error("BaseTest::doFailed", e);
 		return String.join("\n", CacheLogger.getLastMessages());
 	}
 	
@@ -107,11 +107,15 @@ public abstract class BaseTest {
 	}
 	
 	public void waitPageLoad() {
-		SeleniumUtils.wait(connector.getDriver(), connector.getConfig().getPageLoadTimeout(), null);
+		waitPageLoad(null);
 	}
 
 	public void waitPageLoad(String urlPath) {
-		SeleniumUtils.wait(connector.getDriver(), connector.getConfig().getPageLoadTimeout(), Pattern.compile(urlPath));
+		waitPageLoad(urlPath, connector.getConfig().getPageLoadTimeout());
+	}
+	
+	public void waitPageLoad(String urlPath, int timeoutSec) {
+		SeleniumUtils.wait(connector.getDriver(), timeoutSec, urlPath != null ? Pattern.compile(urlPath) : null);
 	}
 
 	/*
@@ -145,12 +149,12 @@ public abstract class BaseTest {
 	public String getURL(String url) {
 		return url;
 	}
-	
+
 	public void openPage(String url) {
 		log.info("Opening " + url);
 		connector.getDriver().get(getURL(url));
 	}
-	
+
 	public void gotoURL(String path) {
 		String url = getCurrentURL();
 		url = getURL(url.substring(0,  url.indexOf('/', url.indexOf("//") + 2)) + path);
@@ -165,6 +169,11 @@ public abstract class BaseTest {
 		connector.getDriver().navigate().to(url);
 	}
 	
+	public void waitForLoad() {
+		new WebDriverWait(connector.getDriver(), 30).until((ExpectedCondition<Boolean>) wd ->
+			((JavascriptExecutor) wd).executeScript("return document.readyState").equals("complete"));
+	}
+
 	public void addCookies(String name, String value) {
 		connector.getDriver().manage().addCookie(new Cookie(name, value));
 	}

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.logging.Level;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
@@ -33,6 +34,9 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.logging.LoggingPreferences;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -42,9 +46,12 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 public class SeleniumUtils {
 
 	public static boolean acceptNextAlert = true;
+	
+	private static String browserName;
 
 	public static WebDriver getDriver(String name, Config config) {
 		WebDriver driver = null;
+		browserName = name;
 		boolean isPrivate = "true".equals(config.getProperty("open_as_private"));
 		boolean isFullScreen = "true".equals(config.getProperty("open_fullscreen"));
 		if (name.equals("Firefox")) {
@@ -64,6 +71,10 @@ public class SeleniumUtils {
 				capabilities.setCapability("chrome.switches", Arrays.asList("--incognito"));
 			}
 			options.addArguments("--disable-extensions");
+
+			LoggingPreferences logPrefs = new LoggingPreferences();
+			logPrefs.enable(LogType.BROWSER, Level.ALL);
+			capabilities.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
 			capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 			driver = new ChromeDriver(capabilities);
 		} else if (name.equals("Safari")) {
@@ -83,6 +94,9 @@ public class SeleniumUtils {
 				driver.manage().window().maximize();
 			}
 		} else if (config.getProperty("window_dimension") != null) {
+			if (name.equals("Chrome")) {
+				config.getWindowOffset().move(8, 8); //Chrome browser wrapping window with 8 pixels border
+			}
 			String[] wh = config.getProperty("window_dimension").split("x");
 			if (wh.length == 2) {
 				Dimension d = new Dimension(Integer.parseInt(wh[0]), Integer.parseInt(wh[1]));
@@ -181,19 +195,23 @@ public class SeleniumUtils {
 		StringSelection ss = new StringSelection(path);
 		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, null);
 		try {
-			Thread.sleep(500);
+			Thread.sleep(200);
 			driver.switchTo().activeElement();
 			Robot robot = new Robot();
+			robot.setAutoDelay(200);
 			robot.keyPress(KeyEvent.VK_CONTROL);
 			robot.keyPress(KeyEvent.VK_V);
 			robot.keyRelease(KeyEvent.VK_V);
 			robot.keyRelease(KeyEvent.VK_CONTROL);
-			Thread.sleep(500);
 			robot.keyPress(KeyEvent.VK_ENTER);
 			robot.keyRelease(KeyEvent.VK_ENTER);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static void beep() {
+		java.awt.Toolkit.getDefaultToolkit().beep();
 	}
 	
 	public static List<String> getVMArguments() {
@@ -226,9 +244,31 @@ public class SeleniumUtils {
 		return sf.toString();
 	}
 	
+	public static void resetWindow() {
+		if (SeleniumUtils.getBrowserName().equals("Chrome")) {
+			//Close Chrome download bar
+			try {
+				Robot robot = new Robot();
+				robot.setAutoDelay(500);
+				robot.keyPress(KeyEvent.VK_CONTROL);
+				robot.keyPress(KeyEvent.VK_J);
+				robot.keyPress(KeyEvent.VK_W);
+				robot.keyRelease(KeyEvent.VK_W);
+				robot.keyRelease(KeyEvent.VK_J);
+				robot.keyRelease(KeyEvent.VK_CONTROL);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public static HttpResponse getHttpResponse(String url) throws IOException {
 		HttpClient client = HttpClientBuilder.create().build();
 		HttpGet request = new HttpGet(url);
 		return client.execute(request);
+	}
+
+	public static String getBrowserName() {
+		return browserName;
 	}
 }
