@@ -721,6 +721,7 @@ public class Element {
 		Point point = getElementLocation(element);
 		log.info("robotMouseMove: " + (point.x + offsetX) + 'x' + (point.y + offsetY) + " - " + a.get(0).intValue() + 'x' + a.get(1).intValue());
 		robotMouseMove(point.x + offsetX - a.get(0).intValue(), point.y + offsetY - a.get(1).intValue());
+		SeleniumUtils.sleep(config.getActionDelay());
 	}
 
 	public void robotMouseMove(int x, int y) {
@@ -746,7 +747,6 @@ public class Element {
 
 	public void robotMouseClick(WebElement element, int offsetX, int offsetY) {
 		robotMouseMove(element, offsetX, offsetY);
-		wait(.2f);
 		robotMouseClick();
 	}
 
