@@ -182,6 +182,10 @@ public abstract class BaseTest {
 		connector.getDriver().manage().deleteCookieNamed(name);
 	}
 	
+	public void deleteAllCookies() {
+		connector.getDriver().manage().deleteAllCookies();
+	}
+	
 	public void closeBrowser() {
 		connector.getDriver().quit();
 	}
