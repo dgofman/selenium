@@ -177,9 +177,13 @@ public abstract class BaseTest {
 	public void addCookies(String name, String value) {
 		connector.getDriver().manage().addCookie(new Cookie(name, value));
 	}
-	
+
 	public void deleteCookie(String name) {
 		connector.getDriver().manage().deleteCookieNamed(name);
+	}
+	
+	public void deleteAllCookies() {
+		connector.getDriver().manage().deleteAllCookies();
 	}
 	
 	public void closeBrowser() {
