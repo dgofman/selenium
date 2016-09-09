@@ -770,18 +770,38 @@ public class Element {
 	public void robotMouseDragAndDrop(WebElement source, WebElement target) throws AWTException {
 		robotMouseDragAndDrop(source, target, 0, 0);
 	}
-
+	
 	public void robotMouseDragAndDrop(WebElement source, WebElement target, int offsetX, int offsetY) throws AWTException {
+		robotMouseDragAndDrop(source, target, offsetX, offsetY, offsetX, offsetY);
+	}
+
+	public void robotMouseDragAndDrop(WebElement source, WebElement target, int offsetX1, int offsetY1, int offsetX2, int offsetY2) throws AWTException {
+		WebElement element;
+		if (source.getLocation().y > target.getLocation().y) {
+			element = target;
+		} else {
+			element = source;
+		}
+		executeScript("return arguments[0].scrollIntoView(true);", element);
+		WebElement body = driver.findElement(By.tagName("body"));
+		@SuppressWarnings("unchecked")
+		ArrayList<Number> a = (ArrayList<Number>) executeScript(
+				"return (function(o) { var l = [o.scrollLeft, o.scrollTop]; return l;})(arguments[0])", body);
+		wait(.2f);
+		log.info("robotMouseDragAndDrop: " + a.get(0).intValue() + 'x' + a.get(1).intValue());
+
 		Robot robot = new Robot();
 		robot.setAutoDelay(500);
 		Point sourcePoint = getElementLocation(source);
 		Point targetPoint = getElementLocation(target);
 		// drag
-		robot.mouseMove(sourcePoint.x + offsetX, sourcePoint.y + offsetY);
+		log.info("Source - x=" + (sourcePoint.x + offsetX1 - a.get(0).intValue()) + ", y=" + (sourcePoint.y + offsetY1 - a.get(1).intValue()));
+		robot.mouseMove(sourcePoint.x + offsetX1 - a.get(0).intValue(), sourcePoint.y + offsetY1 - a.get(1).intValue());
 		robot.mousePress(InputEvent.BUTTON1_MASK);
-		robot.mouseMove(sourcePoint.x, sourcePoint.y - 5); //register drag event
+		robot.mouseMove(sourcePoint.x - a.get(0).intValue(), sourcePoint.y - a.get(1).intValue() - 5); //register drag event
 		// drop
-		robot.mouseMove(targetPoint.x + offsetX, targetPoint.y + offsetY);
+		log.info("Target - x=" + (targetPoint.x + offsetX2 - a.get(0).intValue()) + ", y=" + (targetPoint.y + offsetY2 - a.get(1).intValue()));
+		robot.mouseMove(targetPoint.x + offsetX2 - a.get(0).intValue(), targetPoint.y + offsetY2 - a.get(1).intValue());
 		robot.mouseRelease(InputEvent.BUTTON1_MASK);
 		SeleniumUtils.sleep(config.getActionDelay());
 	}
