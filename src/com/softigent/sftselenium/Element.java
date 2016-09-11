@@ -758,6 +758,7 @@ public class Element {
 		try {
 			Robot robot = new Robot();
 			robot.mousePress(InputEvent.BUTTON1_MASK);
+			wait(.1f);
 			robot.mouseRelease(InputEvent.BUTTON1_MASK);
 			if (moveMouseOut) {
 				robotMouseMove(0, 0);
