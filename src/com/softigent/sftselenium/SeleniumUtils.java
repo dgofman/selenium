@@ -197,14 +197,9 @@ public class SeleniumUtils {
 		try {
 			Thread.sleep(200);
 			driver.switchTo().activeElement();
-			Robot robot = new Robot();
-			robot.setAutoDelay(200);
-			robot.keyPress(KeyEvent.VK_CONTROL);
-			robot.keyPress(KeyEvent.VK_V);
-			robot.keyRelease(KeyEvent.VK_V);
-			robot.keyRelease(KeyEvent.VK_CONTROL);
-			robot.keyPress(KeyEvent.VK_ENTER);
-			robot.keyRelease(KeyEvent.VK_ENTER);
+			Robot robot = Element.getRobot(200);
+			Element.keyPress(new int[] {KeyEvent.VK_CONTROL, KeyEvent.VK_V}, robot);
+			Element.keyPress(KeyEvent.VK_ENTER, robot);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -247,18 +242,7 @@ public class SeleniumUtils {
 	public static void resetWindow() {
 		if (SeleniumUtils.getBrowserName().equals("Chrome")) {
 			//Close Chrome download bar
-			try {
-				Robot robot = new Robot();
-				robot.setAutoDelay(500);
-				robot.keyPress(KeyEvent.VK_CONTROL);
-				robot.keyPress(KeyEvent.VK_J);
-				robot.keyPress(KeyEvent.VK_W);
-				robot.keyRelease(KeyEvent.VK_W);
-				robot.keyRelease(KeyEvent.VK_J);
-				robot.keyRelease(KeyEvent.VK_CONTROL);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			Element.keyPress(new int[] {KeyEvent.VK_CONTROL, KeyEvent.VK_J, KeyEvent.VK_W}, Element.getRobot(500));
 		}
 	}
 	

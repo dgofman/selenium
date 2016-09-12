@@ -7,6 +7,7 @@ import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.InputEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -725,12 +726,7 @@ public class Element {
 	}
 
 	public void robotMouseMove(int x, int y) {
-		try {
-			Robot robot = new Robot();
-			robot.mouseMove(x, y);
-		} catch (AWTException e) {
-			e.printStackTrace();
-		}
+		getRobot().mouseMove(x, y);
 	}
 	
 	public void robotMouseClick(String selector) {
@@ -755,16 +751,11 @@ public class Element {
 	}
 
 	public void robotMouseClick(boolean moveMouseOut) {
-		try {
-			Robot robot = new Robot();
-			robot.setAutoDelay(100);
-			robot.mousePress(InputEvent.BUTTON1_MASK);
-			robot.mouseRelease(InputEvent.BUTTON1_MASK);
-			if (moveMouseOut) {
-				robotMouseMove(0, 0);
-			}
-		} catch (AWTException e) {
-			e.printStackTrace();
+		Robot robot = getRobot(100);
+		robot.mousePress(InputEvent.BUTTON1_MASK);
+		robot.mouseRelease(InputEvent.BUTTON1_MASK);
+		if (moveMouseOut) {
+			robotMouseMove(0, 0);
 		}
 	}
 
@@ -772,11 +763,11 @@ public class Element {
 		robotMouseDragAndDrop(source, target, 0, 0);
 	}
 	
-	public void robotMouseDragAndDrop(WebElement source, WebElement target, int offsetX, int offsetY) throws AWTException {
+	public void robotMouseDragAndDrop(WebElement source, WebElement target, int offsetX, int offsetY) {
 		robotMouseDragAndDrop(source, target, offsetX, offsetY, offsetX, offsetY);
 	}
 
-	public void robotMouseDragAndDrop(WebElement source, WebElement target, int offsetX1, int offsetY1, int offsetX2, int offsetY2) throws AWTException {
+	public void robotMouseDragAndDrop(WebElement source, WebElement target, int offsetX1, int offsetY1, int offsetX2, int offsetY2) {
 		WebElement element;
 		if (source.getLocation().y > target.getLocation().y) {
 			element = target;
@@ -791,8 +782,7 @@ public class Element {
 		wait(.2f);
 		log.info("robotMouseDragAndDrop: " + a.get(0).intValue() + 'x' + a.get(1).intValue());
 
-		Robot robot = new Robot();
-		robot.setAutoDelay(500);
+		Robot robot = getRobot(500);
 		Point sourcePoint = getElementLocation(source);
 		Point targetPoint = getElementLocation(target);
 		// drag
@@ -830,7 +820,48 @@ public class Element {
 		action.build().perform();
 		SeleniumUtils.sleep(config.getActionDelay());
 	}
+	
+	//key - java.awt.event.KeyEvent;
+	public static void keyPress(int key) {
+		keyPress(key, getRobot());
+	}
 
+	public static void keyPress(int key, Robot robot) {
+		int[] keys = new int[1];
+		keys[0] = key;
+		keyPress(keys, robot);
+	}
+
+	public static void keyPress(int [] keys) {
+		keyPress(keys, getRobot());
+	}
+		
+	public static void keyPress(int [] keys, Robot robot) {
+		log.info("keyPress: " + Arrays.toString(keys));
+		for (int i = 0; i < keys.length; i++) {
+			robot.keyPress(keys[i]);
+		}
+		for (int i = keys.length - 1; i >= 0; i--) {
+			robot.keyRelease(keys[i]);
+		}
+	}
+	
+	public static Robot getRobot() {
+		return getRobot(0);
+	}
+		
+	public static Robot getRobot(int delay) {
+		Robot robot = null;
+		try {
+			robot = new Robot();
+			if (delay > 0) {
+				robot.setAutoDelay(100);
+			}
+		} catch (AWTException e) {
+			e.printStackTrace();
+		}
+		return robot;
+	}
 
 	public boolean isSelected(String selector) {
 		log.debug("isSelected: " + selector);
