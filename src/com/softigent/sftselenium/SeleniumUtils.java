@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -42,6 +43,13 @@ import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import com.sun.jna.Native;
+import com.sun.jna.Pointer;
+import com.sun.jna.platform.win32.WinUser;
+import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.platform.win32.WinUser.WNDENUMPROC;
+import com.sun.jna.win32.StdCallLibrary;
 
 public class SeleniumUtils {
 
@@ -250,6 +258,38 @@ public class SeleniumUtils {
 		HttpClient client = HttpClientBuilder.create().build();
 		HttpGet request = new HttpGet(url);
 		return client.execute(request);
+	}
+	
+	public interface User32 extends StdCallLibrary {
+		User32 INSTANCE = (User32) Native.loadLibrary("user32", User32.class);
+		boolean EnumWindows(WinUser.WNDENUMPROC lpEnumFunc, Pointer arg);
+		int GetWindowTextA(HWND hWnd, byte[] lpString, int nMaxCount);
+		HWND SetFocus(HWND hWnd);
+	}
+	
+	public static List<HWND> getWin32Handle(String title) {
+		final List<HWND> hWnds = new ArrayList<HWND>();
+		final User32 user32 = User32.INSTANCE;
+		user32.EnumWindows(new WNDENUMPROC() {
+			@Override
+			public boolean callback(HWND hWnd, Pointer arg1) {
+				byte[] windowText = new byte[512];
+				user32.GetWindowTextA(hWnd, windowText, 512);
+				String wText = Native.toString(windowText).trim();
+
+				if (wText.isEmpty()) {
+					return true;
+				} else if (title.equals(wText)) {
+					hWnds.add(hWnd);
+				}
+				return true;
+			}
+		}, null);
+		return hWnds;
+	}
+	
+	public static void setWin32Focus(HWND hWnd) {
+		User32.INSTANCE.SetFocus(hWnd);
 	}
 
 	public static String getBrowserName() {
