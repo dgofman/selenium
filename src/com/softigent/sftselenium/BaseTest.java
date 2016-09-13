@@ -230,6 +230,10 @@ public abstract class BaseTest {
 		return connector.getDriver().switchTo().window(winHandle);
 	}
 	
+	public void closeWindow(String winHandle) {
+		connector.getDriver().switchTo().window(winHandle).close();
+	}
+	
 	/**
 		startThread(new Runnable() {
 			public void run() {
