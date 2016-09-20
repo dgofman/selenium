@@ -1,5 +1,7 @@
 package com.softigent.sftselenium;
 
+import static org.junit.Assume.assumeTrue;
+
 import java.io.File;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -7,6 +9,7 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.junit.FixMethodOrder;
 import org.junit.Rule;
+import org.junit.rules.TestName;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runners.MethodSorters;
@@ -33,6 +36,18 @@ public abstract class BaseTest {
 		}
 	};
 	
+	@Rule
+	public TestName testName = new TestName();
+	
+	public void validateIgnoreTests(String[] ignoreTests) throws Exception {
+		for (String test : ignoreTests) {
+			if (test.equals(testName.getMethodName())) {
+				assumeTrue(false);
+				break;
+			}
+		}
+	}
+
 	public final Container body;
 
 	public BaseTest(Connector connector) {
