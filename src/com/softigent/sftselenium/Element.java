@@ -637,7 +637,18 @@ public class Element {
 			SeleniumUtils.sleep(config.getActionDelay());
 		}
 	}
-
+	
+	public void doubleClick(String selector) {
+		doubleClick(waitAndFindElement(selector));
+	}
+	
+	public void doubleClick(WebElement element) {
+		log.debug("DoubleClick on: " + getElementName(element));
+		Actions action = new Actions(driver);
+		action.moveToElement(element).doubleClick().build().perform();
+		SeleniumUtils.sleep(config.getActionDelay());
+	}
+	
 	public void jsClick(String selector) {
 		jsClick(waitAndFindElement(selector));
 	}

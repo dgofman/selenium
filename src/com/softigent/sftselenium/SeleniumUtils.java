@@ -279,7 +279,7 @@ public class SeleniumUtils {
 
 				if (wText.isEmpty()) {
 					return true;
-				} else if (title.equals(wText)) {
+				} else if (Element.regExpString(wText, title)) {
 					hWnds.add(hWnd);
 				}
 				return true;
