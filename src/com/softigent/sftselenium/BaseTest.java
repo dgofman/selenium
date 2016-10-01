@@ -27,6 +27,8 @@ public abstract class BaseTest {
 
 	protected Logger log;
 	protected String className;
+	
+	public static final double GIT_VERSION = 1.2;
 
 	@Rule
 	public TestWatcher testWatchThis = new TestWatcher() {
@@ -38,6 +40,14 @@ public abstract class BaseTest {
 	
 	@Rule
 	public TestName testName = new TestName();
+	
+	public static void verifySeleniumVersion(double version) {
+		if (version < GIT_VERSION) {
+			String error = "Unsupported major.minor version " + GIT_VERSION + ".\nGet latest changes from https://github.com/dgofman/selenium";
+			System.err.println(error);
+			throw new UnsupportedClassVersionError(error);
+		}
+	}
 	
 	public void validateIgnoreTests(String[] ignoreTests) throws Exception {
 		for (String test : ignoreTests) {

@@ -104,6 +104,8 @@ public class SeleniumUtils {
 		} else if (config.getProperty("window_dimension") != null) {
 			if (name.equals("Chrome")) {
 				config.getWindowOffset().move(8, 8); //Chrome browser wrapping window with 8 pixels border
+			} else if (name.equals("Firefox")) {
+				config.getWindowOffset().move(10, 5); //FireFox browser wrapping window with 8 pixels border
 			}
 			String[] wh = config.getProperty("window_dimension").split("x");
 			if (wh.length == 2) {
