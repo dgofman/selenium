@@ -789,7 +789,7 @@ public class Element {
 		WebElement body = driver.findElement(By.tagName("body"));
 		@SuppressWarnings("unchecked")
 		ArrayList<Number> a = (ArrayList<Number>) executeScript(
-				"return (function(o) { var l = [o.scrollLeft, o.scrollTop]; return l;})(arguments[0])", body);
+				"return (function(o) { var l = [o.scrollLeft || o.parentElement.scrollLeft, o.scrollTop || o.parentElement.scrollTop]; return l;})(arguments[0])", body);
 		wait(.2f);
 		log.info("robotMouseDragAndDrop: " + a.get(0).intValue() + 'x' + a.get(1).intValue());
 
