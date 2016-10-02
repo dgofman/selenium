@@ -28,7 +28,7 @@ public class Config extends Properties {
 	public Config(String propertyFile, String delayKey, String clickDelay,  String timeoutKey, String useRobotClick) {
 		super();
 		try {
-			log.info("File properties path " + new File(propertyFile).getAbsolutePath());
+			log.info("File properties path " + getAbsolutePath(propertyFile));
 			this.load(new FileInputStream(propertyFile));
 		} catch (Exception e1) {
 			try {
@@ -84,5 +84,17 @@ public class Config extends Properties {
 	
 	public boolean isRobotClick() {
 		return useRobotClick;
+	}
+	
+	public static File getFile(String path) {
+		String parentDirectory = System.getProperty("parentDir");
+		if (parentDirectory == null) {
+			parentDirectory = ".";
+		}
+		return new File(parentDirectory, path);
+	}
+	
+	public static String getAbsolutePath(String path) {
+		return getFile(path).getAbsolutePath();
 	}
 }

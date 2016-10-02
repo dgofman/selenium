@@ -1,6 +1,5 @@
 package com.softigent.sftselenium.rest;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
@@ -39,6 +38,7 @@ import com.mashape.unirest.http.utils.ClientFactory;
 import com.mashape.unirest.request.BaseRequest;
 import com.mashape.unirest.request.HttpRequest;
 import com.softigent.sftselenium.CacheLogger;
+import com.softigent.sftselenium.Config;
 
 public class Client {
 
@@ -165,7 +165,7 @@ public class Client {
 	}
 	
 	public static String readJsonFile(String path) throws IOException {
-		String absPath = new File(path).getAbsolutePath();
+		String absPath = Config.getAbsolutePath(path);
 		logger.info("File: " + absPath);
 		return new String(Files.readAllBytes(Paths.get(absPath)), StandardCharsets.UTF_8);
 	}

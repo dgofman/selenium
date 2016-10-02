@@ -152,7 +152,7 @@ public class SeleniumUtils {
 		File scrFile = null;
 		try {
 			scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-			FileUtils.copyFile(scrFile, new File(fileName));
+			FileUtils.copyFile(scrFile, Config.getFile(fileName));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
