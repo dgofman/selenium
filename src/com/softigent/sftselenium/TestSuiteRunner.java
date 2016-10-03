@@ -40,7 +40,7 @@ public class TestSuiteRunner {
 			
 			Class<?> testSuite = info.getTestSuite();
 			String description = info.getDescription();
-			String fileName = info.getFileName();
+			String fileName = Config.getAbsolutePath(info.getFileName());
 			PrintWriter writer = new PrintWriter(fileName, "UTF-8");
 			
 			Suite.SuiteClasses annotation = (SuiteClasses) testSuite.getAnnotation(Suite.SuiteClasses.class);
