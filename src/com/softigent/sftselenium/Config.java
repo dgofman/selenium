@@ -88,10 +88,11 @@ public class Config extends Properties {
 	
 	public static File getFile(String path) {
 		String parentDirectory = System.getProperty("parentDir");
-		if (parentDirectory == null) {
-			parentDirectory = ".";
+		if (parentDirectory != null) {
+			return new File(parentDirectory, path);
+		} else {
+			return new File(path);
 		}
-		return new File(parentDirectory, path);
 	}
 	
 	public static String getAbsolutePath(String path) {
