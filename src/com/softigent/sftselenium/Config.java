@@ -2,6 +2,7 @@ package com.softigent.sftselenium;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -28,8 +29,9 @@ public class Config extends Properties {
 	public Config(String propertyFile, String delayKey, String clickDelay,  String timeoutKey, String useRobotClick) {
 		super();
 		try {
-			log.info("File properties path " + getAbsolutePath(propertyFile));
-			this.load(new FileInputStream(propertyFile));
+			String absPath = getAbsolutePath(propertyFile);
+			log.info("File properties path " + absPath);
+			this.load(new FileInputStream(absPath));
 		} catch (Exception e1) {
 			try {
 				log.info("File properties path " + Config.class.getResource('/' + propertyFile).getPath());
@@ -89,7 +91,11 @@ public class Config extends Properties {
 	public static File getFile(String path) {
 		String parentDirectory = System.getProperty("parentDir");
 		if (parentDirectory != null) {
-			return new File(parentDirectory, path);
+			try {
+				return new File(new File(parentDirectory).getCanonicalPath(), path);
+			} catch (IOException e) {
+				return new File(parentDirectory, path);
+			}
 		} else {
 			return new File(path);
 		}
