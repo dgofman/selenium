@@ -12,7 +12,6 @@ public class Config extends Properties {
 	
 	private float actionDelay;
 	private int pageLoadTimeout;
-	private int clickButtonDelay;
 
 	private IConfig iConfig;
 		
@@ -23,10 +22,10 @@ public class Config extends Properties {
 	static Logger log = CacheLogger.getLogger(Config.class.getName());
 	
 	public Config(String propertyFile) {
-		this(propertyFile, "action_delay", "click_delay", "load_timeout", "use_robot_click");
+		this(propertyFile, "action_delay", "load_timeout", "use_robot_click");
 	}
 
-	public Config(String propertyFile, String delayKey, String clickDelay,  String timeoutKey, String useRobotClick) {
+	public Config(String propertyFile, String delayKey, String timeoutKey, String useRobotClick) {
 		super();
 		try {
 			String absPath = getAbsolutePath(propertyFile);
@@ -44,7 +43,6 @@ public class Config extends Properties {
 		this.windowOffset = new Point(0, 0);
 		this.actionDelay = Float.parseFloat(this.getProperty(delayKey) != null ? this.getProperty(delayKey) : "0.5");
 		this.pageLoadTimeout = Integer.parseInt(this.getProperty(timeoutKey) != null ? this.getProperty(timeoutKey) : "30");
-		this.clickButtonDelay = Integer.parseInt(this.getProperty(clickDelay) != null ? this.getProperty(clickDelay) : "3");
 		this.useRobotClick = "true".equals(this.getProperty(useRobotClick));
 	}
 
@@ -64,10 +62,6 @@ public class Config extends Properties {
 		return actionDelay;
 	}
 	
-	public int getClickDelay() {
-		return clickButtonDelay;
-	}
-
 	public int getPageLoadTimeout() {
 		return pageLoadTimeout;
 	}
