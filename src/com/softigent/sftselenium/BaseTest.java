@@ -96,7 +96,14 @@ public abstract class BaseTest {
 	}
 	
 	public static Connector createConnector(Config config, String driverName) {
-		String driverPath = config.getProperty("chrome_driver_path");
+		String driverPath = config.getProperty("firefox_driver_path");
+		if (driverPath != null) {
+			System.setProperty("webdriver.gecko.driver", Config.getAbsolutePath(driverPath));
+		} else {
+			CacheLogger.getLogger(BaseTest.class.getName()).info("Install FireFox version 47.0.1 or older. http://filehippo.com/download_firefox/68836");
+		}
+
+		config.getProperty("chrome_driver_path");
 		if (driverPath != null) {
 			System.setProperty("webdriver.chrome.driver", Config.getAbsolutePath(driverPath));
 		}
