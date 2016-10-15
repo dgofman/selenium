@@ -96,21 +96,24 @@ public abstract class BaseTest {
 	}
 	
 	public static Connector createConnector(Config config, String driverName) {
-		String driverPath = config.getProperty("firefox_driver_path");
-		if (driverPath != null) {
-			System.setProperty("webdriver.gecko.driver", Config.getAbsolutePath(driverPath));
-		} else {
-			CacheLogger.getLogger(BaseTest.class.getName()).info("Install FireFox version 47.0.1 or older. http://filehippo.com/download_firefox/68836");
-		}
-
-		config.getProperty("chrome_driver_path");
-		if (driverPath != null) {
-			System.setProperty("webdriver.chrome.driver", Config.getAbsolutePath(driverPath));
-		}
-		
-		driverPath = config.getProperty("ie_driver_path");
-		if (driverPath != null) {
-			System.setProperty("webdriver.ie.driver", Config.getAbsolutePath(driverPath));
+		String driverPath;
+		if (driverName.equals("Firefox")) {
+			driverPath = config.getProperty("firefox_driver_path");
+			if (driverPath != null) {
+				System.setProperty("webdriver.gecko.driver", Config.getAbsolutePath(driverPath));
+			} else {
+				CacheLogger.getLogger(BaseTest.class.getName()).info("Install FireFox version 47.0.1 or older. http://filehippo.com/download_firefox/68836");
+			}
+		} else if (driverName.equals("Chrome")) {
+			driverPath = config.getProperty("chrome_driver_path");
+			if (driverPath != null) {
+				System.setProperty("webdriver.chrome.driver", Config.getAbsolutePath(driverPath));
+			}
+		} else if (driverName.equals("IE")) {
+			driverPath = config.getProperty("ie_driver_path");
+			if (driverPath != null) {
+				System.setProperty("webdriver.ie.driver", Config.getAbsolutePath(driverPath));
+			}
 		}
 
 		WebDriver driver = SeleniumUtils.getDriver(driverName, config);
