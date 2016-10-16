@@ -1,5 +1,9 @@
 ###SFTSelenium
 
+IE Drivers: http://selenium-release.storage.googleapis.com/index.html
+Chrome Drivers: https://sites.google.com/a/chromium.org/chromedriver/downloads
+Firefox Drivers: https://github.com/mozilla/geckodriver/releases
+
 Example of .properties file
 ```
 drivers=Chrome
