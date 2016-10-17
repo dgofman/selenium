@@ -1,9 +1,11 @@
 package com.softigent.sftselenium;
 
+import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
@@ -14,6 +16,8 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
@@ -154,14 +158,22 @@ public class SeleniumUtils {
 	}
 
 	public static File screenshot(WebDriver driver, String fileName) {
-		File scrFile = null;
 		try {
-			scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-			FileUtils.copyFile(scrFile, Config.getFile(fileName));
+			if (driver.getWindowHandles().size() == 1) {
+				File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+				FileUtils.copyFile(scrFile, Config.getFile(fileName));
+				return scrFile;
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return scrFile;
+		try {
+			BufferedImage image = new Robot().createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+			ImageIO.write(image, "png", Config.getFile(fileName));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public static void sleep(float seconds) {
