@@ -82,6 +82,10 @@ public class Config extends Properties {
 		return useRobotClick;
 	}
 	
+	public void setRobotClick(boolean useRobotClick) {
+		this.useRobotClick = useRobotClick;
+	}
+	
 	public static File getFile(String path) {
 		String parentDirectory = System.getProperty("parentDir");
 		if (parentDirectory != null) {

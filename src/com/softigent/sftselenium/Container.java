@@ -52,6 +52,7 @@ public class Container extends Element {
 		WebElement element = getElement(selector);
 		WebDriver frameDriver = driver.switchTo().frame(element);
 		Container iframe = new Container(frameDriver, config, "body", By.cssSelector("body"));
+		executeScript("arguments[0].focus()", iframe.getElement());
 		iframe.iframeElement = element;
 		return iframe;
 	}

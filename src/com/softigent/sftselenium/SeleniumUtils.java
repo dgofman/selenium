@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.logging.Level;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
@@ -46,8 +46,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
-import com.sun.jna.platform.win32.WinUser;
 import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.platform.win32.WinUser;
 import com.sun.jna.platform.win32.WinUser.WNDENUMPROC;
 import com.sun.jna.win32.StdCallLibrary;
 
@@ -90,6 +90,9 @@ public class SeleniumUtils {
 		} else if (name.equals("IE")) {
 			DesiredCapabilities dc = DesiredCapabilities.internetExplorer();
 			dc.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
+			dc.setCapability(InternetExplorerDriver.IGNORE_ZOOM_SETTING, true);
+			dc.setCapability(InternetExplorerDriver.REQUIRE_WINDOW_FOCUS, true);
+			
 			if (isPrivate) {
 				dc.setCapability(InternetExplorerDriver.FORCE_CREATE_PROCESS, true); 
 				dc.setCapability(InternetExplorerDriver.IE_SWITCHES, "-private");
@@ -102,10 +105,12 @@ public class SeleniumUtils {
 				driver.manage().window().maximize();
 			}
 		} else if (config.getProperty("window_dimension") != null) {
-			if (name.equals("Chrome")) {
-				config.getWindowOffset().move(8, 8); //Chrome browser wrapping window with 8 pixels border
-			} else if (name.equals("Firefox")) {
-				config.getWindowOffset().move(10, 5); //FireFox browser wrapping window with 8 pixels border
+			if (name.equals("IE")) {
+				config.getWindowOffset().move(10, 8); //IE browser border
+			} else if (name.equals("Chrome")) {
+				config.getWindowOffset().move(8, 8); //Chrome browser border
+			} else {
+				config.getWindowOffset().move(10, 5); //FireFox browser border
 			}
 			String[] wh = config.getProperty("window_dimension").split("x");
 			if (wh.length == 2) {
@@ -207,12 +212,12 @@ public class SeleniumUtils {
 		try {
 			Thread.sleep(200);
 			driver.switchTo().activeElement();
-			Robot robot = Element.getRobot(200);
-			Element.keyPress(new int[] {KeyEvent.VK_CONTROL, KeyEvent.VK_V}, robot);
-			Element.keyPress(KeyEvent.VK_ENTER, robot);
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
+		Robot robot = Element.getRobot(200);
+		Element.keyPress(new int[] {KeyEvent.VK_CONTROL, KeyEvent.VK_V}, robot);
+		Element.keyPress(KeyEvent.VK_ENTER, robot);
 	}
 	
 	public static void beep() {
