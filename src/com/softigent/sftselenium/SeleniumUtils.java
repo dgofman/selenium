@@ -314,4 +314,11 @@ public class SeleniumUtils {
 	public static String getBrowserName() {
 		return browserName;
 	}
+	
+	public static Dimension getScreenSize() {
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		return new Dimension(
+			(int) toolkit.getScreenSize().getWidth(), 
+			(int) toolkit.getScreenSize().getHeight());
+	}
 }

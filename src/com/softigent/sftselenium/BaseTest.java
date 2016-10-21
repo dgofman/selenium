@@ -13,6 +13,7 @@ import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runners.MethodSorters;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -27,7 +28,7 @@ public abstract class BaseTest {
 	protected Logger log;
 	protected String className;
 	
-	public static final double GIT_VERSION = 1.4;
+	public static final double GIT_VERSION = 1.5;
 
 	@Rule
 	public TestWatcher testWatchThis = new TestWatcher() {
@@ -266,6 +267,25 @@ public abstract class BaseTest {
 	
 	public void closeWindow(String winHandle) {
 		connector.getDriver().switchTo().window(winHandle).close();
+	}
+	
+	public void setWindowSize(int width, int height) { 
+		setWindowSize(new Dimension(width, height));
+	}
+	
+	public void setWindowSize(Dimension dimension) { 
+		connector.getDriver().manage().window().setSize(dimension);
+	}
+	
+	public void fullWindow() {
+		connector.getDriver().manage().window().maximize();
+	}
+	
+	public void restoreWindow() {
+		String[] wh = connector.getConfig().getProperty("window_dimension").split("x");
+		if (wh.length == 2) {
+			setWindowSize(new Dimension(Integer.parseInt(wh[0]), Integer.parseInt(wh[1])));
+		}
 	}
 	
 	/**
