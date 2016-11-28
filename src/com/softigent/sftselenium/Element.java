@@ -85,7 +85,7 @@ public class Element {
 		return getElement(locator);
 	}
 
-	public List<WebElement> findElements(WebElement parent, String path) {
+	public static List<WebElement> findElements(WebElement parent, String path) {
 		return parent.findElements(By.xpath(path));
 	}
 	
@@ -766,7 +766,7 @@ public class Element {
 		robot.mousePress(InputEvent.BUTTON1_MASK);
 		robot.mouseRelease(InputEvent.BUTTON1_MASK);
 		if (moveMouseOut) {
-			robotMouseMove(0, 0);
+			//robotMouseMove(0, 0);
 		}
 	}
 
