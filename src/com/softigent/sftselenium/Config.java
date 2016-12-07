@@ -22,10 +22,6 @@ public class Config extends Properties {
 	static Logger log = CacheLogger.getLogger(Config.class.getName());
 	
 	public Config(String propertyFile) {
-		this(propertyFile, "action_delay", "load_timeout", "use_robot_click");
-	}
-
-	public Config(String propertyFile, String delayKey, String timeoutKey, String useRobotClick) {
 		super();
 		try {
 			String absPath = getAbsolutePath(propertyFile);
@@ -39,7 +35,13 @@ public class Config extends Properties {
 				e2.printStackTrace();
 			}
 		}
-		
+	}
+	
+	public void setDefaultProperties() {
+		this.initProperties("action_delay", "load_timeout", "use_robot_click");
+	}
+	
+	public void initProperties(String delayKey, String timeoutKey, String useRobotClick) {
 		this.windowOffset = new Point(0, 0);
 		this.actionDelay = Float.parseFloat(this.getProperty(delayKey) != null ? this.getProperty(delayKey) : "0.5");
 		this.pageLoadTimeout = Integer.parseInt(this.getProperty(timeoutKey) != null ? this.getProperty(timeoutKey) : "30");
@@ -66,11 +68,11 @@ public class Config extends Properties {
 		return pageLoadTimeout;
 	}
 
-	public IConfig getiConfig() {
+	public IConfig getConfig() {
 		return iConfig;
 	}
 
-	public void setiConfig(IConfig iConfig) {
+	public void setConfig(IConfig iConfig) {
 		this.iConfig = iConfig;
 	}
 	
