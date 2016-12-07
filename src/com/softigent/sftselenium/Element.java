@@ -86,7 +86,7 @@ public class Element {
 	}
 
 	public static List<WebElement> findElements(WebElement parent, String path) {
-		return parent.findElements(By.xpath(path));
+		return parent.findElements(findBy(path));
 	}
 	
 	public List<WebElement> findElements(String selector) {
@@ -610,7 +610,9 @@ public class Element {
 	}
 	
 	public void click(String selector) {
-		click(waitAndFindElement(selector));
+		WebElement element = waitAndFindElement(selector);
+		waitIsEnabled(selector);
+		click(element);
 	}
 
 	public void click() {
