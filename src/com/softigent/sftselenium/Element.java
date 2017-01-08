@@ -360,6 +360,15 @@ public class Element {
 			}
 		});
 	}
+	
+	public void waitHtmlText(String selector, String value) {
+		log.debug("waitHtmlText: " + value + " in selector=" + selector);
+		this.waitWhenTrue(selector, new IWaitCallback() {
+			public boolean isTrue(WebElement element) {
+				return Element.regExpString(getHTML(element).trim(), value);
+			}
+		});
+	}
 
 	public void sendKeys(String selector, String value) {
 		this.sendKeys(selector, value, 0);
