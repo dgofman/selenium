@@ -7,19 +7,19 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.WebDriver;
 
 public class Config extends Properties {
 	
-	private float actionDelay;
-	private int pageLoadTimeout;
-
-	private IConfig iConfig;
-		
-	private Point windowOffset;
-	private boolean useRobotClick;
-	
 	private static final long serialVersionUID = 238683884179262164L;
-	static Logger log = CacheLogger.getLogger(Config.class.getName());
+	
+	protected float actionDelay;
+	protected int pageLoadTimeout;
+
+	protected Point windowOffset;
+	protected boolean useRobotClick;
+	
+	protected Logger log = CacheLogger.getLogger(Config.class.getName());
 	
 	public Config(String propertyFile) {
 		super();
@@ -47,17 +47,34 @@ public class Config extends Properties {
 		this.pageLoadTimeout = Integer.parseInt(this.getProperty(timeoutKey) != null ? this.getProperty(timeoutKey) : "30");
 		this.useRobotClick = "true".equals(this.getProperty(useRobotClick));
 	}
-
-	@Override
-	public String getProperty(String key) {
-		if (iConfig != null) {
-			return iConfig.getProperty(key);
+	
+	public Connector createConnector(String driverName) {
+		String driverPath;
+		if (driverName.equals("Firefox")) {
+			driverPath = getDriverPath(driverName, "firefox_driver_path");
+			if (driverPath != null) {
+				System.setProperty("webdriver.gecko.driver", Config.getAbsolutePath(driverPath));
+			} else {
+				CacheLogger.getLogger(BaseTest.class.getName()).info("Install FireFox version 47.0.1 or older. http://filehippo.com/download_firefox/68836");
+			}
+		} else if (driverName.equals("Chrome")) {
+			driverPath = getDriverPath(driverName, "chrome_driver_path");
+			if (driverPath != null) {
+				System.setProperty("webdriver.chrome.driver", Config.getAbsolutePath(driverPath));
+			}
+		} else if (driverName.equals("IE")) {
+			driverPath = getDriverPath(driverName, "ie_driver_path");
+			if (driverPath != null) {
+				System.setProperty("webdriver.ie.driver", Config.getAbsolutePath(driverPath));
+			}
 		}
-		return super.getProperty(key);
-	}
 
-	public String getSuperProperty(String key) {
-		return super.getProperty(key);
+		WebDriver driver = SeleniumUtils.getDriver(driverName, this);
+		return new Connector(driver, this);
+	}
+	
+	public String getDriverPath(String driverName, String driverPathKey) { 
+		return getProperty(driverPathKey);
 	}
 
 	public float getActionDelay() {
@@ -66,14 +83,6 @@ public class Config extends Properties {
 	
 	public int getPageLoadTimeout() {
 		return pageLoadTimeout;
-	}
-
-	public IConfig getConfig() {
-		return iConfig;
-	}
-
-	public void setConfig(IConfig iConfig) {
-		this.iConfig = iConfig;
 	}
 	
 	public Point getWindowOffset() {

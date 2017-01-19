@@ -28,7 +28,7 @@ public abstract class BaseTest {
 	protected Logger log;
 	protected String className;
 	
-	public static final double GIT_VERSION = 1.8;
+	public static final double GIT_VERSION = 1.9;
 
 	@Rule
 	public TestWatcher testWatchThis = new TestWatcher() {
@@ -94,31 +94,6 @@ public abstract class BaseTest {
 
 	protected void initialize() {
 		log = CacheLogger.getLogger(className);
-	}
-	
-	public static Connector createConnector(Config config, String driverName) {
-		String driverPath;
-		if (driverName.equals("Firefox")) {
-			driverPath = config.getProperty("firefox_driver_path");
-			if (driverPath != null) {
-				System.setProperty("webdriver.gecko.driver", Config.getAbsolutePath(driverPath));
-			} else {
-				CacheLogger.getLogger(BaseTest.class.getName()).info("Install FireFox version 47.0.1 or older. http://filehippo.com/download_firefox/68836");
-			}
-		} else if (driverName.equals("Chrome")) {
-			driverPath = config.getProperty("chrome_driver_path");
-			if (driverPath != null) {
-				System.setProperty("webdriver.chrome.driver", Config.getAbsolutePath(driverPath));
-			}
-		} else if (driverName.equals("IE")) {
-			driverPath = config.getProperty("ie_driver_path");
-			if (driverPath != null) {
-				System.setProperty("webdriver.ie.driver", Config.getAbsolutePath(driverPath));
-			}
-		}
-
-		WebDriver driver = SeleniumUtils.getDriver(driverName, config);
-		return new Connector(driver, config);
 	}
 	
 	public Container createContainer(String selector) {
