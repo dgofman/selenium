@@ -49,10 +49,17 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.sun.jna.Native;
+import com.sun.jna.NativeLong;
+import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
+import com.sun.jna.platform.unix.X11;
+import com.sun.jna.platform.unix.X11.Display;
+import com.sun.jna.platform.unix.X11.Window;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.platform.win32.WinUser;
 import com.sun.jna.platform.win32.WinUser.WNDENUMPROC;
+import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.PointerByReference;
 import com.sun.jna.win32.StdCallLibrary;
 
 public class SeleniumUtils {
@@ -218,18 +225,22 @@ public class SeleniumUtils {
 		}
 	}
 
-	public static void fileBrowseDialog(WebDriver driver, String path) {
-		StringSelection ss = new StringSelection(path);
-		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, null);
-		try {
-			Thread.sleep(200);
-			driver.switchTo().activeElement();
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
+	public static void fileBrowseDialog(Element element, WebDriver driver, String path) {
+		if (Platform.isWindows()) {
+			StringSelection ss = new StringSelection(path);
+			Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, null);
+			try {
+				Thread.sleep(200);
+				driver.switchTo().activeElement();
+			} catch (Exception e) {
+				System.err.println(e.getMessage());
+			}
+			Robot robot = Element.getRobot(200);
+			Element.keyPress(new int[] {KeyEvent.VK_CONTROL, KeyEvent.VK_V}, robot);
+			Element.keyPress(KeyEvent.VK_ENTER, robot);
+		} else {
+			element.sendKeys("[type=file]", path);
 		}
-		Robot robot = Element.getRobot(200);
-		Element.keyPress(new int[] {KeyEvent.VK_CONTROL, KeyEvent.VK_V}, robot);
-		Element.keyPress(KeyEvent.VK_ENTER, robot);
 	}
 	
 	public static void beep() {
@@ -279,36 +290,105 @@ public class SeleniumUtils {
 		return client.execute(request);
 	}
 	
-	public interface User32 extends StdCallLibrary {
+	private interface User32 extends StdCallLibrary {
 		User32 INSTANCE = (User32) Native.loadLibrary("user32", User32.class);
 		boolean EnumWindows(WinUser.WNDENUMPROC lpEnumFunc, Pointer arg);
 		int GetWindowTextA(HWND hWnd, byte[] lpString, int nMaxCount);
 		HWND SetFocus(HWND hWnd);
 	}
 	
-	public static List<HWND> getWin32Handle(String title) {
-		final List<HWND> hWnds = new ArrayList<HWND>();
-		final User32 user32 = User32.INSTANCE;
-		user32.EnumWindows(new WNDENUMPROC() {
-			@Override
-			public boolean callback(HWND hWnd, Pointer arg1) {
-				byte[] windowText = new byte[512];
-				user32.GetWindowTextA(hWnd, windowText, 512);
-				String wText = Native.toString(windowText).trim();
-
-				if (wText.isEmpty()) {
-					return true;
-				} else if (Element.regExpString(wText, title)) {
-					hWnds.add(hWnd);
-				}
-				return true;
-			}
-		}, null);
-		return hWnds;
+	private interface WindowsX11 {
+	    void recurse(X11 x11, Display display, Window root);
 	}
 	
-	public static void setWin32Focus(HWND hWnd) {
-		User32.INSTANCE.SetFocus(hWnd);
+	public static List<?> getWin32Handle(String title) {
+		if (Platform.isWindows()) {
+			final User32 user32 = User32.INSTANCE;
+			final List<HWND> hWnds = new ArrayList<HWND>();
+			user32.EnumWindows(new WNDENUMPROC() {
+				@Override
+				public boolean callback(HWND hWnd, Pointer arg1) {
+					byte[] windowText = new byte[512];
+					user32.GetWindowTextA(hWnd, windowText, 512);
+					String wText = Native.toString(windowText).trim();
+					if (!wText.isEmpty() && Element.regExpString(wText, title)) {
+						hWnds.add(hWnd);
+					}
+					return true;
+				}
+			}, null);
+			return hWnds;
+		} else if (Platform.isLinux()) {
+			final X11 x11 = X11.INSTANCE;
+			final Display display = x11.XOpenDisplay(null);
+			final List<Window> hWnds = new ArrayList<Window>();
+
+	        Window root = x11.XDefaultRootWindow(display);
+	        new WindowsX11() {
+	            @Override
+	            public void recurse(X11 x11, Display display, Window root) {
+	        	    X11.WindowByReference windowRef = new X11.WindowByReference();
+	        	    X11.WindowByReference parentRef = new X11.WindowByReference();
+	        	    PointerByReference childrenRef = new PointerByReference();
+	        	    IntByReference childCountRef = new IntByReference();
+
+	        	    x11.XQueryTree(display, root, windowRef, parentRef, childrenRef, childCountRef);
+	        	    if (childrenRef.getValue() == null) {
+	        	        return;
+	        	    }
+
+	        	    long[] ids;
+
+	        	    if (Native.LONG_SIZE == Long.BYTES) {
+	        	        ids = childrenRef.getValue().getLongArray(0, childCountRef.getValue());
+	        	    } else if (Native.LONG_SIZE == Integer.BYTES) {
+	        	        int[] intIds = childrenRef.getValue().getIntArray(0, childCountRef.getValue());
+	        	        ids = new long[intIds.length];
+	        	        for (int i = 0; i < intIds.length; i++) {
+	        	            ids[i] = intIds[i];
+	        	        }
+	        	    } else {
+	        	        return;
+	        	    }
+	        	    for (long id : ids) {
+	        	        if (id != 0) {
+	        		        Window window = new Window(id);
+	        		        X11.XTextProperty name = new X11.XTextProperty();
+	        		        x11.XGetWMName(display, window, name);
+	        		        if (name.value != null) {
+		        		        String wText = name.value.trim();
+		        		        if (!wText.isEmpty() && Element.regExpString(wText, title)) {
+		    						hWnds.add(window);
+		    					}
+	        		        }
+	        		        x11.XFree(name.getPointer());
+	        		        recurse(x11, display, window);
+	        	        }
+	        	    }
+	            }
+	        }. recurse(x11, display, root);
+	        x11.XCloseDisplay(display);
+	        
+	        return hWnds;
+		} else {
+			throw new UnsupportedOperationException();
+		}
+	}
+
+	
+	public static void setWindowFocus(Object win) {
+		if (Platform.isWindows()) {
+			User32.INSTANCE.SetFocus((HWND)win);
+		} else {
+			final X11 x11 = X11.INSTANCE;
+			x11.XSelectInput(x11.XOpenDisplay(null), (Window)win, new NativeLong(X11.ExposureMask |
+																				X11.VisibilityChangeMask |
+																				X11.StructureNotifyMask |
+																				X11.FocusChangeMask |
+																				//X11.PointerMotionMask |
+																				X11.EnterWindowMask |
+																				X11.LeaveWindowMask));
+		}
 	}
 
 	public static String getBrowserName() {

@@ -369,6 +369,11 @@ public class Element {
 			}
 		});
 	}
+	
+	public void sendKeys(String value) {
+		log.debug("value=" + value);
+		SeleniumUtils.sleep(config.getActionDelay());
+	}
 
 	public void sendKeys(String selector, String value) {
 		this.sendKeys(selector, value, 0);
@@ -1010,7 +1015,7 @@ public class Element {
 
 	public void setBrowseFile(String path) {
 		log.debug("Browse File: " + path);
-		SeleniumUtils.fileBrowseDialog(driver, path);
+		SeleniumUtils.fileBrowseDialog(this, driver, path);
 	}
 
 	public void waitWhenTrue(String selector, IWaitCallback callback) {
