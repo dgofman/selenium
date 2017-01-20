@@ -356,7 +356,7 @@ public class Element {
 		log.debug("waitText: " + value + " in selector=" + selector);
 		this.waitWhenTrue(selector, new IWaitCallback() {
 			public boolean isTrue(WebElement element) {
-				return Element.regExpString(element.getText(), value);
+				return Element.regExpString(getText(element), value);
 			}
 		});
 	}
