@@ -19,6 +19,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -894,7 +895,11 @@ public class Element {
 		log.debug("isSelected: " + selector);
 		WebElement element = getElement(selector);
 		if (element != null) {
-			return element.isSelected();
+			try {
+				return element.isSelected();
+			} catch (StaleElementReferenceException elementHasDisappeared) {
+				return false;
+			}
 		}
 		return false;
 	}
@@ -903,7 +908,11 @@ public class Element {
 		log.debug("isEnabled: " + selector);
 		WebElement element = getElement(selector);
 		if (element != null) {
-			return element.isEnabled();
+			try {
+				return element.isEnabled();
+			} catch (StaleElementReferenceException elementHasDisappeared) {
+				return false;
+			}
 		}
 		return false;
 	}
@@ -934,7 +943,11 @@ public class Element {
 		log.debug("waitIsEnabled: " + selector);
 		this.waitWhenTrue(selector, new IWaitCallback() {
 			public boolean isTrue(WebElement element) {
-				return element.isEnabled();
+				try {
+					return element.isEnabled();
+				} catch (StaleElementReferenceException elementHasDisappeared) {
+					return false;
+				}
 			}
 		});
 	}
@@ -943,8 +956,11 @@ public class Element {
 		log.debug("isDisplayed: " + selector);
 		WebElement element = getElement(selector);
 		if (element != null) {
-			print(element.isDisplayed() + " > " + element.getAttribute("style"));
-			return element.isDisplayed();
+			try {
+				return element.isDisplayed();
+			} catch (StaleElementReferenceException elementHasDisappeared) {
+				return false;
+			}
 		}
 		return false;
 	}
@@ -992,7 +1008,11 @@ public class Element {
 		this.waitWhenTrue(selector, new IWaitCallback() {
 			public boolean isTrue(WebElement element) {
 				print('.', false);
-				return element.isDisplayed();
+				try {
+					return element.isDisplayed();
+				} catch (StaleElementReferenceException elementHasDisappeared) {
+					return false;
+				}
 			}
 		});
 	}
