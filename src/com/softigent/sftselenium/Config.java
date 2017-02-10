@@ -69,8 +69,11 @@ public class Config extends Properties {
 			}
 		}
 
-		WebDriver driver = SeleniumUtils.getDriver(driverName, this);
-		return new Connector(driver, this);
+		return new Connector(getDriver(driverName), this);
+	}
+	
+	public WebDriver getDriver(String driverName) {
+		return SeleniumUtils.getDriver(driverName, this);
 	}
 	
 	public String getDriverPath(String driverName, String driverPathKey) { 
