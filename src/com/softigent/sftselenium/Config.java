@@ -3,11 +3,25 @@ package com.softigent.sftselenium;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Properties;
+import java.util.logging.Level;
 
 import org.apache.log4j.Logger;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.logging.LoggingPreferences;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.safari.SafariDriver;
 
 public class Config extends Properties {
 	
@@ -20,6 +34,8 @@ public class Config extends Properties {
 	protected boolean useRobotClick;
 	
 	protected Logger log = CacheLogger.getLogger(Config.class.getName());
+	
+	private static String driverName;
 	
 	public Config(String propertyFile) {
 		super();
@@ -48,7 +64,16 @@ public class Config extends Properties {
 		this.useRobotClick = "true".equals(this.getProperty(useRobotClick));
 	}
 	
+	public void setDriverName(String driverName) {
+		Config.driverName = driverName;
+	}
+	
+	public static final String getDriverName() {
+		return Config.driverName;
+	}
+	
 	public Connector createConnector(String driverName) {
+		setDriverName(driverName);
 		String driverPath;
 		if (driverName.equals("Firefox")) {
 			driverPath = getDriverPath(driverName, "firefox_driver_path");
@@ -73,7 +98,85 @@ public class Config extends Properties {
 	}
 	
 	public WebDriver getDriver(String driverName) {
-		return SeleniumUtils.getDriver(driverName, this);
+		WebDriver driver = null;
+		boolean isPrivate = "true".equals(this.getProperty("open_as_private"));
+		boolean isFullScreen = "true".equals(this.getProperty("open_fullscreen"));
+		if (driverName.equals("Firefox")) {
+			FirefoxProfile ffProfile = new FirefoxProfile();
+			ffProfile.setPreference("layout.css.devPixelsPerPx", "1.0");
+			if (isPrivate) {
+				ffProfile.setPreference("browser.privatebrowsing.autostart", true);
+			}
+			driver = createDriver(driverName, null, ffProfile);
+		} else if (driverName.equals("Chrome")) {
+			ChromeOptions options = new ChromeOptions();
+			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+			if (isFullScreen) {
+				options.addArguments("--start-maximized");
+			}
+			if (isPrivate) {
+				capabilities.setCapability("chrome.switches", Arrays.asList("--incognito"));
+			}
+			options.addArguments("--disable-extensions");
+
+			LoggingPreferences logPrefs = new LoggingPreferences();
+			logPrefs.enable(LogType.BROWSER, Level.ALL);
+			capabilities.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
+			capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+			driver = createDriver(driverName, capabilities, null);
+		} else if (driverName.equals("Safari")) {
+			driver = createDriver(driverName, DesiredCapabilities.safari(), null);
+		} else if (driverName.equals("IE")) {
+			DesiredCapabilities dc = DesiredCapabilities.internetExplorer();
+			dc.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
+			dc.setCapability(InternetExplorerDriver.IGNORE_ZOOM_SETTING, true);
+			dc.setCapability(InternetExplorerDriver.REQUIRE_WINDOW_FOCUS, true);
+			
+			if (isPrivate) {
+				dc.setCapability(InternetExplorerDriver.FORCE_CREATE_PROCESS, true); 
+				dc.setCapability(InternetExplorerDriver.IE_SWITCHES, "-private");
+			}
+			driver = createDriver(driverName, dc, null);
+		}
+
+		fullScreenControl(isFullScreen, driver, driverName);
+		
+		return driver;
+	}
+	
+	public WebDriver createDriver(String driverName, Capabilities capabilities, FirefoxProfile profile) {
+		switch (driverName) {
+			case "Firefox":
+				return new FirefoxDriver(profile);
+			case "Chrome":
+				return new ChromeDriver(capabilities);
+			case "Safari":
+				return new SafariDriver(capabilities);
+			case "IE":
+				return new InternetExplorerDriver(capabilities);
+		}
+		return null;
+	}
+	
+	public void fullScreenControl(boolean isFullScreen, WebDriver driver, String driverName) {
+		if (isFullScreen) {
+			if (!driverName.equals("Chrome")) {
+				driver.manage().window().maximize();
+			}
+		} else if (this.getProperty("window_dimension") != null) {
+			if (driverName.equals("IE")) {
+				this.getWindowOffset().move(10, 8); //IE browser border
+			} else if (driverName.equals("Chrome")) {
+				this.getWindowOffset().move(8, 8); //Chrome browser border
+			} else {
+				this.getWindowOffset().move(10, 5); //FireFox browser border
+			}
+			String[] wh = this.getProperty("window_dimension").split("x");
+			if (wh.length == 2) {
+				Dimension d = new Dimension(Integer.parseInt(wh[0]), Integer.parseInt(wh[1]));
+				driver.manage().window().setSize(d);
+			}
+		}
 	}
 	
 	public String getDriverPath(String driverName, String driverPathKey) { 
