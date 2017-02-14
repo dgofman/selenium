@@ -148,21 +148,29 @@ public class SeleniumUtils {
 	}
 
 	public static void fileBrowseDialog(Element element, WebDriver driver, String path) {
-		if (Platform.isWindows()) {
-			StringSelection ss = new StringSelection(path);
-			Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, null);
-			try {
-				Thread.sleep(200);
-				driver.switchTo().activeElement();
-			} catch (Exception e) {
-				System.err.println(e.getMessage());
-			}
-			Robot robot = Element.getRobot(200);
-			Element.keyPress(new int[] {KeyEvent.VK_CONTROL, KeyEvent.VK_V}, robot);
-			Element.keyPress(KeyEvent.VK_ENTER, robot);
-		} else {
-			element.sendKeys("[type=file]", path);
-		}
+		StringSelection ss = new StringSelection(path);
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, null);
+        Robot robot = Element.getRobot(200);
+        try {
+                Thread.sleep(2000);
+                driver.switchTo().activeElement();
+        } catch (Exception e) {
+                System.err.println(e.getMessage());
+        }
+        switch (Platform.getOSType()) {
+                case Platform.WINDOWS:
+                        Element.keyPress(new int[] {KeyEvent.VK_CONTROL, KeyEvent.VK_V}, robot);
+                        Element.keyPress(KeyEvent.VK_ENTER, robot);
+                        break;
+                case Platform.LINUX:
+                        Element.keyPress(new int[] {KeyEvent.VK_DOWN}, robot);
+                        Element.keyPress(new int[] {KeyEvent.VK_CONTROL, KeyEvent.VK_V}, robot);
+                        Element.keyPress(KeyEvent.VK_ENTER, robot);
+                        break;
+                default:
+                        element.sendKeys("[type=file]", path);
+                        break;
+        }
 	}
 	
 	public static void beep() {
