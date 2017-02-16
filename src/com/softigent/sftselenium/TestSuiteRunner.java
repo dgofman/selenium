@@ -81,7 +81,7 @@ public class TestSuiteRunner {
 				for (Class<?> testCase : suiteClassLst) {
 					log.info("Start: " + testCase.getName());
 					try {
-						Result result = JUnitCore.runClasses(testCase);
+						Result result = getResult(writer, testCase, description);
 						for (Failure failure : result.getFailures()) {
 							log.info(failure.toString());
 						}
@@ -132,6 +132,10 @@ public class TestSuiteRunner {
 	
 			writer.close();
 		}
+	}
+	
+	protected Result getResult(PrintWriter writer, Class<?> testCase, String descritption) {
+		return JUnitCore.runClasses(testCase);
 	}
 	
 	protected WebDriver getDriver() {
