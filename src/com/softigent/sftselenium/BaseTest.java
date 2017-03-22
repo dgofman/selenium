@@ -28,7 +28,7 @@ public abstract class BaseTest {
 	protected Logger log;
 	protected String className;
 	
-	public static final double GIT_VERSION = 2.3;
+	public static final double GIT_VERSION = 2.4;
 
 	@Rule
 	public TestWatcher testWatchThis = new TestWatcher() {
@@ -219,21 +219,28 @@ public abstract class BaseTest {
 	}
 	
 	public String getWindowHandleByURL(String regex) {
-		WebDriver driver = connector.getDriver();
-		Set<String> windows = driver.getWindowHandles();
-	
-		for (String window : windows) {
-			try {
-				driver.switchTo().window(window);
-				Boolean isTrue = Container.compareString(driver.getCurrentUrl(), regex);
-				if (isTrue) {
-					return window;
+		final WebDriver driver = connector.getDriver();
+		WaitCallback waitCallBack = new WaitCallback() {
+			public boolean isTrue() {
+				Set<String> windows = driver.getWindowHandles();
+				
+				for (String window : windows) {
+					try {
+						driver.switchTo().window(window);
+						Boolean isTrue = Container.compareString(driver.getCurrentUrl(), regex);
+						if (isTrue) {
+							value = window;
+							return true;
+						}
+					} catch(Exception e) {
+						e.printStackTrace();
+					}
 				}
-			} catch(Exception e) {
-				e.printStackTrace();
+				return false;
 			}
-		}
-		return null;
+		};
+		body.waitWhenTrue(waitCallBack);
+		return (String)waitCallBack.getValue();
 	}
 
 	public WebDriver switchWindow(String winHandle) {

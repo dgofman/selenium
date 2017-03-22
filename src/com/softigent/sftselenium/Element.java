@@ -270,6 +270,16 @@ public class Element {
 		return this.executeScript(command, element, null, null);
 	}
 
+	public void setFocus(String selector) {
+		setFocus(waitAndFindElement(selector));
+	}
+	
+	public void setFocus(WebElement element) {
+		log.debug("setFocus on: " + getElementName(element));
+		executeScript("arguments[0].focus();", element);
+		SeleniumUtils.sleep(config.getActionDelay());
+	}
+	
 	public void clearAllText(String selector) {
 		clearText(selector, -1);
 	}
