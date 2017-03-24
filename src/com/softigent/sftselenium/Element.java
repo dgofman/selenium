@@ -362,21 +362,45 @@ public class Element {
 		element.sendKeys(value);
 		SeleniumUtils.sleep(config.getActionDelay());
 	}
+	
+	public void waitValue(String selector, String value) {
+		log.debug("waitValue: " + value + " in selector=" + selector);
+		this.waitWhenTrue(new IWaitCallback() {
+			public boolean isTrue(WebElement element) {
+				try {
+					element = getElement(selector);
+					return Element.regExpString(getValue(element), value);
+				} catch (Exception e) {
+					return false;
+				}
+			}
+		});
+	}
 
 	public void waitText(String selector, String value) {
 		log.debug("waitText: " + value + " in selector=" + selector);
-		this.waitWhenTrue(selector, new IWaitCallback() {
+		this.waitWhenTrue(new IWaitCallback() {
 			public boolean isTrue(WebElement element) {
-				return Element.regExpString(getText(element), value);
+				try {
+					element = getElement(selector);
+					return Element.regExpString(getText(element), value);
+				} catch (Exception e) {
+					return false;
+				}
 			}
 		});
 	}
 	
 	public void waitHtmlText(String selector, String value) {
 		log.debug("waitHtmlText: " + value + " in selector=" + selector);
-		this.waitWhenTrue(selector, new IWaitCallback() {
+		this.waitWhenTrue(new IWaitCallback() {
 			public boolean isTrue(WebElement element) {
-				return Element.regExpString(getHTML(element).trim(), value);
+				try {
+					element = getElement(selector);
+					return Element.regExpString(getHTML(element).trim(), value);
+				} catch (Exception e) {
+					return false;
+				}
 			}
 		});
 	}
@@ -420,12 +444,45 @@ public class Element {
 	}
 
 	public String getValue(String selector) {
-		log.debug("Get Value for selector: " + selector);
-		WebElement element = getElement(selector);
+		return getValue(getElement(selector));
+	}
+	
+	public String getValue(WebElement element) {
+		log.debug("Get Value for element: " + getElementName(element));
 		if (element != null) {
 			return element.getAttribute("value");
 		}
 		return null;
+	}
+	
+	public Boolean compareValue(String value) {
+		log.debug("Compare Value =" + value + ", for selector: " + selector);
+		return compareString(getValue(element), value);
+	}
+
+	public Boolean compareValue(String selector, String value) {
+		log.debug("Compare Value =" + value + ", for selector: " + selector);
+		return compareString(getValue(selector), value);
+	}
+
+	public int validateValue(String value) {
+		log.debug("Validate Value =" + value + ", for selector: " + selector);
+		return validateString(getValue(element), value)  ? 0 : 1;
+	}
+
+	public int validateValue(String selector, String value) {
+		log.debug("Validate Value =" + value + ", for selector: " + selector);
+		return validateString(getValue(selector), value) ? 0 : 1;
+	}
+
+	public Boolean assertValue(String value) {
+		log.debug("Assert Value =" + value + ", for selector: " + selector);
+		return assertString(getValue(selector), value);
+	}
+
+	public Boolean assertValue(String selector, String value) {
+		log.debug("Assert Value =" + value + ", for selector: " + selector);
+		return assertString(getValue(selector), value);
 	}
 
 	public Boolean compareText(String value) {
@@ -967,8 +1024,11 @@ public class Element {
 	}
 
 	public boolean isDisplayed(String selector) {
-		log.debug("isDisplayed: " + selector);
-		WebElement element = getElement(selector);
+		return isDisplayed(getElement(selector));
+	}
+	
+	public boolean isDisplayed(WebElement element) {
+		log.debug("isDisplayed: " + getElementName(element));
 		if (element != null) {
 			try {
 				return element.isDisplayed();
@@ -1053,7 +1113,7 @@ public class Element {
 	}
 
 	public void waitWhenTrue(String selector, IWaitCallback callback) {
-		this.waitWhenTrue(SeleniumUtils.waitAndFindElement(driver, getBy(selector), config.getPageLoadTimeout()), callback);
+		this.waitWhenTrue(waitAndFindElement(selector), callback);
 	}
 
 	public void waitWhenTrue(WebElement element, IWaitCallback callback) {
