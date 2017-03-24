@@ -42,7 +42,7 @@ public abstract class BaseTest {
 	public TestName testName = new TestName();
 	
 	public static void verifySeleniumVersion(double version) {
-		if (version < GIT_VERSION) {
+		if (version > GIT_VERSION) {
 			String error = "Unsupported major.minor version " + GIT_VERSION + ".\nGet latest changes from https://github.com/dgofman/selenium";
 			System.err.println(error);
 			throw new UnsupportedClassVersionError(error);
