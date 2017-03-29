@@ -1,5 +1,7 @@
 package com.softigent.sftselenium;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -23,7 +25,8 @@ public class Container extends Element {
 
 	public Container(WebDriver driver, Config config, String selector, By locator) {
 		this(driver, config, selector, locator, null);
-		this.element = getElement(locator);
+		List<WebElement> elements = getElements(locator, -1);
+		this.element = elements.size() == 0 ? null : elements.get(0);
 	}
 
 	public Container(WebDriver driver, Config config, String selector, By locator, WebElement element) {
