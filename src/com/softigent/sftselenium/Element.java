@@ -282,6 +282,10 @@ public class Element {
 		setFocus(waitAndFindElement(selector));
 	}
 	
+	public void setFocus() {
+		setFocus(element);
+	}
+	
 	public void setFocus(WebElement element) {
 		log.debug("setFocus on: " + getElementName(element));
 		executeScript("arguments[0].focus();", element);
@@ -793,6 +797,10 @@ public class Element {
 	public Actions mouseMove(WebElement element) {
 		return this.mouseMove(element, 0, 0);
 	}
+	
+	public Actions mouseMove() {
+		return this.mouseMove(element, 0, 0);
+	}
 
 	public Actions mouseMove(WebElement element, int x, int y) {
 		log.debug("Mouse Move (" + x + 'x' + y + ") on: " + getElementName(element));
@@ -1032,12 +1040,12 @@ public class Element {
 	}
 
 	public boolean isDisplayed(String selector) {
-		return isDisplayed(getElement(selector));
+		return isDisplayed(getElement(selector, -1));
 	}
 	
 	public boolean isDisplayed(WebElement element) {
-		log.debug("isDisplayed: " + getElementName(element));
 		if (element != null) {
+			log.debug("isDisplayed: " + getElementName(element));
 			try {
 				return element.isDisplayed();
 			} catch (StaleElementReferenceException elementHasDisappeared) {
