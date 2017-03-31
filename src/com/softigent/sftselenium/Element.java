@@ -219,17 +219,25 @@ public class Element {
 	}
 
 	public WebElement getElement(String selector) {
-		return getElement(getBy(selector));
+		return getElement(selector, 1);
+	}
+	
+	public WebElement getElement(String selector, int expectSize) {
+		return getElement(getBy(selector), expectSize);
+	}
+	
+	public WebElement getElement(By locator) {
+		return getElement(locator, 1);
 	}
 
-	public WebElement getElement(By locator) {
-		List<WebElement> elements = getElements(locator, 1);
-		if (elements == null || elements.size() == 0) {
-			log.warn("Cannot find an element for locator: " + locator);
-			fail();
-		}
+	public WebElement getElement(By locator, int expectSize) {
+		List<WebElement> elements = getElements(locator, expectSize);
 		if (elements != null && elements.size() > 0) {
 			return elements.get(0);
+		}
+		if (expectSize != -1) {
+			log.warn("Cannot find an element for locator: " + locator);
+			fail();
 		}
 		return null;
 	}
@@ -382,7 +390,7 @@ public class Element {
 		this.waitWhenTrue(new IWaitCallback() {
 			public boolean isTrue(WebElement element) {
 				try {
-					element = getElement(selector);
+					element = getElement(selector, -1);
 					return Element.regExpString(getText(element), value);
 				} catch (Exception e) {
 					return false;
@@ -396,7 +404,7 @@ public class Element {
 		this.waitWhenTrue(new IWaitCallback() {
 			public boolean isTrue(WebElement element) {
 				try {
-					element = getElement(selector);
+					element = getElement(selector, -1);
 					return Element.regExpString(getHTML(element).trim(), value);
 				} catch (Exception e) {
 					return false;
