@@ -779,6 +779,7 @@ public class Element {
 
 	public Actions mouseClick(WebElement element, int x, int y) {
 		log.debug("Mouse Click (" + x + 'x' + y + ") on: " + getElementName(element));
+		executeScript("return arguments[0].scrollIntoView(true);", element);
 		Actions action = new Actions(driver);
 		action.moveToElement(element, x, y).click();
 		action.build().perform();
