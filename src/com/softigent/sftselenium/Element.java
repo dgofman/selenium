@@ -31,6 +31,12 @@ public class Element {
 	protected String selector;
 	protected By locator;
 	protected WebElement element;
+	
+	final String JS_BUILD_CSS_SELECTOR =
+		    "var n = []; function t(e) { var i = 1; p = e.parentNode; " +
+		    "while (e = e.previousElementSibling) { i++;}; " +
+		    "n.unshift('*:nth-child(' + i + ')'); if (p.nodeName !== 'BODY') " +
+		    "t(p);};t(arguments[0]); n.unshift('body'); return n.join('>');";
 
 	static Logger log = CacheLogger.getLogger(Element.class.getName());
 
@@ -100,6 +106,12 @@ public class Element {
 
 	public static WebElement findElement(WebElement parentElement, String path) {
 		return parentElement.findElement(findBy(path));
+	}
+	
+	public Element createElement(WebElement element) {
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+		String selector = (String)js.executeScript(JS_BUILD_CSS_SELECTOR, element);
+		return new Element(driver, config, selector, findBy(selector), element);
 	}
 
 	public Element find(String selector) {
@@ -395,7 +407,8 @@ public class Element {
 			public boolean isTrue(WebElement element) {
 				try {
 					element = getElement(selector, -1);
-					return Element.regExpString(getText(element), value);
+					String text = getText(element);
+					return Element.regExpString(text, value);
 				} catch (Exception e) {
 					return false;
 				}
