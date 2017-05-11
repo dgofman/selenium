@@ -402,7 +402,7 @@ public class Element {
 	}
 
 	public void waitText(String selector, String value) {
-		log.debug("waitText: " + value + " in selector=" + selector);
+		log.debug("waitText: " + value + " in selector=" + selector + ", value=" + value);
 		this.waitWhenTrue(new IWaitCallback() {
 			public boolean isTrue(WebElement element) {
 				try {
@@ -544,6 +544,10 @@ public class Element {
 		log.debug("Set HTML value=" + value);
 		executeScript(selector, "arguments[0].innerHTML=arguments[2];", null, value);
 		SeleniumUtils.sleep(config.getActionDelay());
+	}
+	
+	public String getHTML() {
+		return getHTML(element);
 	}
 
 	public String getHTML(String selector) {
