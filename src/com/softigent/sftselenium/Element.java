@@ -289,7 +289,8 @@ public class Element {
 	}
 
 	public Object executeScript(String command) {
-		return this.executeScript(command, element, null, null);
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+		return js.executeScript(command);
 	}
 
 	public void setFocus(String selector) {
