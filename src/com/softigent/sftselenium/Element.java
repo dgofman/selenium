@@ -24,6 +24,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
+import com.sun.glass.events.KeyEvent;
+
 public class Element {
 
 	protected WebDriver driver;
@@ -718,6 +720,10 @@ public class Element {
 	public void enter(WebElement element) {
 		log.debug("Enter on: " + getElementName(element));
 		element.sendKeys(Keys.ENTER);
+	}
+	
+	public static void tab() {
+		getRobot().keyPress(KeyEvent.VK_TAB);
 	}
 	
 	public void click(String selector) {
