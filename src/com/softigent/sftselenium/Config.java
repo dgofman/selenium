@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 
@@ -117,7 +119,19 @@ public class Config extends Properties {
 			if (isPrivate) {
 				capabilities.setCapability("chrome.switches", Arrays.asList("--incognito"));
 			}
+			options.addArguments("disable-infobars");
 			options.addArguments("--disable-extensions");
+			options.addArguments("--disable-notifications");
+			options.addArguments("--start-maximized");
+			options.addArguments("--disable-web-security");
+			options.addArguments("--no-proxy-server");
+			options.addArguments("--enable-automation");
+			options.addArguments("--disable-save-password-bubble");
+			
+			Map<String, Object> prefs = new HashMap<String, Object>();
+			prefs.put("credentials_enable_service", false);
+			prefs.put("profile.password_manager_enabled", false);
+			options.setExperimentalOption("prefs", prefs);
 
 			LoggingPreferences logPrefs = new LoggingPreferences();
 			logPrefs.enable(LogType.BROWSER, Level.ALL);
