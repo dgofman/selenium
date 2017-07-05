@@ -1063,6 +1063,19 @@ public class Element {
 			}
 		});
 	}
+	
+	public void waitIsEnabled() {
+		log.debug("waitIsEnabled: " + getElementName(this.element));
+		this.waitWhenTrue(this.element, new IWaitCallback() {
+			public boolean isTrue(WebElement element) {
+				try {
+					return element.isEnabled();
+				} catch (StaleElementReferenceException elementHasDisappeared) {
+					return false;
+				}
+			}
+		});
+	}
 
 	public boolean isDisplayed(String selector) {
 		return isDisplayed(getElement(selector, -1));
