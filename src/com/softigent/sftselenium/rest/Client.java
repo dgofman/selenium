@@ -57,7 +57,7 @@ public class Client {
 			throws UnirestException {
 		String url = getURL(config, path);
 		logger.info("GET " + url);
-		return call(Unirest.get(url), responseClass);
+		return call(Unirest.get(url).headers(config.getHeaders()), responseClass);
 	}
 
 	public static HttpResponse<JsonNode> optionsRequest(HostConfig config, String path, JsonNode body) throws UnirestException {
@@ -67,7 +67,7 @@ public class Client {
 	public static <T> HttpResponse<T> optionsRequest(HostConfig config, String path, T body, Class<T> responseClass) throws UnirestException {
 		String url = getURL(config, path);
 		logger.info("OPTIONS " + url);
-		return call(Unirest.options(url).body(body), responseClass);
+		return call(Unirest.options(url).headers(config.getHeaders()).body(body), responseClass);
 	}
 
 	public static HttpResponse<JsonNode> optionsRequest(HostConfig config, String path, String body) throws UnirestException {
@@ -77,7 +77,7 @@ public class Client {
 	public static <T> HttpResponse<T> optionsRequest(HostConfig config, String path, String body, Class<T> responseClass) throws UnirestException {
 		String url = getURL(config, path);
 		logger.info("OPTIONS " + url);
-		return call(Unirest.options(url).body(body), responseClass);
+		return call(Unirest.options(url).headers(config.getHeaders()).body(body), responseClass);
 	}
 	
 	public static HttpResponse<JsonNode> postRequest(HostConfig config, String path, JsonNode body) throws UnirestException {
@@ -87,7 +87,7 @@ public class Client {
 	public static <T> HttpResponse<T> postRequest(HostConfig config, String path, T body, Class<T> responseClass) throws UnirestException {
 		String url = getURL(config, path);
 		logger.info("POST " + url);
-		return call(Unirest.post(url).body(body), responseClass);
+		return call(Unirest.post(url).headers(config.getHeaders()).body(body), responseClass);
 	}
 	
 	public static HttpResponse<JsonNode> postRequest(HostConfig config, String path, String body) throws UnirestException {
@@ -97,7 +97,7 @@ public class Client {
 	public static <T> HttpResponse<T> postRequest(HostConfig config, String path, String body, Class<T> responseClass) throws UnirestException {
 		String url = getURL(config, path);
 		logger.info("POST " + url);
-		return call(Unirest.post(url).body(body), responseClass);
+		return call(Unirest.post(url).headers(config.getHeaders()).body(body), responseClass);
 	}
 
 	public static HttpResponse<JsonNode> putRequest(HostConfig config, String path, JsonNode body) throws UnirestException {
@@ -107,7 +107,7 @@ public class Client {
 	public static <T> HttpResponse<T> putRequest(HostConfig config, String path, T body, Class<T> responseClass) throws UnirestException {
 		String url = getURL(config, path);
 		logger.info("PUT " + url);
-		return call(Unirest.put(url).body(body), responseClass);
+		return call(Unirest.put(url).headers(config.getHeaders()).body(body), responseClass);
 	}
 
 	public static HttpResponse<JsonNode> putRequest(HostConfig config, String path, String body) throws UnirestException {
@@ -117,7 +117,7 @@ public class Client {
 	public static <T> HttpResponse<T> putRequest(HostConfig config, String path, String body, Class<T> responseClass) throws UnirestException {
 		String url = getURL(config, path);
 		logger.info("PUT " + url);
-		return call(Unirest.put(url).body(body), responseClass);
+		return call(Unirest.put(url).headers(config.getHeaders()).body(body), responseClass);
 	}
 
 	public static HttpResponse<JsonNode> patchRequest(HostConfig config, String path, JsonNode body) throws UnirestException {
@@ -127,7 +127,7 @@ public class Client {
 	public static <T> HttpResponse<T> patchRequest(HostConfig config, String path, T body, Class<T> responseClass) throws UnirestException {
 		String url = getURL(config, path);
 		logger.info("PATCH " + url);
-		return call(Unirest.patch(url).body(body), responseClass);
+		return call(Unirest.patch(url).headers(config.getHeaders()).body(body), responseClass);
 	}
 
 	public static HttpResponse<JsonNode> patchRequest(HostConfig config, String path, String body) throws UnirestException {
@@ -137,7 +137,7 @@ public class Client {
 	public static <T> HttpResponse<T> patchRequest(HostConfig config, String path, String body, Class<T> responseClass) throws UnirestException {
 		String url = getURL(config, path);
 		logger.info("PATCH " + url);
-		return call(Unirest.patch(url).body(body), responseClass);
+		return call(Unirest.patch(url).headers(config.getHeaders()).body(body), responseClass);
 	}
 
 	public static HttpResponse<JsonNode> deleteRequest(HostConfig config, String path, JsonNode body) throws UnirestException {
@@ -147,7 +147,7 @@ public class Client {
 	public static <T> HttpResponse<T> deleteRequest(HostConfig config, String path, T body, Class<T> responseClass) throws UnirestException {
 		String url = getURL(config, path);
 		logger.info("DELETE " + url);
-		return call(Unirest.delete(url).body(body), responseClass);
+		return call(Unirest.delete(url).headers(config.getHeaders()).body(body), responseClass);
 	}
 	
 	public static HttpResponse<JsonNode> deleteRequest(HostConfig config, String path, String body) throws UnirestException {
@@ -157,7 +157,7 @@ public class Client {
 	public static <T> HttpResponse<T> deleteRequest(HostConfig config, String path, String body, Class<T> responseClass) throws UnirestException {
 		String url = getURL(config, path);
 		logger.info("DELETE " + url);
-		return call(Unirest.delete(url).body(body), responseClass);
+		return call(Unirest.delete(url).headers(config.getHeaders()).body(body), responseClass);
 	}
 
 	public static String getURL(HostConfig config, String path) {
