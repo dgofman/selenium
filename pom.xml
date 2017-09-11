@@ -43,7 +43,6 @@
 	</properties>
 	
 	<build>
-		<finalName>portal-4.0</finalName>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
 			<plugin>
