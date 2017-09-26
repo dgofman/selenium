@@ -723,6 +723,10 @@ public class Element {
 		element.sendKeys(Keys.ENTER);
 	}
 	
+	public void enter() {
+		element.sendKeys(Keys.ENTER);
+	}
+	
 	public static void tab() {
 		getRobot().keyPress(KeyEvent.VK_TAB);
 	}
@@ -730,6 +734,11 @@ public class Element {
 	public void click(String selector) {
 		WebElement element = waitAndFindElement(selector);
 		waitIsEnabled(selector);
+		click(element);
+	}
+	
+	public void forceClick(String selector) {
+		WebElement element = SeleniumUtils.waitAndFindElement(driver, locator, config.getPageLoadTimeout(), false);
 		click(element);
 	}
 
@@ -1075,6 +1084,10 @@ public class Element {
 				}
 			}
 		});
+	}
+	
+	public boolean isNotDisplayed(String selector) {
+		return !isDisplayed(selector);
 	}
 
 	public boolean isDisplayed(String selector) {
