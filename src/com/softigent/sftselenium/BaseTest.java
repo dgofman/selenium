@@ -2,6 +2,7 @@ package com.softigent.sftselenium;
 
 import static org.junit.Assume.assumeTrue;
 
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -101,15 +102,17 @@ public abstract class BaseTest {
 	}
 	
 	public Container createContainer(WebElement element) {
-		return createContainer(element, createContainer("body"));
-	}
-	
-	public Container createContainer(WebElement element, Container container) {
 		return new Container(connector.getDriver(), connector.getConfig(), element);
 	}
 	
 	public Container createContainer(WebElement element, String xpath) {
 		return new Container(connector.getDriver(), connector.getConfig(), Container.getParent(element, xpath));
+	}
+	
+	public Container createContainer(List<WebElement> elements, int index) {
+		Container container = createContainer(elements.get(index));
+		container.selector += ":nth-child(" + (index + 1) + ")";
+		return container;
 	}
 	
 	public Container createWindowContainer(String windowTitle) {

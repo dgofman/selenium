@@ -1144,6 +1144,22 @@ public class Element {
 		}
 		return false;
 	}
+	
+	public void waitIsHidden(String selector) {
+		WebElement element = this.getElement(selector, -1);
+		if (element != null) {
+			this.waitWhenTrue(element, new IWaitCallback() {
+				public boolean isTrue(WebElement element) {
+					print('.', false);
+					try {
+						return !element.isDisplayed();
+					} catch (StaleElementReferenceException elementHasDisappeared) {
+						return true;
+					}
+				}
+			});
+		}
+	}
 
 	public void waitIsDisplayed(String selector) {
 		this.waitWhenTrue(selector, new IWaitCallback() {

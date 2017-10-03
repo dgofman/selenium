@@ -18,8 +18,7 @@ public class Container extends Element {
 	}
 
 	public Container(WebDriver driver, Config config, WebElement element) {
-		this(driver, config, null, null, element);
-		this.selector = getSelector(element);
+		this(driver, config, getSelector(element), null, element);
 		this.locator = findBy(selector);
 	}
 
