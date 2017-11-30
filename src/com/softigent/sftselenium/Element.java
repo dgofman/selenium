@@ -731,6 +731,11 @@ public class Element {
 		getRobot().keyPress(KeyEvent.VK_TAB);
 	}
 	
+	// Click Alt-F4 to close outlook, printer windows
+	public static void closeWindow() {
+		Element.keyPress(new int[] { KeyEvent.VK_ALT, KeyEvent.VK_F4 });
+	}
+	
 	public void click(String selector) {
 		WebElement element = waitAndFindElement(selector);
 		waitIsEnabled(selector);
@@ -776,6 +781,10 @@ public class Element {
 		Actions action = new Actions(driver);
 		action.moveToElement(element).doubleClick().build().perform();
 		SeleniumUtils.sleep(config.getActionDelay());
+	}
+	
+	public void jsClick() {
+		jsClick(selector);
 	}
 	
 	public void jsClick(String selector) {

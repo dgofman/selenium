@@ -159,6 +159,16 @@ public class Client {
 		logger.info("DELETE " + url);
 		return call(Unirest.delete(url).headers(config.getHeaders()).body(body), responseClass);
 	}
+	
+	public static HttpResponse<JsonNode> deleteRequest(HostConfig config, String path) throws UnirestException {
+		return deleteRequest(config, path, JsonNode.class);
+	}
+	
+	public static <T> HttpResponse<T> deleteRequest(HostConfig config, String path,  Class<T> responseClass) throws UnirestException {
+		String url = getURL(config, path);
+		logger.info("DELETE " + url);
+		return call(Unirest.delete(url).headers(config.getHeaders()), responseClass);
+	}
 
 	public static String getURL(HostConfig config, String path) {
 		return (config.isSecure() ? "https://" : "http://") + config.getHost() + ":" + config.getPort() + path;
