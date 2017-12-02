@@ -3,27 +3,24 @@ package com.softigent.sftselenium;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Level;
 
 import org.apache.log4j.Logger;
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.ie.InternetExplorerDriver;
-import org.openqa.selenium.logging.LogType;
-import org.openqa.selenium.logging.LoggingPreferences;
-import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.ie.InternetExplorerOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.safari.SafariDriver;
+import org.openqa.selenium.safari.SafariOptions;
 
 public class Config extends Properties {
 	
@@ -104,21 +101,14 @@ public class Config extends Properties {
 		boolean isPrivate = "true".equals(this.getProperty("open_as_private"));
 		boolean isFullScreen = "true".equals(this.getProperty("open_fullscreen"));
 		if (driverName.equals("Firefox")) {
-			FirefoxProfile ffProfile = new FirefoxProfile();
-			ffProfile.setPreference("layout.css.devPixelsPerPx", "1.0");
+			FirefoxOptions options = new FirefoxOptions()
+				.addPreference("layout.css.devPixelsPerPx", "1.0");
 			if (isPrivate) {
-				ffProfile.setPreference("browser.privatebrowsing.autostart", true);
+				options.addPreference("browser.privatebrowsing.autostart", true);
 			}
-			driver = createDriver(driverName, null, ffProfile);
+			driver = createDriver(driverName, options);
 		} else if (driverName.equals("Chrome")) {
 			ChromeOptions options = new ChromeOptions();
-			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-			if (isFullScreen) {
-				options.addArguments("--start-maximized");
-			}
-			if (isPrivate) {
-				capabilities.setCapability("chrome.switches", Arrays.asList("--incognito"));
-			}
 			options.addArguments("disable-infobars");
 			options.addArguments("--disable-extensions");
 			options.addArguments("--disable-notifications");
@@ -133,13 +123,21 @@ public class Config extends Properties {
 			prefs.put("profile.password_manager_enabled", false);
 			options.setExperimentalOption("prefs", prefs);
 
-			LoggingPreferences logPrefs = new LoggingPreferences();
+			/*LoggingPreferences logPrefs = new LoggingPreferences();
 			logPrefs.enable(LogType.BROWSER, Level.ALL);
+			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+			if (isFullScreen) {
+				options.addArguments("--start-maximized");
+			}
+			if (isPrivate) {
+				capabilities.setCapability("chrome.switches", Arrays.asList("--incognito"));
+			}
 			capabilities.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
-			capabilities.setCapability(ChromeOptions.CAPABILITY, options);
-			driver = createDriver(driverName, capabilities, null);
+			capabilities.setCapability(ChromeOptions.CAPABILITY, options);*/
+			driver = createDriver(driverName, options);
 		} else if (driverName.equals("Safari")) {
-			driver = createDriver(driverName, DesiredCapabilities.safari(), null);
+			//driver = createDriver(driverName, DesiredCapabilities.safari());
+			driver = createDriver(driverName, new SafariOptions());
 		} else if (driverName.equals("IE")) {
 			DesiredCapabilities dc = DesiredCapabilities.internetExplorer();
 			dc.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
@@ -150,7 +148,7 @@ public class Config extends Properties {
 				dc.setCapability(InternetExplorerDriver.FORCE_CREATE_PROCESS, true); 
 				dc.setCapability(InternetExplorerDriver.IE_SWITCHES, "-private");
 			}
-			driver = createDriver(driverName, dc, null);
+			driver = createDriver(driverName, new InternetExplorerOptions(dc));
 		}
 
 		fullScreenControl(isFullScreen, driver, driverName);
@@ -158,16 +156,16 @@ public class Config extends Properties {
 		return driver;
 	}
 	
-	public WebDriver createDriver(String driverName, Capabilities capabilities, FirefoxProfile profile) {
+	public WebDriver createDriver(String driverName, MutableCapabilities capabilities) {
 		switch (driverName) {
 			case "Firefox":
-				return new FirefoxDriver(profile);
+				return new FirefoxDriver((FirefoxOptions)capabilities);
 			case "Chrome":
-				return new ChromeDriver(capabilities);
+				return new ChromeDriver((ChromeOptions)capabilities);
 			case "Safari":
-				return new SafariDriver(capabilities);
+				return new SafariDriver((SafariOptions)capabilities);
 			case "IE":
-				return new InternetExplorerDriver(capabilities);
+				return new InternetExplorerDriver((InternetExplorerOptions)capabilities);
 		}
 		return null;
 	}

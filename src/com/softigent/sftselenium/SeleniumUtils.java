@@ -157,19 +157,15 @@ public class SeleniumUtils {
         } catch (Exception e) {
                 System.err.println(e.getMessage());
         }
-        switch (Platform.getOSType()) {
-                case Platform.WINDOWS:
-                        Element.keyPress(new int[] {KeyEvent.VK_CONTROL, KeyEvent.VK_V}, robot);
-                        Element.keyPress(KeyEvent.VK_ENTER, robot);
-                        break;
-                case Platform.LINUX:
-                        Element.keyPress(new int[] {KeyEvent.VK_DOWN}, robot);
-                        Element.keyPress(new int[] {KeyEvent.VK_CONTROL, KeyEvent.VK_V}, robot);
-                        Element.keyPress(KeyEvent.VK_ENTER, robot);
-                        break;
-                default:
-                        element.sendKeys("[type=file]", path);
-                        break;
+        if (Platform.isWindows()) {
+            Element.keyPress(new int[] {KeyEvent.VK_CONTROL, KeyEvent.VK_V}, robot);
+            Element.keyPress(KeyEvent.VK_ENTER, robot);
+        } else if (Platform.isLinux()) {
+            Element.keyPress(new int[] {KeyEvent.VK_DOWN}, robot);
+            Element.keyPress(new int[] {KeyEvent.VK_CONTROL, KeyEvent.VK_V}, robot);
+            Element.keyPress(KeyEvent.VK_ENTER, robot);
+        } else {
+            element.sendKeys("[type=file]", path);
         }
 	}
 	
