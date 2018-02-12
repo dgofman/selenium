@@ -37,9 +37,16 @@ public class Element {
 	final String JS_BUILD_CSS_SELECTOR =
 		    "var n = []; function t(e) { var i = 1; p = e.parentNode; " +
 		    "while (e = e.previousElementSibling) { i++;}; " +
-		    "n.unshift('*:nth-child(' + i + ')'); if (p.nodeName !== 'BODY') " +
+		    "n.unshift(p.tagName.toLowerCase() + ':nth-child(' + i + ')'); if (p.nodeName !== 'BODY') " +
 		    "t(p);};t(arguments[0]); n.unshift('body'); return n.join('>');";
-
+	
+	//document.evaluate(PATH, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+	final String JS_BUILD_XPATH_SELECTOR =
+		    "var n = []; function t(e) { while (e) { if (e.tagName) { " +
+		    "var p = e; var i = 1; while (p = p.previousElementSibling) { " +
+		    "if(e.tagName == p.tagName) i++; } n.unshift(e.tagName.toLowerCase() + " + 
+		    "(i > 1 ? '[' + i + ']' : '')); } e = e.parentNode; }}; t(arguments[0]); return n.join('/');";
+	
 	static Logger log = CacheLogger.getLogger(Element.class.getName());
 
 	public String getSelector() {
@@ -230,6 +237,21 @@ public class Element {
 			log.debug("Elements (" + elements.size() + ") - " + locator);
 		}
 		return elements;
+	}
+
+	public WebElement getElementByText(String path, String text) {
+		log.debug("getElementByText: " + getElementName(this.element));
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+		String currentPath = (String)js.executeScript(JS_BUILD_XPATH_SELECTOR, this.element);
+		By by = getBy("xpath://" + path + "[text()='" + text + "']");
+		List<WebElement> elements = driver.findElements(by);
+		for (WebElement element : elements) {
+			String selector = (String)js.executeScript(JS_BUILD_XPATH_SELECTOR, element);
+			if (selector.startsWith(currentPath)) {
+				return element;
+			}
+		}
+		return null;
 	}
 
 	public WebElement getElement(String selector) {

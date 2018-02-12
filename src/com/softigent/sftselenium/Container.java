@@ -34,7 +34,7 @@ public class Container extends Element {
 
 	public Container waitAndFindContainer(String selector) {
 		WebElement element = waitAndFindElement(selector);
-		return new Container(driver, config, selector, locator, element);
+		return find(element);
 	}
 
 	public Container find(String selector) {
