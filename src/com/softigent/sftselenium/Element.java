@@ -1176,6 +1176,20 @@ public class Element {
 		return false;
 	}
 	
+	public void waitSelector(String selector, boolean isExists) {
+		this.waitWhenTrue(element, new IWaitCallback() {
+			public boolean isTrue(WebElement element) {
+				print('.', false);
+				WebElement el = null;
+				try {
+					el = Element.this.getElement(selector, -1);
+				} catch (StaleElementReferenceException elementHasDisappeared) {
+				}
+				return (isExists ? el != null : el == null);
+			}
+		});
+	}
+	
 	public void waitIsHidden(String selector) {
 		WebElement element = this.getElement(selector, -1);
 		if (element != null) {
@@ -1183,7 +1197,7 @@ public class Element {
 				public boolean isTrue(WebElement element) {
 					print('.', false);
 					try {
-						return !element.isDisplayed();
+						return element == null || !element.isDisplayed();
 					} catch (StaleElementReferenceException elementHasDisappeared) {
 						return true;
 					}
@@ -1191,7 +1205,7 @@ public class Element {
 			});
 		}
 	}
-
+	
 	public void waitIsDisplayed(String selector) {
 		this.waitWhenTrue(selector, new IWaitCallback() {
 			public boolean isTrue(WebElement element) {
