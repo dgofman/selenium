@@ -1291,14 +1291,18 @@ public class Element {
 	}
 	
 	public static Boolean assertObject(Object obj1, Object obj2) {
-		boolean isTrue = validateObject(obj1, obj2);
+		return assertObject(obj1, obj2, true);
+	}
+	
+	public static Boolean assertObject(Object obj1, Object obj2, boolean isExpectedTrue) {
+		boolean isTrue = validateObject(obj1, obj2, isExpectedTrue);
 		assertTrue(isTrue);
 		return isTrue;
 	}
 	
-	public static Boolean validateObject(Object obj1, Object obj2) {
-		log.debug("compareString: '" + obj1 + "' = '" + obj2 + "'");
-		boolean isTrue = obj1 == obj2;
+	public static Boolean validateObject(Object obj1, Object obj2, boolean isExcepted) {
+		log.debug("ASSERT: '" + obj1 + (isExcepted ? " ' = ' " : " '!=' ") + obj2 + "'");
+		boolean isTrue = (obj1 == obj2) == isExcepted;
 		if (!isTrue) {
 			log.error("\n'" + obj1 + "' != \n'" + obj2 + "'");
 		}
