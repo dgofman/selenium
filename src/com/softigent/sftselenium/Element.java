@@ -557,7 +557,7 @@ public class Element {
 
 	public Boolean assertText(String value) {
 		log.debug("Assert Text value=" + value + ", for selector: " + selector);
-		return assertString(getText(selector), value);
+		return assertString(getText(), value);
 	}
 
 	public Boolean assertText(String selector, String value) {
