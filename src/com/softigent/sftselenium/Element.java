@@ -406,15 +406,19 @@ public class Element {
 			SeleniumUtils.sleep(config.getActionDelay());
 		}
 	}
-
+	
 	public void setText(String value) {
+		setText(element, value);
+	}
+
+	public void setText(WebElement element, String value) {
 		element.sendKeys(value);
 		SeleniumUtils.sleep(config.getActionDelay());
 	}
 	
-	public void waitValue(String selector, String value) {
+	public WebElement waitValue(String selector, String value) {
 		log.debug("waitValue: " + value + " in selector=" + selector);
-		this.waitWhenTrue(new IWaitCallback() {
+		return this.waitWhenTrue(new IWaitCallback() {
 			public boolean isTrue(WebElement element) {
 				try {
 					element = getElement(selector);
@@ -426,9 +430,9 @@ public class Element {
 		});
 	}
 
-	public void waitText(String selector, String value) {
+	public WebElement waitText(String selector, String value) {
 		log.debug("waitText: " + value + " in selector=" + selector + ", value=" + value);
-		this.waitWhenTrue(new IWaitCallback() {
+		return this.waitWhenTrue(new IWaitCallback() {
 			public boolean isTrue(WebElement element) {
 				try {
 					element = getElement(selector, -1);
@@ -441,9 +445,9 @@ public class Element {
 		});
 	}
 	
-	public void waitHtmlText(String selector, String value) {
+	public WebElement waitHtmlText(String selector, String value) {
 		log.debug("waitHtmlText: " + value + " in selector=" + selector);
-		this.waitWhenTrue(new IWaitCallback() {
+		return this.waitWhenTrue(new IWaitCallback() {
 			public boolean isTrue(WebElement element) {
 				try {
 					element = getElement(selector, -1);
@@ -747,6 +751,10 @@ public class Element {
 	
 	public void enter() {
 		element.sendKeys(Keys.ENTER);
+	}
+	
+	public static void enterKey() {
+		getRobot().keyPress(KeyEvent.VK_ENTER);
 	}
 	
 	public static void tab() {
@@ -1091,9 +1099,9 @@ public class Element {
 		return alert;
 	}
 
-	public void waitIsEnabled(String selector) {
+	public WebElement waitIsEnabled(String selector) {
 		log.debug("waitIsEnabled: " + selector);
-		this.waitWhenTrue(selector, new IWaitCallback() {
+		return this.waitWhenTrue(selector, new IWaitCallback() {
 			public boolean isTrue(WebElement element) {
 				try {
 					return element.isEnabled();
@@ -1104,9 +1112,9 @@ public class Element {
 		});
 	}
 	
-	public void waitIsEnabled() {
+	public WebElement waitIsEnabled() {
 		log.debug("waitIsEnabled: " + getElementName(this.element));
-		this.waitWhenTrue(this.element, new IWaitCallback() {
+		return this.waitWhenTrue(this.element, new IWaitCallback() {
 			public boolean isTrue(WebElement element) {
 				try {
 					return element.isEnabled();
@@ -1176,8 +1184,8 @@ public class Element {
 		return false;
 	}
 	
-	public void waitSelector(String selector, boolean isExists) {
-		this.waitWhenTrue(element, new IWaitCallback() {
+	public WebElement waitSelector(String selector, boolean isExists) {
+		return this.waitWhenTrue(element, new IWaitCallback() {
 			public boolean isTrue(WebElement element) {
 				print('.', false);
 				WebElement el = null;
@@ -1190,10 +1198,10 @@ public class Element {
 		});
 	}
 	
-	public void waitIsHidden(String selector) {
+	public WebElement waitIsHidden(String selector) {
 		WebElement element = this.getElement(selector, -1);
 		if (element != null) {
-			this.waitWhenTrue(element, new IWaitCallback() {
+			return this.waitWhenTrue(element, new IWaitCallback() {
 				public boolean isTrue(WebElement element) {
 					print('.', false);
 					try {
@@ -1204,10 +1212,11 @@ public class Element {
 				}
 			});
 		}
+		return element;
 	}
 	
-	public void waitIsDisplayed(String selector) {
-		this.waitWhenTrue(selector, new IWaitCallback() {
+	public WebElement waitIsDisplayed(String selector) {
+		return this.waitWhenTrue(selector, new IWaitCallback() {
 			public boolean isTrue(WebElement element) {
 				print('.', false);
 				try {
@@ -1219,9 +1228,9 @@ public class Element {
 		});
 	}
 	
-	public void waitIsDisplayed(String selector, int count) {
+	public WebElement waitIsDisplayed(String selector, int count) {
 		List<WebElement> els = this.getElements(selector);
-		this.waitWhenTrue(new IWaitCallback() {
+		return this.waitWhenTrue(new IWaitCallback() {
 			public boolean isTrue(WebElement element) {
 				print('.', false);
 				int displayed = 0;
@@ -1240,15 +1249,15 @@ public class Element {
 		SeleniumUtils.fileBrowseDialog(this, driver, path);
 	}
 
-	public void waitWhenTrue(String selector, IWaitCallback callback) {
-		this.waitWhenTrue(waitAndFindElement(selector), callback);
+	public WebElement waitWhenTrue(String selector, IWaitCallback callback) {
+		return this.waitWhenTrue(waitAndFindElement(selector), callback);
 	}
 
-	public void waitWhenTrue(WebElement element, IWaitCallback callback) {
-		this.waitWhenTrue(element, callback, true);
+	public WebElement waitWhenTrue(WebElement element, IWaitCallback callback) {
+		return this.waitWhenTrue(element, callback, true);
 	}
 	
-	public void waitWhenTrue(WebElement element, IWaitCallback callback, boolean isPrint) {
+	public WebElement waitWhenTrue(WebElement element, IWaitCallback callback, boolean isPrint) {
 		for (int i = 0; i < config.getPageLoadTimeout(); i++) {
 			if (isPrint) {
 				print('.', false);
@@ -1257,7 +1266,7 @@ public class Element {
 				if (isPrint) {
 					print('.');
 				}
-				return;
+				return element;
 			}
 			try {
 				Thread.sleep(1000);
@@ -1266,10 +1275,11 @@ public class Element {
 			}
 		}
 		fail("TIMEOUT: [" + driver.getCurrentUrl() + "]");
+		return null;
 	}
 	
-	public void waitWhenTrue(IWaitCallback callback) {
-		this.waitWhenTrue(element, callback, true);
+	public WebElement waitWhenTrue(IWaitCallback callback) {
+		return this.waitWhenTrue(element, callback, true);
 	}
 	
 	public static void isFalse(Boolean bool, String message) {
