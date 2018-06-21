@@ -827,6 +827,12 @@ public class Element {
 		SeleniumUtils.sleep(config.getActionDelay());
 	}
 	
+	public void jsEventClick(WebElement element) {
+		log.debug("jsClick on: " + getElementName(element));
+		executeScript("var event = document.createEvent('Event'); event.initEvent('click', true, true); arguments[0].dispatchEvent(event);", element);
+		SeleniumUtils.sleep(config.getActionDelay());
+	}
+	
 	public Actions contextClick(String selector) {
 		return this.contextClick(waitAndFindElement(selector));
 	}
@@ -1199,7 +1205,10 @@ public class Element {
 	}
 	
 	public WebElement waitIsHidden(String selector) {
-		WebElement element = this.getElement(selector, -1);
+		return this.waitIsHidden(this.getElement(selector, -1));
+	}
+
+	public WebElement waitIsHidden(WebElement element) {
 		if (element != null) {
 			return this.waitWhenTrue(element, new IWaitCallback() {
 				public boolean isTrue(WebElement element) {
