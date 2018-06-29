@@ -1320,8 +1320,8 @@ public class Element {
 	}
 	
 	public static Boolean validateObject(Object obj1, Object obj2, boolean isExcepted) {
-		log.debug("ASSERT: '" + obj1 + (isExcepted ? " ' = ' " : " '!=' ") + obj2 + "'");
-		boolean isTrue = (obj1.equals(obj2) || obj1 == obj2) == isExcepted;
+		log.debug("ASSERT: '" + obj1 + (isExcepted ? "' = '" : "' != '") + obj2 + "'");
+		boolean isTrue = (String.valueOf(obj1).equals(String.valueOf(obj2))) == isExcepted;
 		if (!isTrue) {
 			log.error("\n'" + obj1 + "' != \n'" + obj2 + "'");
 		}

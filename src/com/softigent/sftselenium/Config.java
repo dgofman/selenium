@@ -15,7 +15,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.ie.InternetExplorerOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -35,6 +37,7 @@ public class Config extends Properties {
 	protected Logger log = CacheLogger.getLogger(Config.class.getName());
 	
 	private static String driverName;
+	private static boolean debugDriver = false;
 	
 	public Config(String propertyFile) {
 		super();
@@ -103,6 +106,12 @@ public class Config extends Properties {
 		if (driverName.equals("Firefox")) {
 			FirefoxOptions options = new FirefoxOptions()
 				.addPreference("layout.css.devPixelsPerPx", "1.0");
+			if (debugDriver) {
+				FirefoxProfile profile = new FirefoxProfile();
+				profile.setPreference("security.sandbox.content.level", 1);
+				options.setProfile(profile)
+				.setLogLevel(FirefoxDriverLogLevel.TRACE);
+			}
 			if (isPrivate) {
 				options.addPreference("browser.privatebrowsing.autostart", true);
 			}
