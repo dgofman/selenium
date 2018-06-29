@@ -1,10 +1,9 @@
 package com.softigent.sftselenium.database;
 
-import java.util.Arrays;
-
 import org.bson.Document;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.FindIterable;
@@ -42,7 +41,8 @@ public class Mongo {
 		if (mongoClient == null) {
 			if (username != null && password != null) {
 				MongoCredential credential = MongoCredential.createCredential(username, dbName, password.toCharArray());
-				mongoClient = new MongoClient(new ServerAddress(host, port), Arrays.asList(credential));
+				MongoClientOptions options = new MongoClientOptions.Builder().build();
+				mongoClient = new MongoClient(new ServerAddress(host, port), credential, options);
 			} else {
 				mongoClient = new MongoClient(host, port);
 			}
