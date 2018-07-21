@@ -828,8 +828,16 @@ public class Element {
 	}
 	
 	public void jsEventClick(WebElement element) {
-		log.debug("jsClick on: " + getElementName(element));
-		executeScript("var event = document.createEvent('Event'); event.initEvent('click', true, true); arguments[0].dispatchEvent(event);", element);
+		createEvent(element, "click");
+	}
+	
+	public void createEvent(String eventName) {
+		createEvent(element, eventName);
+	}
+	
+	public void createEvent(WebElement element, String eventName) {
+		log.debug("createEvent: " + eventName + ", " + getElementName(element));
+		executeScript("var event = document.createEvent('Event'); event.initEvent('" + eventName + "', true, true); arguments[0].dispatchEvent(event);", element);
 		SeleniumUtils.sleep(config.getActionDelay());
 	}
 	
