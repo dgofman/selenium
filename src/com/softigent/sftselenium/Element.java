@@ -34,6 +34,8 @@ public class Element {
 	protected By locator;
 	protected WebElement element;
 	
+	public static List<Throwable> assertErrorCollector;
+	
 	final String JS_BUILD_CSS_SELECTOR =
 		    "var n = []; function t(e) { var i = 1; p = e.parentNode; " +
 		    "while (e = e.previousElementSibling) { i++;}; " +
@@ -1305,12 +1307,16 @@ public class Element {
 	
 	public static void isTrue(Boolean bool, String message) {
 		if (!bool) {
-			fail("<<<<<<<<<<[" + message + "]>>>>>>>>>>");
+			assertFail("<<<<<<<<<<[" + message + "]>>>>>>>>>>");
 		}
 	}
 
 	public static void assertFail(String message) {
-		fail(message);
+		if (assertErrorCollector == null) {
+			fail(message);
+		} else {
+			assertErrorCollector.add(new AssertionError(message));
+		}
 	}
 
 	public static Boolean assertString(String str1, String str2) {

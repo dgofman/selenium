@@ -29,7 +29,7 @@ public abstract class BaseTest {
 	protected Logger log;
 	protected String className;
 	
-	public static final double GIT_VERSION = 2.9;
+	public static final double GIT_VERSION = 3.0;
 
 	@Rule
 	public TestWatcher testWatchThis = new TestWatcher() {
