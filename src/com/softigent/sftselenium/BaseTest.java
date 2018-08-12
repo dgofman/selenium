@@ -128,6 +128,7 @@ public abstract class BaseTest {
 	}
 	
 	public void waitPageLoad(String urlPath, int timeoutSec) {
+		log.info("Wait page load: " + urlPath);
 		SeleniumUtils.wait(connector.getDriver(), timeoutSec, urlPath != null ? Pattern.compile(urlPath) : null);
 	}
 

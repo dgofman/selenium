@@ -418,6 +418,17 @@ public class Element {
 		SeleniumUtils.sleep(config.getActionDelay());
 	}
 	
+	public WebElement setText(String selector, Object value, String lastChar) {
+		return setText(getElement(selector), value, lastChar);
+	}
+	
+	public WebElement setText(WebElement elemenet, Object value, String lastChar) {
+		executeScript("arguments[0].value=arguments[2];", elemenet, null, value);
+		elemenet.sendKeys(lastChar);
+		SeleniumUtils.sleep(config.getActionDelay());
+		return elemenet;
+	}
+	
 	public WebElement waitValue(String selector, String value) {
 		log.debug("waitValue: " + value + " in selector=" + selector);
 		return this.waitWhenTrue(new IWaitCallback() {
