@@ -1288,7 +1288,11 @@ public class Element {
 	}
 	
 	public WebElement waitWhenTrue(WebElement element, IWaitCallback callback, boolean isPrint) {
-		for (int i = 0; i < config.getPageLoadTimeout(); i++) {
+		return waitWhenTrue(config.getPageLoadTimeout(), element, callback, isPrint);
+	}
+	
+	public WebElement waitWhenTrue(int timeoutInSec, WebElement element, IWaitCallback callback, boolean isPrint) {
+		for (int i = 0; i < timeoutInSec; i++) {
 			if (isPrint) {
 				print('.', false);
 			}
@@ -1310,6 +1314,10 @@ public class Element {
 	
 	public WebElement waitWhenTrue(IWaitCallback callback) {
 		return this.waitWhenTrue(element, callback, true);
+	}
+	
+	public WebElement waitWhenTrue(int timeout, IWaitCallback callback) {
+		return this.waitWhenTrue(timeout, element, callback, true);
 	}
 	
 	public static void isFalse(Boolean bool, String message) {
@@ -1403,8 +1411,12 @@ public class Element {
 	}
 
 	public WebElement waitAndFindElement(By locator) {
+		return waitAndFindElement(locator, config.getPageLoadTimeout());
+	}
+	
+	public WebElement waitAndFindElement(By locator, int timeout) {
 		log.trace("Wait element(s) = " + locator);
-		return SeleniumUtils.waitAndFindElement(driver, locator, config.getPageLoadTimeout());
+		return SeleniumUtils.waitAndFindElement(driver, locator, timeout);
 	}
 
 	public void wait(float sec) {
