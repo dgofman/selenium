@@ -235,6 +235,10 @@ public class Element {
 		}
 		if (expectSize == 1 && elements.size() > 1) {
 			log.warn("Found elements=" + elements.size() + " for locator: " + locator);
+		} else if (elements.size() == 1) {
+			log.debug("Found Element - " + locator);
+		} else if (expectSize == -1){
+			log.warn("Elements (" + elements.size() + ") - " + locator);
 		} else {
 			log.debug("Elements (" + elements.size() + ") - " + locator);
 		}
@@ -899,7 +903,11 @@ public class Element {
 	}
 	
 	public Actions mouseMove() {
-		return this.mouseMove(element, 0, 0);
+		return this.mouseMove(0, 0);
+	}
+	
+	public Actions mouseMove(int x, int y) {
+		return this.mouseMove(element, x, y);
 	}
 
 	public Actions mouseMove(WebElement element, int x, int y) {
