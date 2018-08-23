@@ -454,6 +454,7 @@ public class Element {
 				try {
 					element = getElement(selector, -1);
 					String text = getText(element);
+					log.debug("waitText:\n'" + text + "'\n'" + value + "'");
 					return Element.regExpString(text, value);
 				} catch (Exception e) {
 					return false;
