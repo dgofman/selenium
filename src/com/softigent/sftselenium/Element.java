@@ -583,8 +583,17 @@ public class Element {
 	}
 
 	public Boolean assertText(String selector, String value) {
+		return assertText(selector, value, false);
+	}
+	
+	public Boolean assertText(String selector, String value, boolean useTrim) {
 		log.debug("Assert Text value=" + value + ", for selector: " + selector);
-		return assertString(getText(selector), value);
+		String str1 = getText(selector);
+		if (useTrim) {
+			str1 = str1.trim();
+			value = value.trim();
+		}
+		return assertString(str1, value);
 	}
 
 	public void setHTML(String selector, String value) {
