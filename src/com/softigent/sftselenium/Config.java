@@ -38,6 +38,7 @@ public class Config extends Properties {
 	
 	private static String driverName;
 	private static boolean debugDriver = false;
+	private static boolean ignoreCaseSensitivity = false;
 	
 	public Config(String propertyFile) {
 		super();
@@ -56,14 +57,15 @@ public class Config extends Properties {
 	}
 	
 	public void setDefaultProperties() {
-		this.initProperties("action_delay", "load_timeout", "use_robot_click");
+		this.initProperties("action_delay", "load_timeout", "use_robot_click", "ignore_case_sensitivity");
 	}
 	
-	public void initProperties(String delayKey, String timeoutKey, String useRobotClick) {
+	public void initProperties(String delayKey, String timeoutKey, String useRobotClick, String ignoreCaseSensitivity) {
 		this.windowOffset = new Point(0, 0);
 		this.actionDelay = Float.parseFloat(this.getProperty(delayKey) != null ? this.getProperty(delayKey) : "0.5");
 		this.pageLoadTimeout = Integer.parseInt(this.getProperty(timeoutKey) != null ? this.getProperty(timeoutKey) : "30");
 		this.useRobotClick = "true".equals(this.getProperty(useRobotClick));
+		Config.ignoreCaseSensitivity = "true".equals(this.getProperty(ignoreCaseSensitivity));
 	}
 	
 	public void setDriverName(String driverName) {
@@ -218,6 +220,10 @@ public class Config extends Properties {
 	
 	public boolean isRobotClick() {
 		return useRobotClick;
+	}
+	
+	public static boolean ignoreCaseSensitivity() {
+		return Config.ignoreCaseSensitivity;
 	}
 	
 	public void setRobotClick(boolean useRobotClick) {

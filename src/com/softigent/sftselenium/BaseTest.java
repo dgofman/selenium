@@ -291,6 +291,10 @@ public abstract class BaseTest {
 		System.out.println(message);
 	}
 	
+	public void tab() {
+		connector.getDriver().switchTo().activeElement();
+	}
+	
 	@Rule
 	public TestWatcher testWatcher = new TestWatcher() {
 		@Override

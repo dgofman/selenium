@@ -780,12 +780,9 @@ public class Element {
 		element.sendKeys(Keys.ENTER);
 	}
 	
-	public static void enterKey() {
-		getRobot().keyPress(KeyEvent.VK_ENTER);
-	}
-	
-	public static void tab() {
-		getRobot().keyPress(KeyEvent.VK_TAB);
+	public void tab() {
+		//getRobot().keyPress(KeyEvent.VK_TAB);
+		driver.switchTo().activeElement();
 	}
 	
 	// Click Alt-F4 to close outlook, printer windows
@@ -1402,10 +1399,47 @@ public class Element {
 		if (str == null) {
 			isTrue = regExp == null;
 		} else {
-			isTrue = str.equals(regExp);
+			if (Config.ignoreCaseSensitivity()) {
+				isTrue = str.equalsIgnoreCase(regExp);
+			} else {
+				isTrue = str.equals(regExp);
+			}
 			if (!isTrue) {
-				regExp = regExp.replaceAll("\\(", "\\\\(").replaceAll("\\)", "\\\\)");
-				isTrue = Pattern.compile(regExp, Pattern.DOTALL).matcher(str).matches();
+				StringBuilder sb = new StringBuilder();
+				int index = 0;
+				while (true) {
+					//Replace non-regular expression string with left and right parenthesis by \( or \)
+					//Any regular expression parenthesis must be wrap by forward slashes. Example: /(.*)/
+					int i1 = regExp.indexOf("(", index);
+					int i2 = regExp.indexOf(")", index);
+					if (i1 == -1 && i2 == -1) {
+						break;
+					} else {
+						if (i2 == -1 || (i1 != -1 && i1 < i2)) {
+							if (i1 > 0 && regExp.charAt(i1 - 1) == '/') {
+								sb.append(regExp.substring(index, i1 - 1) + "(");
+							} else {
+								sb.append(regExp.substring(index, i1) + "\\(");
+							}
+							index = i1 + 1;
+						} else if (i1 == -1 || (i2 != -1 && i2 < i1)) {
+							if (i2 + 1 < regExp.length() && regExp.charAt(i2 + 1) == '/') {
+								sb.append(regExp.substring(index, ++i2));
+								if (i2 + 1 == regExp.length()) { //skip end string Forward Slash
+									index = regExp.length();
+									break;
+								}
+							} else {
+								sb.append(regExp.substring(index, i2) + "\\)");
+							}
+							index = i2 + 1;
+						}
+					}
+				}
+				sb.append(regExp.substring(index));
+				regExp = sb.toString();
+				int options = (Config.ignoreCaseSensitivity() ? Pattern.DOTALL | Pattern.CASE_INSENSITIVE : Pattern.DOTALL); 
+				isTrue = Pattern.compile(regExp, options).matcher(str).matches();
 			}
 		}
 		return isTrue;
