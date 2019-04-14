@@ -169,8 +169,11 @@ public abstract class BaseTest {
 	}
 
 	public Container popupWindow(List<WebDriverInfo> popups) {
-		Container.assertObject(popups.size(), 1);
-		return createWindowContainer(switchWindow(popups.get(0)));
+		if (popups.size() > 0) {
+			return createWindowContainer(switchWindow(popups.get(0)));
+		} else {
+			return null;
+		}
 	}
 
 	public Container createWindowContainer(String winHandle) {
