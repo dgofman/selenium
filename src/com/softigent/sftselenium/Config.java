@@ -25,6 +25,7 @@ import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.GeckoDriverService;
+import org.openqa.selenium.firefox.ProfilesIni;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.ie.InternetExplorerDriverService;
 import org.openqa.selenium.ie.InternetExplorerOptions;
@@ -194,14 +195,22 @@ public class Config extends Properties {
 		case FIREFOX_DRIVER:
 			FirefoxOptions fopt = new FirefoxOptions().addPreference("layout.css.devPixelsPerPx", "1.0");
 			fopt.setHeadless(headless);
+			
+			//To create a new test Profile: (Windows->R, type: "firefox.exe -p" and press ENTER)
+			FirefoxProfile profile = new ProfilesIni().getProfile("SeleniumProfie");
+			if (profile == null) {
+				profile = new FirefoxProfile();
+			}
+			fopt.setProfile(profile);
 			if (debugDriver) {
-				FirefoxProfile profile = new FirefoxProfile();
 				profile.setPreference("security.sandbox.content.level", 1);
-				fopt.setProfile(profile).setLogLevel(FirefoxDriverLogLevel.TRACE);
+				fopt.setLogLevel(FirefoxDriverLogLevel.TRACE);
 			}
 			if (isPrivate) {
 				fopt.addPreference("browser.privatebrowsing.autostart", true);
 			}
+			fopt.addPreference("browser.tabs.remote.autostart", false);
+			fopt.addPreference("browser.tabs.remote.autostart.2", false);
 			driver = createDriver(driverName, new GeckoDriverService.Builder().usingFirefoxBinary(fopt.getBinary()).build(), fopt);
 			break;
 		case CHROME_DRIVER:
