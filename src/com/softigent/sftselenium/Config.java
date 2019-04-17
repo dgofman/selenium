@@ -105,6 +105,14 @@ public class Config extends Properties {
 		Config.ignoreCaseSensitivity = "true".equals(this.getProperty(ignoreCaseSensitivity));
 		Config.replaceNoBreakSpace = "true".equals(this.getProperty(replaceNoBreakSpace));
 	}
+	
+	public String getProperty(String key) {
+		String value = System.getProperty(key);
+		if (value != null) {
+			return value;
+		}
+		return super.getProperty(key);
+	}
 
 	public String getDriverName() {
 		return this.getProperty("driver");
