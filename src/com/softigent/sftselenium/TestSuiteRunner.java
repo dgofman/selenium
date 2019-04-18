@@ -28,8 +28,9 @@ public class TestSuiteRunner {
 		this.suites = suites;
 	}
 
-	public void run() throws IOException {
+	public int run() throws IOException {
 
+		int suitesErrors = 0;
 		for (TestRunnerInfo info : suites) {
 			Date startTime = new Date();
 			int totalTestCases = 0;
@@ -116,7 +117,9 @@ public class TestSuiteRunner {
 			writer.println("</html>");
 	
 			close(writer, file);
+			suitesErrors += totalFailed;
 		}
+		return suitesErrors;
 	}
 
 	protected void close(PrintWriter writer, File file) throws IOException {

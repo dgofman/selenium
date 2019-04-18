@@ -23,7 +23,7 @@ public abstract class TestRunner extends Runner {
 	public TestRunner(String[] args) {
 		List<TestRunnerInfo> suites = this.initialize(args);
 		try {
-			getTestSuiteRunner(suites).run();
+			System.exit(getTestSuiteRunner(suites).run());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
