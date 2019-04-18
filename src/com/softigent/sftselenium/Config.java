@@ -57,8 +57,10 @@ public class Config extends Properties {
 
 	protected Logger log = CacheLogger.getLogger(Config.class.getName());
 
-	private boolean debugDriver = false;
-	private static boolean ignoreCaseSensitivity = false;
+	protected boolean assignUserProfile = false; //true - is slow down Firefox driver initialization (clean addons WARN)
+	protected boolean debugDriver = false;
+	protected static boolean ignoreCaseSensitivity = false;
+	
 	//Replace [No-Break space] -> "194 160" to [Space] -> "32" 
 	private static boolean replaceNoBreakSpace = false;
 	
@@ -195,22 +197,13 @@ public class Config extends Properties {
 		case FIREFOX_DRIVER:
 			FirefoxOptions fopt = new FirefoxOptions().addPreference("layout.css.devPixelsPerPx", "1.0");
 			fopt.setHeadless(headless);
-			
-			//To create a new test Profile: (Windows->R, type: "firefox.exe -p" and press ENTER)
-			FirefoxProfile profile = new ProfilesIni().getProfile("SeleniumProfie");
-			if (profile == null) {
-				profile = new FirefoxProfile();
-			}
-			fopt.setProfile(profile);
-			if (debugDriver) {
-				profile.setPreference("security.sandbox.content.level", 1);
-				fopt.setLogLevel(FirefoxDriverLogLevel.TRACE);
-			}
+			createProfile(driverName, fopt);
 			if (isPrivate) {
 				fopt.addPreference("browser.privatebrowsing.autostart", true);
 			}
 			fopt.addPreference("browser.tabs.remote.autostart", false);
 			fopt.addPreference("browser.tabs.remote.autostart.2", false);
+			fopt.setAcceptInsecureCerts(true);
 			driver = createDriver(driverName, new GeckoDriverService.Builder().usingFirefoxBinary(fopt.getBinary()).build(), fopt);
 			break;
 		case CHROME_DRIVER:
@@ -300,10 +293,57 @@ public class Config extends Properties {
 			"};", new Object[] {});
 			break;
 		}
+		log.info("getDriver: " + driverName);
 		return driver;
+	}
+	
+	public void createProfile(String driverName, MutableCapabilities capabilities) {
+		if (assignUserProfile) {
+			switch (driverName) {
+			case FIREFOX_DRIVER:
+				FirefoxOptions fopt = (FirefoxOptions) capabilities;
+				//To create a new test Profile: (Windows->R, type: "firefox.exe -p" and press ENTER)
+				FirefoxProfile profile = new ProfilesIni().getProfile("SeleniumProfile");
+				if (profile == null) {
+					log.info("Create user: SeleniumProfile");
+					try {
+						String os = System.getProperty("os.name").toLowerCase();
+						Process process;
+						if (os.startsWith("win")) {
+							process = Runtime.getRuntime().exec(new String[] {"cmd", "/c", "\"%ProgramFiles%/Mozilla Firefox/firefox.exe\" -CreateProfile SeleniumProfile"});
+						} else {
+							process = Runtime.getRuntime().exec(new String[] {"firefox -CreateProfile SeleniumProfile"});
+						}
+						Thread.sleep(1000);
+						process.destroy();
+						if (os.startsWith("win")) {
+							process = Runtime.getRuntime().exec(new String[] {"cmd", "/c", "\"%ProgramFiles%/Mozilla Firefox/firefox.exe\" -headless -foreground -P SeleniumProfile"});
+						} else {
+							process = Runtime.getRuntime().exec(new String[] {"firefox -headless -foreground -P SeleniumProfile"});
+						}
+						Thread.sleep(3000);
+						process.destroy();
+						profile = new ProfilesIni().getProfile("SeleniumProfile");
+						fopt.addPreference("firefox_profile", "SeleniumProfile");
+					} catch (IOException | InterruptedException e) {
+						e.printStackTrace();
+					} finally {
+						if (profile == null) {
+							profile = new FirefoxProfile();
+						}
+					}
+				}
+				fopt.setProfile(profile);
+				if (debugDriver) {
+					profile.setPreference("security.sandbox.content.level", 1);
+					fopt.setLogLevel(FirefoxDriverLogLevel.TRACE);
+				}
+			}
+		}
 	}
 
 	public WebDriver createDriver(String driverName, DriverService driverService, MutableCapabilities capabilities) {
+		log.info("createDriver: " + driverName);
 		this.driverService = driverService;
 		switch (driverName) {
 		case FIREFOX_DRIVER:
