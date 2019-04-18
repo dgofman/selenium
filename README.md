@@ -17,4 +17,21 @@ export CHROME_PATH=/usr/bin/google-chrome
 wget -O- "https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=en-US" | sudo tar -jx -C /usr/local/
 sudo ln -s /usr/local/firefox/firefox /usr/bin/firefox
 or
-sudo yum install firefox
+sudo yum install Xvfb firefox
+sudo Xvfb :10 -ac &
+sudo export DISPLAY=:10
+
+##"Failed to open connection to "session" message bus: Unable to autolaunch a dbus-daemon without a $DISPLAY for X11"
+sudo yum install dbus-x11
+export $(dbus-launch)
+# TEST: dbus-send --session --print-reply --dest="org.freedesktop.DBus" /org/freedesktop/DBus  org.freedesktop.DBus.ListNames
+
+##Gtk-WARNING **: Locale not supported by C library.
+export LC_ALL="en_US"
+Optional:
+export LANG="en_US"
+export LANGUAGE="en_NZ"
+export C_CTYPE="en_US"
+export LC_NUMERIC=
+export LC_TIME=en"en_US"
+
