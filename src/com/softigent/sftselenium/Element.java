@@ -1416,7 +1416,8 @@ public class Element {
 	}
 	
 	public static String waitIsExists(Runnable runnable, Element parent, String... selectors) {
-		return waitIsExists(parent, runnable, selectors).keySet().toArray()[0].toString();
+		Object[] list = waitIsExists(parent, runnable, selectors).keySet().toArray();
+		return list.length > 0 ? list[0].toString() : null;
 	}
 
 	public static Map<String, List<WebElement>> waitIsExists(Element parent, Runnable runnable, String... selectors) {

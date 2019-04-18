@@ -233,7 +233,6 @@ public class TestSuiteRunner {
 		writer.println("<p><b>Total TestCases Succeed</b>: " + totalSucceed + "</p>");
 		writer.println("<p><b>Total TestCases Failed</b>: " + totalFailed + "</p><br/>");
 		writer.println("<p><b>Total Tests</b>: " + totalTests + "</p>");
-		writer.println("<p><b>Total Tests Succeed</b>: " + (totalTests - totalErrors - totalAsserts - totalIgnored) + "</p>");
 		writer.println("<p><b>Total Tests Ignored</b>: " + totalIgnored + "</p>");
 		writer.println("<p><b>Total Tests Errors</b>: " + totalErrors + "</p>");
 		writer.println("<p><b>Total Tests Asserts</b>: " + totalAsserts + "</p>");
@@ -246,7 +245,6 @@ public class TestSuiteRunner {
 			+ "\nTotal TestCases Succeed: " + totalSucceed 
 			+ "\nTotal TestCases Failed: " + totalFailed
 			+ "\nTotal Tests: " + totalTests 
-			+ "\nTotal Tests Succeed: " + (totalTests - totalErrors - totalAsserts - totalIgnored)
 			+ "\nTotal Tests Ignored: " + totalIgnored
 			+ "\nTotal Tests Errors: " + totalErrors
 			+ "\nTotal Tests Asserts: " + totalAsserts

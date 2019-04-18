@@ -11,7 +11,7 @@ import org.apache.log4j.spi.LoggingEvent;
 
 public class CacheLogger extends Logger {
 	
-	public static int MAX_STACK_SIZE = 5;
+	public static int MAX_STACK_SIZE = 10;
 	public static boolean SKIP_LOGS = false;
 
 	private static final CacheLoggerFactory loggerFactory = new CacheLoggerFactory();
