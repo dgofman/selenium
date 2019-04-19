@@ -21,7 +21,7 @@ import com.softigent.sftselenium.TestSuiteRunner;
 public class %PROJECT%TestRunner extends TestRunner {
 	
 	//Application Contractor
-	public %PROJECT%TestRunner(String[] args) {
+	public %PROJECT%TestRunner(String[] args) throws Exception {
 		super(args);
 	}
 	
@@ -35,7 +35,7 @@ public class %PROJECT%TestRunner extends TestRunner {
 		return new CustomTestSuiteRunner(suites);
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		%PACKAGE%.%PROJECT%Config.initLogs();
 		new %PROJECT%TestRunner(args);
 	}
