@@ -20,12 +20,11 @@ public abstract class TestRunner extends Runner {
 	protected Description description;
 
 	// Application Contractor
-	public TestRunner(String[] args) {
+	public TestRunner(String[] args) throws Exception {
 		List<TestRunnerInfo> suites = this.initialize(args);
-		try {
-			System.exit(getTestSuiteRunner(suites).run());
-		} catch (Exception e) {
-			e.printStackTrace();
+		int errors = getTestSuiteRunner(suites).run();
+		if (errors > 0) {
+			throw new Exception("Number of failures: " + errors);
 		}
 	}
 	
