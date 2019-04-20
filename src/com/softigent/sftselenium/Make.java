@@ -73,13 +73,13 @@ public final class Make {
 			config.setProperty("packageName", getPackageName(in));
 		}
 		if (config.getProperty("projectDir") == null || !new File(config.getProperty("projectDir")).exists()) {
-			config.setProperty("projectDir", getProjectDir(in));
+			config.setProperty("projectDir", getProjectDir(in, config, "Output directory: "));
 		}
 		if (config.getProperty("driverName") == null || !DRIVERS.containsKey(config.getProperty("driverName"))) {
 			config.setProperty("driverName", getDriver(in));
 		}
 		File outputDir =  loadDrivers(in, config);
-		File driverFile = selectDriver(in, outputDir, config.getProperty("driverOS"));
+		File driverFile = selectDriver(in, outputDir, config);
 		config.setProperty("driverPath", new File(config.getProperty("projectDir")).toURI().relativize(driverFile.toURI()).getPath());
 		File resources = new File(config.getProperty("projectDir"), "resources");
 		resources.mkdirs();
@@ -113,13 +113,13 @@ public final class Make {
 	private static void update(Properties config) throws Exception {
 		Scanner in = new Scanner(System.in);
 		if (config.getProperty("projectDir") == null || !new File(config.getProperty("projectDir")).exists()) {
-			config.setProperty("projectDir", getProjectDir(in));
+			config.setProperty("projectDir", getProjectDir(in, null, "Project directory"));
 		}
 		if (config.getProperty("driverName") == null || !DRIVERS.containsKey(config.getProperty("driverName"))) {
 			config.setProperty("driverName", getDriver(in));
 		}
 		File outputDir =  loadDrivers(in, config);
-		File driverFile = selectDriver(in, outputDir, config.getProperty("driverOS"));
+		File driverFile = selectDriver(in, outputDir, config);
 		config.setProperty("driverPath", new File(config.getProperty("projectDir")).toURI().relativize(driverFile.toURI()).getPath());
 		File src = new File(config.getProperty("projectDir"), "src");
 		copy(config, new File(src, "config.properties"), new File(src, "config.properties"), true);
@@ -137,7 +137,8 @@ public final class Make {
 				.replaceAll("%PROJECT%", config.getProperty("projectName", "").trim());
 		if (isProperites) {
 			content = content.replaceAll("(driver=)(.*)", "$1" + driverName)
-				.replaceAll("(" + driverName.toLowerCase() + "_driver_path=)(.*)", "$1" + config.getProperty("driverPath").trim());
+				.replaceAll("(driverOS=)(.*)", "$1" + config.getProperty("driverOS"))
+				.replaceAll("(" + config.getProperty("driverOS") + "_" + driverName.toLowerCase() + "_driver_path=)(.*)", "$1" + config.getProperty("driverPath").trim());
 		}
 		FileOutputStream fos = new FileOutputStream(output);
 		IOUtils.write(content, fos, Charset.defaultCharset());
@@ -154,13 +155,18 @@ public final class Make {
 		return in.nextLine();
 	}
 
-	private static String getProjectDir(final Scanner in) {
-		System.out.print("Project directory: ");
-		File dir = new File(in.nextLine());
-		if (dir.exists() && dir.isDirectory()) {
-			return dir.getAbsolutePath();
-		}
-		return getProjectDir(in);
+	private static String getProjectDir(final Scanner in, Properties config, String message) {
+		System.out.print(message);
+		try {
+			File dir = new File(in.nextLine());
+			if (dir.exists() && dir.isDirectory()) {
+				if (config != null) {
+					dir = new File(dir, config.getProperty("projectName"));
+				}
+				return dir.getAbsolutePath();
+			}
+		} catch (Exception e) {}
+		return getProjectDir(in, config, message);
 	}
 
 	private static String getDriver(final Scanner in) {
@@ -263,7 +269,7 @@ public final class Make {
 		}
 	}
 
-	private static File selectDriver(final Scanner in, final File outputDir, final String driverOS) {
+	private static File selectDriver(final Scanner in, final File outputDir, final Properties config) {
 		File[] envs = outputDir.listFiles();
 		if (envs.length == 0) {
 			System.out.print("WARN: Cannot find drivers for your browser");
@@ -271,7 +277,7 @@ public final class Make {
 			return envs[0];
 		}
 		for (int i = 0; i < envs.length; i++) {
-			if (envs[i].getName().equals(driverOS)) {
+			if (envs[i].getName().equals(config.getProperty("driverOS"))) {
 				File file = envs[i];
 				if (file.isDirectory()) {
 					return file.listFiles()[0];
@@ -286,12 +292,13 @@ public final class Make {
 		try {
 			int index = Integer.parseInt(in.nextLine());
 			File file = envs[index - 1];
+			config.setProperty("driverOS", file.getName().substring(0, 3));
 			if (file.isDirectory()) {
 				return file.listFiles()[0];
 			}
 			return file;
 		} catch (Exception e) {
 		}
-		return selectDriver(in, outputDir, driverOS);
+		return selectDriver(in, outputDir, config);
 	}
 }

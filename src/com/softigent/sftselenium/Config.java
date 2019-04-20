@@ -409,7 +409,10 @@ public class Config extends Properties {
 	}
 
 	public String getDriverPath(String driverName, String driverPathKey) {
-		return getProperty(driverPathKey);
+		String os = getOS();
+		String driverOsPath = getProperty(driverName, os + '_' + driverPathKey);
+		log.info("OS: " + os + ", DriverPath: " + driverOsPath);
+		return driverOsPath;
 	}
 
 	public void actionDelay() {
@@ -480,5 +483,16 @@ public class Config extends Properties {
 	
 	public Connector setConnector() {
 		return connector;
+	}
+
+	public String getOS() {
+		String os = this.getProperty("driverOS");
+		if (os == null) {
+			os = System.getProperty("os.name").toLowerCase().substring(0, 3);
+			if ("lin".equals(os) || "nix".equals(os) || "nux".equals(os) || "aix".equals(os) || "sunos".equals(os)) {
+				os = "lin";
+			}
+		}
+		return os;
 	}
 }
