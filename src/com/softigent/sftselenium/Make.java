@@ -45,18 +45,20 @@ public final class Make {
 		PropertyConfigurator.configure(prop);
 
 		Properties config = new Properties();
-		if (args.length > 0) {
-			if ("update".equals(args[0])) {
-				update(config);
-				return;
+		boolean isUpdate = false;
+		for (String val : args) {
+			if ("update".equals(val)) {
+				isUpdate = true;
 			} else {
-				File propFile = new File(args[0]);
-				if (propFile.exists()) {
-					config.load(new FileInputStream(propFile));
-				}
+				try {
+					File propFile = new File(val);
+					if (propFile.exists()) {
+						config.load(new FileInputStream(propFile));
+					}
+				} catch (Exception  e) {}
 			}
 		}
-		if (args.length > 1 && "update".equals(args[1])) {
+		if (isUpdate) {
 			update(config);
 		} else {
 			create(config);
