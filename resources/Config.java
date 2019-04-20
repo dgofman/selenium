@@ -26,4 +26,9 @@ public class %PROJECT%Config extends Config {
 		System.setProperty("httplog.log", "./logs/http.log");
 		System.setProperty("httperror.log", "./logs/http-errors.log");
 	}
+	
+	@Override
+	public String getDriverPath(String driverName, String driverPathKey) {
+		return super.getDriverPath(driverName, getOS() + '_' + driverPathKey);
+	}
 }
