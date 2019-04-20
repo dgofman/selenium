@@ -409,8 +409,9 @@ public class Config extends Properties {
 	}
 
 	public String getDriverPath(String driverName, String driverPathKey) {
-		log.info("OS: " + driverName + ", DriverPath: " + driverPathKey);
-		return getProperty(driverPathKey);
+		String path = getProperty(driverPathKey);
+		log.info("Driver Name: " + driverName + ", Path: " + path);
+		return path;
 	}
 
 	public void actionDelay() {
