@@ -485,12 +485,9 @@ public class Config extends Properties {
 	}
 
 	public String getOS() {
-		String os = this.getProperty("driverOS");
-		if (os == null) {
-			os = System.getProperty("os.name").toLowerCase().substring(0, 3);
-			if ("lin".equals(os) || "nix".equals(os) || "nux".equals(os) || "aix".equals(os) || "sunos".equals(os)) {
-				os = "lin";
-			}
+		String os = System.getProperty("os.name").toLowerCase().substring(0, 3);
+		if ("lin".equals(os) || "nix".equals(os) || "nux".equals(os) || "aix".equals(os) || "sunos".equals(os)) {
+			os = "lin";
 		}
 		return os;
 	}

@@ -54,6 +54,9 @@ public final class Make {
 					File propFile = new File(val);
 					if (propFile.exists()) {
 						config.load(new FileInputStream(propFile));
+						if (propFile.getName().equals("config.properties") && config.getProperty("projectDir") == null) {
+							config.setProperty("projectDir", propFile.getParentFile().getParent());
+						}
 					}
 				} catch (Exception  e) {}
 			}
@@ -77,8 +80,8 @@ public final class Make {
 		if (config.getProperty("projectDir") == null || !new File(config.getProperty("projectDir")).exists()) {
 			config.setProperty("projectDir", getProjectDir(in, config, "Output directory: "));
 		}
-		if (config.getProperty("driverName") == null || !DRIVERS.containsKey(config.getProperty("driverName"))) {
-			config.setProperty("driverName", getDriver(in));
+		if (config.getProperty("driver") == null || !DRIVERS.containsKey(config.getProperty("driver"))) {
+			config.setProperty("driver", getDriver(in));
 		}
 		File outputDir =  loadDrivers(in, config);
 		File driverFile = selectDriver(in, outputDir, config);
@@ -115,10 +118,10 @@ public final class Make {
 	private static void update(Properties config) throws Exception {
 		Scanner in = new Scanner(System.in);
 		if (config.getProperty("projectDir") == null || !new File(config.getProperty("projectDir")).exists()) {
-			config.setProperty("projectDir", getProjectDir(in, null, "Project directory"));
+			config.setProperty("projectDir", getProjectDir(in, null, "Project directory: "));
 		}
-		if (config.getProperty("driverName") == null || !DRIVERS.containsKey(config.getProperty("driverName"))) {
-			config.setProperty("driverName", getDriver(in));
+		if (config.getProperty("driver") == null || !DRIVERS.containsKey(config.getProperty("driver"))) {
+			config.setProperty("driver", getDriver(in));
 		}
 		File outputDir =  loadDrivers(in, config);
 		File driverFile = selectDriver(in, outputDir, config);
@@ -133,14 +136,14 @@ public final class Make {
 	}
 
 	private static void copy(final Properties config, File input, File output, boolean isProperites) throws IOException {
-		String driverName = config.getProperty("driverName").trim();
+		String driver = config.getProperty("driver").trim();
 		String content = IOUtils.toString(input.toURI(), Charset.defaultCharset());
 		content = content.replaceAll("%PACKAGE%", config.getProperty("packageName", "").trim())
 				.replaceAll("%PROJECT%", config.getProperty("projectName", "").trim());
 		if (isProperites) {
-			content = content.replaceAll("(driver=)(.*)", "$1" + driverName)
+			content = content.replaceAll("(driver=)(.*)", "$1" + driver)
 				.replaceAll("(driverOS=)(.*)", "$1" + config.getProperty("driverOS"))
-				.replaceAll("(" + config.getProperty("driverOS") + "_" + driverName.toLowerCase() + "_driver_path=)(.*)", "$1" + config.getProperty("driverPath").trim());
+				.replaceAll("(" + config.getProperty("driverOS") + "_" + driver.toLowerCase() + "_driver_path=)(.*)", "$1" + config.getProperty("driverPath").trim());
 		}
 		FileOutputStream fos = new FileOutputStream(output);
 		IOUtils.write(content, fos, Charset.defaultCharset());
@@ -172,15 +175,15 @@ public final class Make {
 	}
 
 	private static String getDriver(final Scanner in) {
-		Object[] driverNames = DRIVERS.keySet().toArray();
-		for (int i = 0; i < driverNames.length; i++) {
-			System.out.println((i + 1) + ". " + driverNames[i] + DRIVERS.get(driverNames[i])[0]);
+		Object[] drivers = DRIVERS.keySet().toArray();
+		for (int i = 0; i < drivers.length; i++) {
+			System.out.println((i + 1) + ". " + drivers[i] + DRIVERS.get(drivers[i])[0]);
 		}
-		System.out.print("Select driver (1 - " + driverNames.length + "): ");
+		System.out.print("Select driver (1 - " + drivers.length + "): ");
 		try {
 			int index = Integer.parseInt(in.nextLine());
-			if (index >= 1 && index <= driverNames.length) {
-				return driverNames[index - 1].toString();
+			if (index >= 1 && index <= drivers.length) {
+				return drivers[index - 1].toString();
 			}
 		} catch (Exception e) {
 		}
@@ -188,7 +191,7 @@ public final class Make {
 	}
 
 	public static File loadDrivers(final Scanner in, final Properties config) throws UnirestException, IOException {
-		String dirverId = DRIVERS.get(config.getProperty("driverName"))[1];
+		String dirverId = DRIVERS.get(config.getProperty("driver"))[1];
 		System.out.println("Please wait loading " + dirverId + " ...");
 		JSONArray versions = getVersions(dirverId);
 		JSONObject item = null;
@@ -279,7 +282,7 @@ public final class Make {
 			return envs[0];
 		}
 		for (int i = 0; i < envs.length; i++) {
-			if (envs[i].getName().equals(config.getProperty("driverOS"))) {
+			if (envs[i].getName().startsWith(config.getProperty("driverOS"))) {
 				File file = envs[i];
 				if (file.isDirectory()) {
 					return file.listFiles()[0];

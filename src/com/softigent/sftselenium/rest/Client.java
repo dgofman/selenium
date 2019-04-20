@@ -62,6 +62,10 @@ public class Client {
 	private static final String USER_AGENT_HEADER = "user-agent";
 	private static final String USER_AGENT = "reset-service/1.0.0";
 	
+	static {
+		Unirest.setTimeouts(30000, 60000);
+	}
+	
 	public static void defaultSSL() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
 		SSLContext sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
 		SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext);
