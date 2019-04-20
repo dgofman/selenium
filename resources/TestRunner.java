@@ -11,11 +11,12 @@ import org.junit.runner.Result;
 import org.junit.runner.RunWith;
 import org.junit.runner.notification.Failure;
 
-import com.equinix.etiming.ETimingBaseTest;
 import com.softigent.sftselenium.TestError;
 import com.softigent.sftselenium.TestRunner;
 import com.softigent.sftselenium.TestRunnerInfo;
 import com.softigent.sftselenium.TestSuiteRunner;
+
+import %PACKAGE%.%PROJECT%BaseTest;
 
 @RunWith(%PROJECT%TestRunner.class)
 public class %PROJECT%TestRunner extends TestRunner {
