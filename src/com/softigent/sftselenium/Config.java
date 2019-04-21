@@ -482,10 +482,6 @@ public class Config extends Properties {
 	public Connector getConnector() {
 		return connector;
 	}
-	
-	public Connector setConnector() {
-		return connector;
-	}
 
 	public String getOS() {
 		String os = System.getProperty("os.name").toLowerCase().substring(0, 3);
