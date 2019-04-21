@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.UnexpectedAlertBehaviour;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
@@ -47,6 +48,7 @@ public class Config extends Properties {
 	
 	protected Connector connector;
 	protected DriverService driverService;
+	protected MutableCapabilities capabilities;
 
 	protected float actionDelay;
 	protected File snapshotDir;
@@ -57,7 +59,7 @@ public class Config extends Properties {
 
 	protected Logger log = CacheLogger.getLogger(Config.class.getName());
 
-	protected boolean assignUserProfile = false; //true - is slow down Firefox driver initialization (clean addons WARN)
+	protected boolean assignUserProfile = false; //true - Firefox driver initialization (clean addons WARN)
 	protected boolean debugDriver = false;
 	protected static boolean ignoreCaseSensitivity = false;
 	
@@ -257,18 +259,17 @@ public class Config extends Properties {
 			break;
 		case INTERNET_EXPLORER_DRIVER:
 			DesiredCapabilities iedc = DesiredCapabilities.internetExplorer();
-			iedc.setCapability(InternetExplorerDriver.NATIVE_EVENTS, false);
-			iedc.setCapability(InternetExplorerDriver.ENABLE_PERSISTENT_HOVERING, false);
-			iedc.setCapability(InternetExplorerDriver.REQUIRE_WINDOW_FOCUS, true);
-			iedc.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
-			iedc.setCapability(InternetExplorerDriver.IGNORE_ZOOM_SETTING, true);
-			iedc.setCapability(CapabilityType.ForSeleniumServer.ENSURING_CLEAN_SESSION, true);
 			iedc.setCapability("initialBrowserUrl", "about:blank");
+			iedc.setCapability("disable-popup-blocking", true);
+			iedc.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+			iedc.setCapability(InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS, true);
+			iedc.setCapability(InternetExplorerDriver.IGNORE_ZOOM_SETTING, true);  
+			iedc.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR, UnexpectedAlertBehaviour.DISMISS);
+			iedc.setCapability(InternetExplorerDriver.NATIVE_EVENTS, true);
+			iedc.setCapability(InternetExplorerDriver.ENABLE_PERSISTENT_HOVERING, true);
+			iedc.setCapability(InternetExplorerDriver.REQUIRE_WINDOW_FOCUS, true);
+			iedc.setCapability(CapabilityType.ForSeleniumServer.ENSURING_CLEAN_SESSION, true);
 			iedc.setJavascriptEnabled(true); 
-			if (isPrivate) {
-				//iedc.setCapability(InternetExplorerDriver.FORCE_CREATE_PROCESS, true);
-				iedc.setCapability(InternetExplorerDriver.IE_SWITCHES, "-private");
-			}
 			InternetExplorerOptions iop = new InternetExplorerOptions(iedc);
 			driver = createDriver(driverName, new InternetExplorerDriverService.Builder().build(), iop);
 			break;
@@ -349,6 +350,7 @@ public class Config extends Properties {
 	public WebDriver createDriver(String driverName, DriverService driverService, MutableCapabilities capabilities) {
 		log.info("createDriver: " + driverName);
 		this.driverService = driverService;
+		this.capabilities = capabilities;
 		switch (driverName) {
 		case FIREFOX_DRIVER:
 			return new FirefoxDriver((GeckoDriverService) driverService, (FirefoxOptions) capabilities);
@@ -370,6 +372,7 @@ public class Config extends Properties {
 
 	public WebDriver createDriver(String driverName, MutableCapabilities capabilities) {
 		this.driverService = null;
+		this.capabilities = capabilities;
 		switch (driverName) {
 		case FIREFOX_DRIVER:
 			return new FirefoxDriver((FirefoxOptions) capabilities);
@@ -482,6 +485,10 @@ public class Config extends Properties {
 
 	public Connector getConnector() {
 		return connector;
+	}
+	
+	public MutableCapabilities getCapabilities() {
+		return capabilities;
 	}
 
 	public String getOS() {

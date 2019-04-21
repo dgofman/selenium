@@ -23,6 +23,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.ie.InternetExplorerOptions;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -360,9 +361,17 @@ public abstract class BaseTest {
 	}
 	
 	public List<WebDriverInfo> getWindowHandle(String urlRegex, String titleRegExp) {
+		return getWindowHandle(urlRegex, titleRegExp, 0);
+	}
+	
+	public List<WebDriverInfo> getWindowHandle(String urlRegex, String titleRegExp, int index) {
 		final WebDriver driver = connector.getDriver();
 		final String winHandler = getWindowHandle();
+		driver.getWindowHandles();
 		Set<String> handles = driver.getWindowHandles();
+		if (handles.size() == 1 && config.getCapabilities() instanceof InternetExplorerOptions) {
+			log.warn("Uncheck: Internet Options -> Security -> Enable Protected Mode");
+		}
 		List<WebDriverInfo> list = new ArrayList<WebDriverInfo>();
 		for (String handle : handles) {
 			WebDriver win = driver.switchTo().window(handle);
@@ -372,6 +381,13 @@ public abstract class BaseTest {
 			}
 		}
 		driver.switchTo().window(winHandler);
+		if (list.size() == 0 && index < 20) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+			}
+			return getWindowHandle(urlRegex, titleRegExp, ++index);
+		}
 		return list;
 	}
 	

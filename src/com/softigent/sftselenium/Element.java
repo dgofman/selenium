@@ -668,6 +668,14 @@ public class Element {
 	public String getHTML(WebElement element) {
 		return getAttributeValue(element, "innerHTML");
 	}
+	
+	public String getXML(String selector) {
+		return getXML(getElement(selector));
+	}
+
+	public String getXML(WebElement element) {
+		return String.valueOf(executeScript("return new XMLSerializer().serializeToString(arguments[0]);", element));
+	}
 
 	public Boolean validateHTML(String selector, String value) {
 		log.debug("Validate HTML value=" + value + ", for selector: " + selector);
@@ -677,6 +685,11 @@ public class Element {
 	public Boolean assertHTML(String selector, String value) {
 		log.debug("Assert HTML value=" + value + ", for selector: " + selector);
 		return assertString(getHTML(selector), value);
+	}
+	
+	public Boolean assertXML(String selector, String value) {
+		log.debug("Assert XML value=" + value + ", for selector: " + selector);
+		return assertString(getXML(selector), value);
 	}
 
 	public String getAttributeValue(String name) {
