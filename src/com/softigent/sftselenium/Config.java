@@ -491,7 +491,7 @@ public class Config extends Properties {
 		return capabilities;
 	}
 
-	public String getOS() {
+	public static String os() {
 		String os = System.getProperty("os.name").toLowerCase().substring(0, 3);
 		if ("lin".equals(os) || "nix".equals(os) || "nux".equals(os) || "aix".equals(os) || "sunos".equals(os)) {
 			os = "lin";

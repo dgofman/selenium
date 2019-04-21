@@ -29,6 +29,6 @@ public class %PROJECT%Config extends Config {
 	
 	@Override
 	public String getDriverPath(String driverName, String driverPathKey) {
-		return super.getDriverPath(driverName, getOS() + '_' + driverPathKey);
+		return super.getDriverPath(driverName, os() + '_' + driverPathKey);
 	}
 }

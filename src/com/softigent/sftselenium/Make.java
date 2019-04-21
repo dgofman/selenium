@@ -123,6 +123,15 @@ public final class Make {
 		if (config.getProperty("driver") == null || !DRIVERS.containsKey(config.getProperty("driver"))) {
 			config.setProperty("driver", getDriver(in));
 		}
+		if (config.getProperty("driverOS") == null) {	
+			String driverPath = config.getProperty(Config.os() + "_" + config.getProperty("driver").toLowerCase() + "_driver_path");
+			if (driverPath != null) {
+				String[] arr = driverPath.split("/");
+				if (arr.length > 4 && arr[0].equals("drivers") && arr[1].equals(Make.DRIVERS.get(config.getProperty("driver"))[1])) {
+					config.setProperty("driverOS", arr[3]);
+				}
+			}
+		}
 		File outputDir =  loadDrivers(in, config);
 		File driverFile = selectDriver(in, outputDir, config);
 		config.setProperty("driverPath", new File(config.getProperty("projectDir")).toURI().relativize(driverFile.toURI()).getPath());
