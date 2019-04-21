@@ -441,6 +441,14 @@ public abstract class BaseTest {
 	public void tab() {
 		connector.getDriver().switchTo().activeElement();
 	}
+	
+	public Config getConfig() {
+		return config;
+	}
+	
+	public Connector getConnector() {
+		return connector;
+	}
 
 	@Rule
 	public TestWatcher testWatcher = new TestWatcher() {
