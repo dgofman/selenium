@@ -132,7 +132,7 @@ public class Config extends Properties {
 					if (arr[0].equals("drivers") && arr[1].equals(Make.DRIVERS.get(driverName)[1])) {
 						Properties config = new Properties();
 						config.setProperty("projectDir", new File(".").getAbsolutePath());
-						config.setProperty("driverName", driverName);
+						config.setProperty("driver", driverName);
 						config.setProperty("driverVersion", arr[2]);
 						if (arr.length > 4) {
 							config.setProperty("driverOS", arr[3]);

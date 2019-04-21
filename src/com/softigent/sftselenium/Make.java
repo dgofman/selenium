@@ -143,7 +143,7 @@ public final class Make {
 		if (isProperites) {
 			content = content.replaceAll("(driver=)(.*)", "$1" + driver)
 				.replaceAll("(driverOS=)(.*)", "$1" + config.getProperty("driverOS"))
-				.replaceAll("(" + config.getProperty("driverOS") + "_" + driver.toLowerCase() + "_driver_path=)(.*)", "$1" + config.getProperty("driverPath").trim());
+				.replaceAll("(" + config.getProperty("driverOS").substring(0, 3) + "_" + driver.toLowerCase() + "_driver_path=)(.*)", "$1" + config.getProperty("driverPath").trim());
 		}
 		FileOutputStream fos = new FileOutputStream(output);
 		IOUtils.write(content, fos, Charset.defaultCharset());
@@ -282,7 +282,7 @@ public final class Make {
 			return envs[0];
 		}
 		for (int i = 0; i < envs.length; i++) {
-			if (envs[i].getName().startsWith(config.getProperty("driverOS"))) {
+			if (envs[i].getName().equals(config.getProperty("driverOS"))) {
 				File file = envs[i];
 				if (file.isDirectory()) {
 					return file.listFiles()[0];
@@ -297,7 +297,7 @@ public final class Make {
 		try {
 			int index = Integer.parseInt(in.nextLine());
 			File file = envs[index - 1];
-			config.setProperty("driverOS", file.getName().substring(0, 3));
+			config.setProperty("driverOS", file.getName());
 			if (file.isDirectory()) {
 				return file.listFiles()[0];
 			}
