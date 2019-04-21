@@ -172,7 +172,10 @@ public class Config extends Properties {
 			System.setProperty("phantomjs.binary.path", driveFile);
 			break;
 		}
-		this.connector = new Connector(driverName, headless, this);
+		if (connector == null) {
+			connector = new Connector();
+		}
+		connector.init(driverName, headless, this);
 	}
 	
 	public void createDriver() {

@@ -16,7 +16,6 @@ import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.openqa.selenium.WebDriver;
 
 public class TestSuiteRunner {
 
@@ -130,14 +129,6 @@ public class TestSuiteRunner {
 		return JUnitCore.runClasses(testCase);
 	}
 	
-	protected WebDriver getDriver() {
-		Connector con = Connector.instance;
-		if (con != null && con.getConfig() != null && con.getDriver() != null) {
-			return con.getDriver();
-		}
-		return null;
-	}
-
 	protected void openHead(PrintWriter writer, TestRunnerInfo info) {
 		writer.println("<head>");
 		writer.println("<meta charset='utf-8'>");

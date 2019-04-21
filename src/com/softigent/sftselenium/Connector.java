@@ -9,17 +9,12 @@ public class Connector {
 	private Config config;
 	private String driverName;
 	
-	public static Connector instance;
-	
 	protected Logger log = CacheLogger.getLogger(Connector.class.getName());
 	
-	public Connector(String driverName, boolean headless, Config config) {
+	public void init(String driverName, boolean headless, Config config) {
 		this.driverName = driverName;
 		this.isHeadless = headless;
 		this.config = config;
-		if (Connector.instance == null) {
-			Connector.instance = this;
-		}
 	}
 	
 	public void setDriver(WebDriver driver) {
