@@ -914,6 +914,7 @@ public class Element {
 				}
 			});
 			try {
+				new Actions(driver).moveToElement(element).perform();
 				element.click();
 				config.actionDelay();
 			} catch (Exception e) {
@@ -1590,8 +1591,8 @@ public class Element {
 			if (Config.replaceNoBreakSpace()) {
 				str = str.replaceAll("\u00A0", " ");
 			}
-			if (Config.trimTextBeforeCompare()) {
-				str = str.trim();
+			if (Config.replaceLeftToRightMark()) {
+				str = str.trim().replaceAll("\u200E", "");
 			}
 			if (Config.ignoreCaseSensitivity()) {
 				isTrue = str.equalsIgnoreCase(regExp);

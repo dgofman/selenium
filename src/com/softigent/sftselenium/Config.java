@@ -62,7 +62,7 @@ public class Config extends Properties {
 	protected boolean assignUserProfile = false; //true - Firefox driver initialization (clean addons WARN)
 	protected boolean debugDriver = false;
 	protected static boolean ignoreCaseSensitivity = false;
-	protected static boolean trimTextBeforeCompare = false;
+	protected static boolean replaceLeftToRightMark = false;
 	
 	//Replace [No-Break space] -> "194 160" to [Space] -> "32" 
 	protected static boolean replaceNoBreakSpace = false;
@@ -100,17 +100,17 @@ public class Config extends Properties {
 	}
 
 	public void setDefaultProperties() {
-		this.initProperties("action_delay", "load_timeout", "use_robot_click", "ignore_case_sensitivity", "replaceNoBreakSpace", "trimTextBeforeCompare");
+		this.initProperties("action_delay", "load_timeout", "use_robot_click", "ignore_case_sensitivity", "replaceNoBreakSpace", "replaceLeftToRightMark");
 	}
 
-	public void initProperties(String delayKey, String timeoutKey, String useRobotClick, String ignoreCaseSensitivity, String replaceNoBreakSpace, String trimTextBeforeCompare) {
+	public void initProperties(String delayKey, String timeoutKey, String useRobotClick, String ignoreCaseSensitivity, String replaceNoBreakSpace, String replaceLeftToRightMark) {
 		this.actionDelay = Float.parseFloat(this.getProperty(delayKey) != null ? this.getProperty(delayKey) : "0.5");
 		this.pageLoadTimeout = Integer
 				.parseInt(this.getProperty(timeoutKey) != null ? this.getProperty(timeoutKey) : "30");
 		this.useRobotClick = "true".equals(this.getProperty(useRobotClick));
 		Config.ignoreCaseSensitivity = "true".equals(this.getProperty(ignoreCaseSensitivity));
 		Config.replaceNoBreakSpace = "true".equals(this.getProperty(replaceNoBreakSpace));
-		Config.trimTextBeforeCompare  = "true".equals(this.getProperty(replaceNoBreakSpace)) || "Edge".equals(this.getProperty("driver"));
+		Config.replaceLeftToRightMark  = "true".equals(this.getProperty(replaceLeftToRightMark)) || "Edge".equals(this.getProperty("driver"));
 	}
 	
 	public String getProperty(String key) {
@@ -252,7 +252,9 @@ public class Config extends Properties {
 			driver = createDriver(driverName, SafariDriverService.createDefaultService(sopts), sopts);
 			break;
 		case EDGE_DRIVER:
-			DesiredCapabilities edge = DesiredCapabilities.edge();
+			DesiredCapabilities edge = new DesiredCapabilities();
+			edge.setBrowserName("MicrosoftEdge");
+			edge.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 			edge.setJavascriptEnabled(true);
 			driver = createDriver(driverName, EdgeDriverService.createDefaultService(), new EdgeOptions().merge(edge));
 			break;
@@ -464,8 +466,8 @@ public class Config extends Properties {
 		return Config.replaceNoBreakSpace;
 	}
 	
-	public static boolean trimTextBeforeCompare() {
-		return Config.trimTextBeforeCompare;
+	public static boolean replaceLeftToRightMark() {
+		return Config.replaceLeftToRightMark;
 	}
 
 	public void setRobotClick(boolean useRobotClick) {

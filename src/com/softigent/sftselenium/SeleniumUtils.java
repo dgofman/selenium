@@ -351,4 +351,21 @@ public class SeleniumUtils {
 			(int) toolkit.getScreenSize().getWidth(), 
 			(int) toolkit.getScreenSize().getHeight());
 	}
+	
+	public static void scrollIntoView(Container container, String selector) {
+		scrollIntoView(container, container.findElement(selector));
+	}
+
+	public static void scrollIntoView(Container container, Element element) {
+		scrollIntoView(container, element.getElement());
+	}
+
+	public static void scrollIntoView(Element container, WebElement element) {
+		container.executeScript("arguments[0].scrollIntoView(true)", element);
+	}
+		
+	public static void scrollBy(Element container, WebElement element, int offset) {
+		scrollIntoView(container, element);
+		container.executeScript("window.scrollBy(0, " + offset + ")");
+	}
 }
