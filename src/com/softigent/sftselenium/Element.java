@@ -1590,6 +1590,9 @@ public class Element {
 			if (Config.replaceNoBreakSpace()) {
 				str = str.replaceAll("\u00A0", " ");
 			}
+			if (Config.trimTextBeforeCompare()) {
+				str = str.trim();
+			}
 			if (Config.ignoreCaseSensitivity()) {
 				isTrue = str.equalsIgnoreCase(regExp);
 			} else {

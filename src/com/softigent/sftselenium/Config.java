@@ -62,9 +62,10 @@ public class Config extends Properties {
 	protected boolean assignUserProfile = false; //true - Firefox driver initialization (clean addons WARN)
 	protected boolean debugDriver = false;
 	protected static boolean ignoreCaseSensitivity = false;
+	protected static boolean trimTextBeforeCompare = false;
 	
 	//Replace [No-Break space] -> "194 160" to [Space] -> "32" 
-	private static boolean replaceNoBreakSpace = false;
+	protected static boolean replaceNoBreakSpace = false;
 	
 	public static final String FIREFOX_DRIVER = "Firefox";
 	public static final String CHROME_DRIVER = "Chrome";
@@ -99,16 +100,17 @@ public class Config extends Properties {
 	}
 
 	public void setDefaultProperties() {
-		this.initProperties("action_delay", "load_timeout", "use_robot_click", "ignore_case_sensitivity", "replaceNoBreakSpace");
+		this.initProperties("action_delay", "load_timeout", "use_robot_click", "ignore_case_sensitivity", "replaceNoBreakSpace", "trimTextBeforeCompare");
 	}
 
-	public void initProperties(String delayKey, String timeoutKey, String useRobotClick, String ignoreCaseSensitivity, String replaceNoBreakSpace) {
+	public void initProperties(String delayKey, String timeoutKey, String useRobotClick, String ignoreCaseSensitivity, String replaceNoBreakSpace, String trimTextBeforeCompare) {
 		this.actionDelay = Float.parseFloat(this.getProperty(delayKey) != null ? this.getProperty(delayKey) : "0.5");
 		this.pageLoadTimeout = Integer
 				.parseInt(this.getProperty(timeoutKey) != null ? this.getProperty(timeoutKey) : "30");
 		this.useRobotClick = "true".equals(this.getProperty(useRobotClick));
 		Config.ignoreCaseSensitivity = "true".equals(this.getProperty(ignoreCaseSensitivity));
 		Config.replaceNoBreakSpace = "true".equals(this.getProperty(replaceNoBreakSpace));
+		Config.trimTextBeforeCompare  = "true".equals(this.getProperty(replaceNoBreakSpace)) || "Edge".equals(this.getProperty("driver"));
 	}
 	
 	public String getProperty(String key) {
@@ -460,6 +462,10 @@ public class Config extends Properties {
 
 	public static boolean replaceNoBreakSpace() {
 		return Config.replaceNoBreakSpace;
+	}
+	
+	public static boolean trimTextBeforeCompare() {
+		return Config.trimTextBeforeCompare;
 	}
 
 	public void setRobotClick(boolean useRobotClick) {

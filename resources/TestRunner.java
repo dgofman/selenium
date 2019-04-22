@@ -32,6 +32,11 @@ public class %PROJECT%TestRunner extends TestRunner {
 	}
 	
 	@Override
+	public void onExit(int numOfErrors) {
+		System.exit(numOfErrors);
+	}
+	
+	@Override
 	public TestSuiteRunner getTestSuiteRunner(List<TestRunnerInfo> suites) {
 		return new CustomTestSuiteRunner(suites);
 	}
