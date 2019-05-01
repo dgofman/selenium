@@ -352,11 +352,11 @@ public class SeleniumUtils {
 			(int) toolkit.getScreenSize().getHeight());
 	}
 	
-	public static void scrollIntoView(Container container, String selector) {
+	public static void scrollIntoView(Element container, String selector) {
 		scrollIntoView(container, container.findElement(selector));
 	}
 
-	public static void scrollIntoView(Container container, Element element) {
+	public static void scrollIntoView(Element container, Element element) {
 		scrollIntoView(container, element.getElement());
 	}
 

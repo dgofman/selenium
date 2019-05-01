@@ -381,7 +381,8 @@ public class Element {
 	public void clearText(boolean isKeyAction) {
 		element.clear();
 		if (isKeyAction) {
-			new Actions(driver).sendKeys(element, " ", Keys.BACK_SPACE).perform();
+			element.sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.BACK_SPACE)); //clear text
+			new Actions(driver).sendKeys(element, " ", Keys.BACK_SPACE).perform(); //fire JS key events
 		}
 	}
 	
