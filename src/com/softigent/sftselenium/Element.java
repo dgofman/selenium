@@ -354,10 +354,6 @@ public class Element {
 		config.actionDelay();
 	}
 	
-	public void clearAllText(String selector) {
-		clearText(selector, -1);
-	}
-
 	public void clearText(String selector) {
 		clearText(selector, 1);
 	}
@@ -367,8 +363,7 @@ public class Element {
 		if (elements != null) {
 			for (int i = 0; i < elements.size(); i++) {
 				if (index == -1 || i == index - 1) {
-					WebElement element = elements.get(i);
-					element.clear();
+					clearText(elements.get(i));
 				}
 			}
 		}
@@ -379,11 +374,20 @@ public class Element {
 	}
 	
 	public void clearText(boolean isKeyAction) {
+		clearText(element, isKeyAction);
+	}
+	
+	public void clearText(WebElement element) {
+		clearText(element, true);
+	}
+	
+	public void clearText(WebElement element, boolean isKeyAction) {
 		element.clear();
 		if (isKeyAction) {
 			element.sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.BACK_SPACE)); //clear text
 			new Actions(driver).sendKeys(element, " ", Keys.BACK_SPACE).perform(); //fire JS key events
 		}
+		config.actionDelay();
 	}
 	
 	public void keyDown(String str) {
@@ -462,7 +466,7 @@ public class Element {
 		List<WebElement> elements = getElements(selector);
 		if (elements != null && elements.size() > index) {
 			if (doClear) {
-				elements.get(index).clear();
+				clearText(elements.get(index));
 			}
 			setValue(elements.get(index), value);
 		}
@@ -473,12 +477,14 @@ public class Element {
 	}
 	
 	public void setValue(WebElement element, String value) {
-		executeScript("arguments[0].value=arguments[2];", element, null, value);
-		String text = executeScript("return arguments[0].value;", element).toString();
-		if (text.length() > 0) {
-			element.sendKeys(Keys.BACK_SPACE);
-			element.sendKeys(text.substring(text.length() - 1));
+		executeScript("arguments[0].value=arguments[2];", element, null, value); //set full string
+		String firstChar = "";
+		if (value != null && value.length() > 0) {
+			firstChar = String.valueOf(value.charAt(0));
 		}
+		new Actions(driver).sendKeys(element, Keys.HOME, Keys.ARROW_RIGHT, Keys.BACK_SPACE, firstChar).perform();  //fire JS key events
+		String text = executeScript("return arguments[0].value;", element).toString(); //get truncated text (based on maxlen)
+		log.debug("setValue: original length=" + value.length() + ", new length=" + text.length());
 		config.actionDelay();
 	}
 	
