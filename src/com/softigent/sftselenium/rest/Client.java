@@ -34,6 +34,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -94,9 +95,8 @@ public class Client {
 		return optionsRequest(responseClass, getURL(config, path), config.getHeaders(), body);
 	}
 	
-	public static <T> HttpResponse<T> optionsRequest(Class<T> responseClass, String url, Map<String, String> headers, T body) throws UnirestException {
-		logger.info("OPTIONS " + url);
-		return call(Unirest.options(url).headers(headers).body(body), responseClass);
+	public static <T> HttpResponse<T> optionsRequest(Class<T> responseClass, String url, Map<String, String> headers, Object body) throws UnirestException {
+		return optionsRequest(url, headers, JSONObject.valueToString(body), responseClass);
 	}
 
 	public static HttpResponse<JsonNode> optionsRequest(HostConfig config, String path, String body) throws UnirestException {
@@ -120,9 +120,8 @@ public class Client {
 		return postRequest(responseClass, getURL(config, path), config.getHeaders(), body);
 	}
 	
-	public static <T> HttpResponse<T> postRequest(Class<T> responseClass, String url, Map<String, String> headers, T body) throws UnirestException {
-		logger.info("POST " + url);
-		return call(Unirest.post(url).headers(headers).body(body), responseClass);
+	public static <T> HttpResponse<T> postRequest(Class<T> responseClass, String url, Map<String, String> headers, Object body) throws UnirestException {
+		return postRequest(url, headers, JSONObject.valueToString(body), responseClass);
 	}
 	
 	public static HttpResponse<JsonNode> postRequest(HostConfig config, String path, String body) throws UnirestException {
@@ -146,9 +145,8 @@ public class Client {
 		return putRequest(responseClass, getURL(config, path), config.getHeaders(), body);
 	}
 	
-	public static <T> HttpResponse<T> putRequest(Class<T> responseClass, String url, Map<String, String> headers, T body) throws UnirestException {
-		logger.info("PUT " + url);
-		return call(Unirest.put(url).headers(headers).body(body), responseClass);
+	public static <T> HttpResponse<T> putRequest(Class<T> responseClass, String url, Map<String, String> headers, Object body) throws UnirestException {
+		return putRequest(url, headers, JSONObject.valueToString(body), responseClass);
 	}
 
 	public static HttpResponse<JsonNode> putRequest(HostConfig config, String path, String body) throws UnirestException {
@@ -172,9 +170,8 @@ public class Client {
 		return patchRequest(responseClass, getURL(config, path), config.getHeaders(), body);
 	}
 	
-	public static <T> HttpResponse<T> patchRequest(Class<T> responseClass, String url, Map<String, String> headers, T body) throws UnirestException {
-		logger.info("PATCH " + url);
-		return call(Unirest.patch(url).headers(headers).body(body), responseClass);
+	public static <T> HttpResponse<T> patchRequest(Class<T> responseClass, String url, Map<String, String> headers, Object body) throws UnirestException {
+		return patchRequest(url, headers, JSONObject.valueToString(body), responseClass);
 	}
 
 	public static HttpResponse<JsonNode> patchRequest(HostConfig config, String path, String body) throws UnirestException {
@@ -198,7 +195,11 @@ public class Client {
 		return deleteRequest(responseClass, getURL(config, path), config.getHeaders(), body);
 	}
 	
-	public static <T> HttpResponse<T> deleteRequest(Class<T> responseClass, String url, Map<String, String> headers, T body) throws UnirestException {
+	public static <T> HttpResponse<T> deleteRequest(Class<T> responseClass, String url, Map<String, String> headers, Object body) throws UnirestException {
+		return deleteRequest(url, headers, JSONObject.valueToString(body), responseClass);
+	}
+	
+	public static <T> HttpResponse<T> deleteRequest(String url, Map<String, String> headers,  String body, Class<T> responseClass) throws UnirestException {
 		logger.info("DELETE " + url);
 		return call(Unirest.delete(url).headers(headers).body(body), responseClass);
 	}
