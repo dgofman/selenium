@@ -1392,10 +1392,6 @@ public class Element {
 		return element;
 	}
 	
-	public WebElement waitIsDisplayed() {
-		return waitIsDisplayed(selector);
-	}
-	
 	public WebElement waitIsDisplayed(String selector) {
 		Map<String, List<WebElement>> map = waitIsDisplayed(selector, 1);
 		return map.containsKey(selector) && map.get(selector).size() > 0 ? map.get(selector).get(0) : null;
