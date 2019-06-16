@@ -141,6 +141,13 @@ public class Element {
 		String selector = getSelector(element);
 		return new Element(driver, config, selector + ":nth-child(" + (index + 1) + ")");
 	}
+	
+	public Element find(List<WebElement> els, int index) {
+		WebElement element = els.get(index);
+		String selector = getSelector(element);
+		return new Element(driver, config, selector + ":nth-child(" + (index + 1) + ")");
+	}
+
 
 	public static WebElement getParent(WebElement element, String path) {
 		return element.findElement(By.xpath(path));
@@ -1427,6 +1434,10 @@ public class Element {
 		}, parent, count, selectors);
 	}
 	
+	public void waitIsExists(String... selectors) {
+		waitIsExists(this, selectors);
+	}
+	
 	public static String waitIsExists(Element parent, String... selectors) {
 		return waitIsExists(null, parent, selectors);
 	}
@@ -1440,6 +1451,22 @@ public class Element {
 		return multiple(runnable, new Predicate<List<WebElement>>() {
 			public boolean test(List<WebElement> elements) {
 				return elements.size() > 0;
+			}
+		}, parent, selectors);
+	}
+	
+	public void waitIsNotExists(String... selectors) {
+		waitIsNotExists(this, selectors);
+	}
+	
+	public static void waitIsNotExists(Element parent, String... selectors) {
+		waitIsNotExists(parent, null, selectors).keySet().toArray();
+	}
+	
+	public static Map<String, List<WebElement>> waitIsNotExists(Element parent, Runnable runnable, String... selectors) {
+		return multiple(runnable, new Predicate<List<WebElement>>() {
+			public boolean test(List<WebElement> elements) {
+				return elements.size() == 0;
 			}
 		}, parent, selectors);
 	}
