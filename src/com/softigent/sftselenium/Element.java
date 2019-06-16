@@ -540,8 +540,7 @@ public class Element {
 	}
 	
 	public void sendKeys(String value) {
-		log.debug("value=" + value);
-		config.actionDelay();
+		this.sendKeys("", value);
 	}
 
 	public void sendKeys(String selector, String value) {
