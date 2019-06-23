@@ -371,6 +371,27 @@ public class Client {
 	public static String responseToString(HttpResponse<InputStream> res) throws IOException {
 		return new String(ResponseUtils.getBytes(res.getBody()), "UTF-8");
 	}
+	
+	//Example: createJson("key1": "val1", "key2": true, "key3": new JSONArray(new String[] {"1", "2", "3"}));
+	public static String createJson(Object ...keyval) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("{\n");
+		for (int i = 0; i < keyval.length; i+=2) {
+			sb.append(keyVal(keyval[i], keyval[i + 1]));
+			sb.append(i + 2 < keyval.length ? ",\n" : "\n");
+		}
+		sb.append("}");
+		logger.info("JSON: " + sb.toString());
+		return sb.toString();
+	}
+	
+	public static String keyVal(Object key, Object val) {
+		if (val instanceof String) {
+			return "\"" + key + "\": \"" + val + "\"";
+		} else {
+			return "\"" + key + "\": " + val;
+		}
+	}
 }
 
 class HttpWithBody extends HttpEntityEnclosingRequestBase {
