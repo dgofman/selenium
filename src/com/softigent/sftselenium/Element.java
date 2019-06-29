@@ -882,7 +882,11 @@ public class Element {
 	}
 	
 	public void enter() {
-		element.sendKeys(Keys.ENTER);
+		sendKeys(Keys.ENTER);
+	}
+	
+	public void sendKeys(Keys key) {
+		element.sendKeys(key);
 	}
 	
 	public void tab() {
