@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.UnexpectedAlertBehaviour;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -155,6 +156,15 @@ public class Config extends Properties {
 				}
 			}
 		}
+		setDriverPath(driverName, driverPath);
+		if (connector == null) {
+			connector = new Connector();
+		}
+		connector.init(driverName, headless, this);
+	}
+	
+	public void setDriverPath(String driverName, String driverPath) {
+		String driveFile = Config.getAbsolutePath(driverPath);
 		switch (driverName) {
 		case FIREFOX_DRIVER:
 			if (driverPath != null) {
@@ -177,15 +187,35 @@ public class Config extends Properties {
 			System.setProperty("phantomjs.binary.path", driveFile);
 			break;
 		}
-		if (connector == null) {
-			connector = new Connector();
-		}
-		connector.init(driverName, headless, this);
 	}
 	
 	public void createDriver() {
 		if (connector.getDriver() == null) {
-			WebDriver driver = getDriver(connector);
+			WebDriver driver = null;
+			try {
+				driver = getDriver(connector);
+			} catch (SessionNotCreatedException e) {
+				File dir  = new File("");
+				String driverName = getDriverName();
+				Scanner in = new Scanner(System.in);
+				Properties config = new Properties();
+				config.setProperty("projectName", "");
+				config.setProperty("packageName", "");
+				config.setProperty("projectDir", dir.getAbsolutePath());
+				config.setProperty("driver", driverName);
+				config.setProperty("driverVersion", "latest");
+				config.setProperty("driverOS", os());
+				try {
+					File outputDir = Make.loadDrivers(in, config);
+					File driverFile = Make.selectDriver(in, outputDir, config);
+					String driverPath = dir.toURI().relativize(driverFile.toURI()).getPath();
+					log.info("Latest Driver path: " + driverPath);
+					setDriverPath(driverName, driverPath);
+					driver = getDriver(connector);
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
 			connector.setDriver(driver);
 			boolean isFullScreen = "true".equals(this.getProperty("open_fullscreen"));
 			fullScreenControl(isFullScreen, connector);

@@ -1097,8 +1097,8 @@ public class Element {
 
 	public void robotMouseClick(boolean moveMouseOut) {
 		Robot robot = getRobot(100);
-		robot.mousePress(InputEvent.BUTTON1_MASK);
-		robot.mouseRelease(InputEvent.BUTTON1_MASK);
+		robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+		robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
 		if (moveMouseOut) {
 			//robotMouseMove(0, 0);
 		}
@@ -1134,14 +1134,14 @@ public class Element {
 		log.info("Source - x=" + (sourcePoint.x + offsetX1 - a.get(0).intValue()) + ", y=" + (sourcePoint.y + offsetY1 - a.get(1).intValue()));
 		robot.mouseMove(sourcePoint.x + offsetX1 - a.get(0).intValue(), sourcePoint.y + offsetY1 - a.get(1).intValue());
 		wait(.2f);
-		robot.mousePress(InputEvent.BUTTON1_MASK);
+		robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
 		robot.mouseMove(sourcePoint.x - a.get(0).intValue(), sourcePoint.y - a.get(1).intValue() - 5); //register drag event
 		wait(.2f);
 		// drop
 		log.info("Target - x=" + (targetPoint.x + offsetX2 - a.get(0).intValue()) + ", y=" + (targetPoint.y + offsetY2 - a.get(1).intValue()));
 		robot.mouseMove(targetPoint.x + offsetX2 - a.get(0).intValue(), targetPoint.y + offsetY2 - a.get(1).intValue());
 		wait(.2f);
-		robot.mouseRelease(InputEvent.BUTTON1_MASK);
+		robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
 		wait(.2f);
 		config.actionDelay();
 	}

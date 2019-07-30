@@ -283,7 +283,7 @@ public final class Make {
 		}
 	}
 
-	private static File selectDriver(final Scanner in, final File outputDir, final Properties config) {
+	public static File selectDriver(final Scanner in, final File outputDir, final Properties config) {
 		File[] envs = outputDir.listFiles();
 		if (envs.length == 0) {
 			System.out.print("WARN: Cannot find drivers for your browser");
@@ -291,7 +291,7 @@ public final class Make {
 			return envs[0];
 		}
 		for (int i = 0; i < envs.length; i++) {
-			if (envs[i].getName().equals(config.getProperty("driverOS"))) {
+			if (envs[i].getName().contains(config.getProperty("driverOS"))) {
 				File file = envs[i];
 				if (file.isDirectory()) {
 					return file.listFiles()[0];
