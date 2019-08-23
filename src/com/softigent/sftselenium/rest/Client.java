@@ -369,7 +369,9 @@ public class Client {
 	}
 	
 	public static String responseToString(HttpResponse<InputStream> res) throws IOException {
-		return new String(ResponseUtils.getBytes(res.getBody()), "UTF-8");
+		String str =  new String(ResponseUtils.getBytes(res.getBody()), "UTF-8");
+		logger.info("Result: " + str);
+		return str;
 	}
 	
 	//Example: createJson("key1": "val1", "key2": true, "key3": new JSONArray(new String[] {"1", "2", "3"}));

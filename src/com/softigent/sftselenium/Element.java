@@ -38,6 +38,8 @@ public class Element {
 	
 	public static List<Throwable> assertErrorCollector;
 	
+	private static Pattern TRIM = Pattern.compile("\\n|\\s", Pattern.MULTILINE);
+	
 	final String JS_BUILD_CSS_SELECTOR =
 		"var n = []; function t(e) { var i = 1; p = e.parentNode; " +
 		"while (e = e.previousElementSibling) { i++;}; " +
@@ -658,8 +660,7 @@ public class Element {
 		log.debug("Assert Text value=" + value + ", for selector: " + selector);
 		String str1 = getText(selector);
 		if (useTrim) {
-			str1 = str1.trim();
-			value = value.trim();
+			return regExpString(TRIM.matcher(str1).replaceAll(""), TRIM.matcher(value).replaceAll(""));
 		}
 		return assertString(str1, value);
 	}

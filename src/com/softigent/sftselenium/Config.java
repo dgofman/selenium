@@ -165,27 +165,30 @@ public class Config extends Properties {
 	
 	public void setDriverPath(String driverName, String driverPath) {
 		String driveFile = Config.getAbsolutePath(driverPath);
-		switch (driverName) {
-		case FIREFOX_DRIVER:
-			if (driverPath != null) {
-				System.setProperty("webdriver.gecko.driver", driveFile);
-			} else {
-				CacheLogger.getLogger(BaseTest.class.getName())
-						.info("Install FireFox version 47.0.1 or older. http://filehippo.com/download_firefox/68836");
+		if (driveFile != null) {
+			switch (driverName) {
+			case FIREFOX_DRIVER:
+				if (driverPath != null) {
+					System.setProperty("webdriver.gecko.driver", driveFile);
+				} else {
+					CacheLogger.getLogger(BaseTest.class.getName())
+							.info("Install FireFox version 47.0.1 or older. http://filehippo.com/download_firefox/68836");
+				}
+				break;
+			case CHROME_DRIVER:
+			case SAFARI_DRIVER:
+				System.setProperty("webdriver.chrome.driver", driveFile);
+				break;
+			case INTERNET_EXPLORER_DRIVER:
+				System.setProperty("webdriver.ie.driver", driveFile);
+				break;
+			case EDGE_DRIVER:
+				System.setProperty("webdriver.edge.driver", driveFile);
+				break;
+			case PHANTOMJS_DRIVER:
+				System.setProperty("phantomjs.binary.path", driveFile);
+				break;
 			}
-			break;
-		case CHROME_DRIVER:
-			System.setProperty("webdriver.chrome.driver", driveFile);
-			break;
-		case INTERNET_EXPLORER_DRIVER:
-			System.setProperty("webdriver.ie.driver", driveFile);
-			break;
-		case EDGE_DRIVER:
-			System.setProperty("webdriver.edge.driver", driveFile);
-			break;
-		case PHANTOMJS_DRIVER:
-			System.setProperty("phantomjs.binary.path", driveFile);
-			break;
 		}
 	}
 	
@@ -195,6 +198,7 @@ public class Config extends Properties {
 			try {
 				driver = getDriver(connector);
 			} catch (SessionNotCreatedException e) {
+				log.info(e.getMessage());
 				File dir  = new File("");
 				String driverName = getDriverName();
 				Scanner in = new Scanner(System.in);
@@ -277,9 +281,7 @@ public class Config extends Properties {
 			driver = createDriver(driverName, ChromeDriverService.createDefaultService(), copt);
 			break;
 		case SAFARI_DRIVER:
-			// driver = createDriver(driverName, DesiredCapabilities.safari());
-			SafariOptions sopts = new SafariOptions();
-			driver = createDriver(driverName, SafariDriverService.createDefaultService(sopts), sopts);
+			driver = createDriver(driverName, DesiredCapabilities.safari());
 			break;
 		case EDGE_DRIVER:
 			DesiredCapabilities edge = new DesiredCapabilities();
@@ -391,7 +393,7 @@ public class Config extends Properties {
 		case CHROME_DRIVER:
 			return new ChromeDriver((ChromeDriverService) driverService, (ChromeOptions) capabilities);
 		case SAFARI_DRIVER:
-			return new SafariDriver((SafariDriverService) driverService, (SafariOptions) capabilities);
+			return new SafariDriver((SafariDriverService) driverService, SafariOptions.fromCapabilities(capabilities));
 		case INTERNET_EXPLORER_DRIVER:
 			return new InternetExplorerDriver((InternetExplorerDriverService) driverService, (InternetExplorerOptions) capabilities);
 		case EDGE_DRIVER:
@@ -413,7 +415,7 @@ public class Config extends Properties {
 		case CHROME_DRIVER:
 			return new ChromeDriver((ChromeOptions) capabilities);
 		case SAFARI_DRIVER:
-			return new SafariDriver((SafariOptions) capabilities);
+			return new SafariDriver(SafariOptions.fromCapabilities(capabilities));
 		case INTERNET_EXPLORER_DRIVER:
 			return new InternetExplorerDriver((InternetExplorerOptions) capabilities);
 		case EDGE_DRIVER:
@@ -444,6 +446,7 @@ public class Config extends Properties {
 			String[] wh = this.getProperty("window_dimension").split("x");
 			if (wh.length == 2) {
 				Dimension d = new Dimension(Integer.parseInt(wh[0]), Integer.parseInt(wh[1]));
+				driver.manage().window().setPosition(new Point(0, 0));
 				driver.manage().window().setSize(d);
 			}
 		}
@@ -518,7 +521,7 @@ public class Config extends Properties {
 	}
 
 	public static String getAbsolutePath(String path) {
-		return getFile(path).getAbsolutePath();
+		return path != null ? getFile(path).getAbsolutePath() : null;
 	}
 
 	public Connector getConnector() {
