@@ -18,12 +18,19 @@ public abstract class TestRunner extends Runner {
 
 	protected Class<?> testClass;
 	protected Description description;
+	protected ITestSuiteReport[] reports;
 
 	// Application Contractor
 	public TestRunner(String[] args) {
+		this(args,  new ITestSuiteReport[] {new TestSuiteHTMLReport(), new TestSuiteXMLReport()});
+	}
+
+	public TestRunner(String[] args, ITestSuiteReport[] reports) {
+		this.reports = reports;
 		List<TestRunnerInfo> suites = this.initialize(args);
 		try {
-			onExit(getTestSuiteRunner(suites).run());
+			TestSuiteRunner runner = new TestSuiteRunner(suites, reports);
+			onExit(runner.run());
 		} catch (Exception e) {
 			e.printStackTrace();
 			onExit(1);
@@ -40,10 +47,6 @@ public abstract class TestRunner extends Runner {
 	public TestRunner(Class<?> testClass, String description) {
 		this.testClass = testClass;
 		this.description = Description.createSuiteDescription(description);
-	}
-
-	public TestSuiteRunner getTestSuiteRunner(List<TestRunnerInfo> suites) {
-		return new com.softigent.sftselenium.TestSuiteRunner(suites);
 	}
 
 	@Override

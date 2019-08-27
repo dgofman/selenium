@@ -1,23 +1,21 @@
 package com.softigent.sftselenium;
 
-import java.io.File;
-
 public class TestRunnerInfo {
 	
-	private File file;
+	private String fileName;
 	private String description;
 	private Class<?> testSuite;
 	
-	public TestRunnerInfo (File file, String description, Class<?> testSuite) {
-		this.file = file;
+	public TestRunnerInfo(String fileName, String description, Class<?> testSuite) {
+		this.fileName = fileName;
 		this.description = description;
 		this.testSuite = testSuite;
 	}
 
-	public File getFile() {
-		return file;
+	public String getFileName() {
+		return fileName;
 	}
-
+	
 	public String getDescription() {
 		return description;
 	}

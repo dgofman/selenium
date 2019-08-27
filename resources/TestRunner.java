@@ -1,7 +1,6 @@
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -11,10 +10,13 @@ import org.junit.runner.Result;
 import org.junit.runner.RunWith;
 import org.junit.runner.notification.Failure;
 
+import com.equinix.etiming.ETimingBaseTest;
+import com.softigent.sftselenium.ITestSuiteReport;
 import com.softigent.sftselenium.TestError;
 import com.softigent.sftselenium.TestRunner;
 import com.softigent.sftselenium.TestRunnerInfo;
-import com.softigent.sftselenium.TestSuiteRunner;
+import com.softigent.sftselenium.TestSuiteHTMLReport;
+import com.softigent.sftselenium.TestSuiteXMLReport;
 
 import %PACKAGE%.%PROJECT%BaseTest;
 
@@ -23,7 +25,7 @@ public class %PROJECT%TestRunner extends TestRunner {
 	
 	//Application Contractor
 	public %PROJECT%TestRunner(String[] args) throws Exception {
-		super(args);
+		super(args, new ITestSuiteReport[] {new TestSuiteCustomHTMLReport(), new TestSuiteXMLReport()});
 	}
 	
 	//JUnit Contractor
@@ -35,11 +37,6 @@ public class %PROJECT%TestRunner extends TestRunner {
 	public void onExit(int numOfErrors) {
 		System.exit(numOfErrors);
 	}
-	
-	@Override
-	public TestSuiteRunner getTestSuiteRunner(List<TestRunnerInfo> suites) {
-		return new CustomTestSuiteRunner(suites);
-	}
 
 	public static void main(String[] args) throws Exception {
 		%PACKAGE%.%PROJECT%Config.initLogs();
@@ -47,23 +44,15 @@ public class %PROJECT%TestRunner extends TestRunner {
 	}
 
 	protected List<TestRunnerInfo> initialize(String[] args) {
-		File reportDir = new File("reports");
-		if (!reportDir.exists()) {
-			reportDir.mkdirs();
-		}
 		List<TestRunnerInfo> suites = new ArrayList<TestRunnerInfo>();
-		suites.add(new TestRunnerInfo(new File(reportDir,  "report.html"), "%PROJECT% Report", %PACKAGE%.suites.%PROJECT%Suite.class));
+		suites.add(new TestRunnerInfo("report", "%PROJECT% Report", %PACKAGE%.suites.%PROJECT%Suite.class));
 		return suites;
 	}
 	
-	static public class CustomTestSuiteRunner extends TestSuiteRunner {
-
-		public CustomTestSuiteRunner(List<TestRunnerInfo> suites) {
-			super(suites);
-		}
+	static public class TestSuiteCustomHTMLReport extends TestSuiteHTMLReport {
 
 		@Override
-		protected void addFailures(PrintWriter writer, Map<Class<?>, Result> failResults) {
+		public void addFailures(Map<Class<?>, Result> failResults) {
 			writer.println("<div style='margin-top: 40px;'>");		
 			writer.println("<h2>Failures:</h2>");
 			int index = 0;
