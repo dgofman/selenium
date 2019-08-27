@@ -10,7 +10,6 @@ import org.junit.runner.Result;
 import org.junit.runner.RunWith;
 import org.junit.runner.notification.Failure;
 
-import com.equinix.etiming.ETimingBaseTest;
 import com.softigent.sftselenium.ITestSuiteReport;
 import com.softigent.sftselenium.TestError;
 import com.softigent.sftselenium.TestRunner;
@@ -105,7 +104,7 @@ public class %PROJECT%TestRunner extends TestRunner {
 			for (Class<?> testCase : failResults.keySet()) {
 				Result result = failResults.get(testCase);
 				for (Failure failure : result.getFailures()) {
-					TestError error = ETimingBaseTest.TEST_ERRORS.get(failure.getDescription().getDisplayName());
+					TestError error = %PROJECT%BaseTest.TEST_ERRORS.get(failure.getDescription().getDisplayName());
 					if (error != null) {
 						logs.add(error.getLastLogs());
 					}
