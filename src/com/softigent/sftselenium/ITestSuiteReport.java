@@ -13,15 +13,10 @@ import org.junit.runner.notification.Failure;
 public interface ITestSuiteReport {
 	
 	void openDoc(TestRunnerInfo info, File file) throws IOException;
-	void openHead(TestRunnerInfo info);
-	void addTitle(TestRunnerInfo info);
-	void addStyle(TestRunnerInfo info);
-	void addScript(TestRunnerInfo info);
-	void closeHead(TestRunnerInfo info);
 	void openBody(TestRunnerInfo info);
 	void addHeader(TestRunnerInfo info, Date startTime);
 	void openTest(TestRunnerInfo info);
-	void addTest(TestRunnerInfo info, long time, List<Failure> failures, Description description);
+	void addTest(TestRunnerInfo info, long time, List<Failure> failures, boolean ignored, Description description);
 	void closeTest(TestRunnerInfo info);
 	void addResult(TestRunnerInfo info, long time, Class<?> testCase, Result result, List<Failure> asserts, List<Failure> errors);
 	void addReport(TestRunnerInfo info, long time, int totalTestCases, int totalSucceed, int totalFailed, int totalTests, int totalErrors, int totalAsserts, int totalIgnored);

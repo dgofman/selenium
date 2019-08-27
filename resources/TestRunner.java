@@ -25,7 +25,7 @@ public class %PROJECT%TestRunner extends TestRunner {
 	
 	//Application Contractor
 	public %PROJECT%TestRunner(String[] args) throws Exception {
-		super(args, new ITestSuiteReport[] {new TestSuiteCustomHTMLReport(), new TestSuiteXMLReport()});
+		super(args, new ITestSuiteReport[] {new TestSuiteCustomHTMLReport(), new TestSuiteCustomXMLReport()});
 	}
 	
 	//JUnit Contractor
@@ -93,6 +93,27 @@ public class %PROJECT%TestRunner extends TestRunner {
 				writer.println("</section>");
 			}
 			writer.println("</div>");
+		}
+	}
+	
+	static public class TestSuiteCustomXMLReport extends TestSuiteXMLReport {
+
+		@Override
+		public void addFailures(Map<Class<?>, Result> failResults) {
+			List<String> logs = new ArrayList<>();
+			List<String> errors = new ArrayList<>();
+			for (Class<?> testCase : failResults.keySet()) {
+				Result result = failResults.get(testCase);
+				for (Failure failure : result.getFailures()) {
+					TestError error = ETimingBaseTest.TEST_ERRORS.get(failure.getDescription().getDisplayName());
+					if (error != null) {
+						logs.add(error.getLastLogs());
+					}
+					errors.add(failure.getTrace());
+				}
+			}
+			writer.println("<system-out><![CDATA[\n" + String.join("\n", logs) + "]]></system-out>");
+			writer.println("<system-err><![CDATA[\n" + String.join("\n", errors) + "]]></system-err>");
 		}
 	}
 }

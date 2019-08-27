@@ -63,11 +63,6 @@ public class TestSuiteRunner {
 					continue;
 				}
 				openReports.add(report);
-				report.openHead(info);
-				report.addTitle(info);
-				report.addStyle(info);
-				report.addScript(info);
-				report.closeHead(info);
 				report.openBody(info);
 				report.addHeader(info, startTime);
 				report.openTest(info);
@@ -202,7 +197,7 @@ class JUnitRunListener extends RunListener {
 	public void testFinished(Description description) throws Exception {
 		long time = System.currentTimeMillis() - startTime;
 		for (ITestSuiteReport report : openReports) {
-			report.addTest(info, time, failures, description);
+			report.addTest(info, time, failures, false, description);
 		}
 	}
 	
@@ -214,5 +209,13 @@ class JUnitRunListener extends RunListener {
 	@Override
 	public void testAssumptionFailure(Failure failure) {
 		failures.add(failure);
+    }
+	
+	@Override
+    public void testIgnored(Description description) throws Exception {
+		long time = System.currentTimeMillis() - startTime;
+		for (ITestSuiteReport report : openReports) {
+			report.addTest(info, time, new ArrayList<Failure>(), true, description);
+		}
     }
 }

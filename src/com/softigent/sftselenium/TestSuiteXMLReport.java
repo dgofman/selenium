@@ -15,6 +15,8 @@ import org.junit.runner.Description;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
+import junit.framework.AssertionFailedError;
+
 public class TestSuiteXMLReport implements ITestSuiteReport {
 
 	protected PrintWriter writer;
@@ -28,25 +30,6 @@ public class TestSuiteXMLReport implements ITestSuiteReport {
 		writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
 	}
 
-	@Override
-	public void openHead(TestRunnerInfo info) {
-	}
-
-	@Override
-	public void addTitle(TestRunnerInfo info) {
-	}
-
-	@Override
-	public void addStyle(TestRunnerInfo info) {
-	}
-
-	@Override
-	public void addScript(TestRunnerInfo info) {
-	}
-
-	@Override
-	public void closeHead(TestRunnerInfo info) {
-	}
 
 	@Override
 	public void openBody(TestRunnerInfo info) {
@@ -70,16 +53,25 @@ public class TestSuiteXMLReport implements ITestSuiteReport {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public void addTest(TestRunnerInfo info, long time, List<Failure> failures, Description description) {
-		results.add("      <testcase classname=\"" + description.getClassName() + "\" name=\""
-				+ description.getMethodName() + "\" time=\"" + Long.valueOf(time / 1000).floatValue() + "\">");
+	public void addTest(TestRunnerInfo info, long time, List<Failure> failures, boolean ignored, Description description) {
+ 		results.add("      <testcase classname=\"" + description.getClassName() + "\" name=\""
+				+ description.getMethodName() + "\" time=\"" + ((float)time) / 1000 + "\">");
+		if (ignored) {
+			results.add("        <skipped />");
+		}
 		for (Failure failure : failures) {
+			Throwable exception = failure.getException();
 			String msg = failure.getMessage();
-			if (msg == null) {
-				msg = failure.getException().toString();
+			if (msg != null) {
+				msg = "message=\"" + TRIM.matcher(org.apache.commons.lang3.StringEscapeUtils.escapeXml(msg)).replaceAll(" ") + "\" ";
+			} else {
+				msg = "";
 			}
-			results.add("        <error message=\"" + TRIM.matcher(org.apache.commons.lang3.StringEscapeUtils.escapeXml(msg)).replaceAll(" ")
-					+ "\" type=\"" + failure.getException().getClass().getTypeName() + "\"><![CDATA[" + failure.getTrace() + "]]></error>");
+			if (exception instanceof AssertionFailedError || exception instanceof AssertionError) {
+				results.add("        <failure " + msg + "type=\"" + exception.getClass().getTypeName() + "\"><![CDATA[" + failure.getTrace() + "]]></failure>");
+			} else {
+				results.add("        <error " + msg + "type=\"" + exception.getClass().getTypeName() + "\"><![CDATA[" + failure.getTrace() + "]]></error>");
+			}
 		}
 		results.add("      </testcase>");
 	}
@@ -94,7 +86,7 @@ public class TestSuiteXMLReport implements ITestSuiteReport {
 		writer.println("  <testsuite errors=\"" + errors.size() + "\" failures=\"" + asserts.size() + "\" skipped=\""
 				+ result.getIgnoreCount() + "\" tests=\"" + result.getRunCount() + "\" name=\""
 				+ testCase.getSimpleName() + "\" package=\"" + testCase.getPackage() + "\" time=\""
-				+ Long.valueOf(time / 1000).floatValue() + "\" timestamp=\""
+				+ ((float)time) / 1000 + "\" timestamp=\""
 				+ new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()) + "\">");
 		for (String testcase : results) {
 			writer.println(testcase);
@@ -110,6 +102,8 @@ public class TestSuiteXMLReport implements ITestSuiteReport {
 
 	@Override
 	public void addFailures(Map<Class<?>, Result> failResults) {
+		writer.println("<system-out></system-out>");
+		writer.println("<system-err></system-err>");
 	}
 
 	@Override

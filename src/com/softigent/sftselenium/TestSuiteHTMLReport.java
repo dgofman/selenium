@@ -23,19 +23,16 @@ public class TestSuiteHTMLReport implements ITestSuiteReport {
 		writer.println("<html lang='en'>");
 	}
 	
-	@Override
 	public void openHead(TestRunnerInfo info) {
 		writer.println("<head>");
 		writer.println("<meta charset='utf-8'>");
 		writer.println("<meta http-equiv='Cache-control' content='no-cache'>");
 	}
 	
-	@Override
 	public void addTitle(TestRunnerInfo info) {
 		writer.println("<title>" + info.getDescription() + "</title>");
 	}
 	
-	@Override
 	public void addStyle(TestRunnerInfo info) {
 		writer.println("<style>");
 		writer.println("li, div {padding: 2px 5px; margin: 2px 0}");
@@ -51,7 +48,6 @@ public class TestSuiteHTMLReport implements ITestSuiteReport {
 		writer.println("</style>");
 	}
 	
-	@Override
 	public void addScript(TestRunnerInfo info) {
 		writer.println("<script>");
 		writer.println("window.testcase = '';");
@@ -67,13 +63,17 @@ public class TestSuiteHTMLReport implements ITestSuiteReport {
 		writer.println("</script>");
 	}
 	
-	@Override
 	public void closeHead(TestRunnerInfo info) {
 		writer.println("</head>");
 	}
 	
 	@Override
 	public void openBody(TestRunnerInfo info) {
+		openHead(info);
+		addTitle(info);
+		addStyle(info);
+		addScript(info);
+		closeHead(info);
 		writer.println("<body>");
 	}
 	
@@ -90,7 +90,7 @@ public class TestSuiteHTMLReport implements ITestSuiteReport {
 	}
 	
 	@Override
-	public void addTest(TestRunnerInfo info, long time, List<Failure> failures, Description description) {
+	public void addTest(TestRunnerInfo info, long time, List<Failure> failures, boolean ignored, Description description) {
 	}
 
 	@Override
