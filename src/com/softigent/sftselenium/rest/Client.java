@@ -34,6 +34,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.google.gson.Gson;
@@ -369,6 +370,9 @@ public class Client {
 	}
 	
 	public static String responseToString(HttpResponse<InputStream> res) throws IOException {
+		if (res.getBody() == null) {
+			return null;
+		}
 		String str =  new String(ResponseUtils.getBytes(res.getBody()), "UTF-8");
 		logger.info("Result: " + str);
 		return str;
@@ -376,6 +380,12 @@ public class Client {
 	
 	//Example: createJson("key1": "val1", "key2": true, "key3": new JSONArray(new String[] {"1", "2", "3"}));
 	public static String createJson(Object ...keyval) {
+		String json = addJson(keyval).toString();
+		logger.info("JSON: " + json);
+		return json;
+	}
+	
+	public static StringBuilder addJson(Object ...keyval) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("{\n");
 		for (int i = 0; i < keyval.length; i+=2) {
@@ -383,13 +393,14 @@ public class Client {
 			sb.append(i + 2 < keyval.length ? ",\n" : "\n");
 		}
 		sb.append("}");
-		logger.info("JSON: " + sb.toString());
-		return sb.toString();
+		return sb;
 	}
 	
 	public static String keyVal(Object key, Object val) {
 		if (val instanceof String) {
 			return "\"" + key + "\": \"" + val + "\"";
+		} else if (val instanceof String[]) {
+			return "\"" + key + "\": " + new JSONArray((String[]) val);
 		} else {
 			return "\"" + key + "\": " + val;
 		}

@@ -1,5 +1,8 @@
 package com.softigent.sftselenium;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+
 import org.junit.runner.Description;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
@@ -13,8 +16,18 @@ public class ExtendedRunner extends BlockJUnit4ClassRunner {
 
     @Override
     protected Description describeChild(FrameworkMethod method) {
-        if (method.getAnnotation(DisplayName.class) != null) {
-            return Description.createTestDescription(getTestClass().getJavaClass(), method.getAnnotation(DisplayName.class).value(), method.getAnnotations());
+    	Class<?> clazz = getTestClass().getJavaClass();
+    	Annotation annotation = null;
+    	try {
+			Method thisMethod = clazz.getMethod(method.getName());
+			annotation = thisMethod.getAnnotation(DisplayName.class);
+		} catch (NoSuchMethodException | SecurityException e) {}
+    	if (annotation == null) {
+    		annotation = method.getAnnotation(DisplayName.class);
+    	}
+        if (annotation != null) {
+        	return Description.createTestDescription(clazz, ((DisplayName)annotation).value(), method.getAnnotations());
+
         }
         return super.describeChild(method);
     }
