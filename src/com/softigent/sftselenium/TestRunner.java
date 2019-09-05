@@ -29,13 +29,17 @@ public abstract class TestRunner extends Runner {
 		this.reports = reports;
 		List<TestRunnerInfo> suites = this.initialize(args);
 		try {
-			TestSuiteRunner runner = new TestSuiteRunner(suites, reports);
+			TestSuiteRunner runner = getTestSuiteRunner(suites, reports);
 			onExit(runner.run());
 		} catch (Exception e) {
 			e.printStackTrace();
 			onExit(1);
 		}
 		onExit(0);
+	}
+	
+	public TestSuiteRunner getTestSuiteRunner(List<TestRunnerInfo> suites, ITestSuiteReport[] reports) {
+		return new TestSuiteRunner(suites, reports);
 	}
 	
 	public void onExit(int numOfErrors) {
