@@ -2,6 +2,10 @@ package com.softigent.sftselenium;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import org.junit.runner.Description;
 import org.junit.runners.BlockJUnit4ClassRunner;
@@ -30,5 +34,21 @@ public class ExtendedRunner extends BlockJUnit4ClassRunner {
 
         }
         return super.describeChild(method);
+    }
+    
+    @Override
+    protected List<FrameworkMethod> computeTestMethods() {
+    	List<FrameworkMethod> copy = new ArrayList<FrameworkMethod>(super.computeTestMethods());
+    	Collections.sort(copy, new Comparator<FrameworkMethod>() {
+            public int compare(FrameworkMethod m1, FrameworkMethod m2) {
+                return extractInt(m1.getName()) - extractInt(m2.getName());
+            }
+
+            int extractInt(String s) {
+                String num = s.replaceAll("\\D", "");
+                return num.isEmpty() ? 0 : Integer.parseInt(num);
+            }
+        });
+        return copy;
     }
 }
