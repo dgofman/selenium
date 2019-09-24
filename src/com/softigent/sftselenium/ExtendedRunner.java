@@ -17,6 +17,8 @@ import org.junit.runners.model.RunnerBuilder;
 
 public class ExtendedRunner extends BlockJUnit4ClassRunner {
 	
+	public static Class<?> RunnerClass;
+	
 	protected RunnerBuilder runner;
 	protected boolean canUseSuiteMethod;
 
@@ -24,6 +26,8 @@ public class ExtendedRunner extends BlockJUnit4ClassRunner {
         super(klass);
         this.runner = runner;
         
+        ExtendedRunner.RunnerClass = klass;
+
         if (runner instanceof AllDefaultPossibilitiesBuilder) {
         	try {
 		        Field f = runner.getClass().getDeclaredField("canUseSuiteMethod");
