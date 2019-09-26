@@ -38,6 +38,10 @@ public class TestSuiteRunner {
 			reportDir.mkdirs();
 		}
 	}
+	
+	public File getReportDir() {
+		return reportDir;
+	}
 
 	public int run() throws IOException {
 		int suitesErrors = 0;
@@ -57,7 +61,7 @@ public class TestSuiteRunner {
 			List<ITestSuiteReport> openReports = new ArrayList<>();
 			for (ITestSuiteReport report : reports) {
 				try {
-					report.openDoc(info, reportDir);
+					report.openDoc(info, getReportDir());
 				} catch (IOException e) {
 					log.error(e.getMessage());
 					continue;
