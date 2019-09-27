@@ -64,8 +64,23 @@ public class Client {
 	private static final String USER_AGENT_HEADER = "user-agent";
 	private static final String USER_AGENT = "reset-service/1.0.0";
 	
+	public static final int connectionTimeout = 3000; //The timeout until a connection with the server is established (in milliseconds).
+	public static final int socketTimeout  = 60000; // The timeout to receive data (in milliseconds).
+	
 	static {
-		Unirest.setTimeouts(30000, 60000);
+		resetTimeout();
+	}
+	
+	public static void resetTimeout() {
+		setTimeout(connectionTimeout, socketTimeout);
+	}
+	
+	public static void setTimeout(int socketTimeout) {
+		Unirest.setTimeouts(connectionTimeout, socketTimeout);
+	}
+	
+	public static void setTimeout(int connectionTimeout, int socketTimeout) {
+		Unirest.setTimeouts(connectionTimeout, socketTimeout);
 	}
 	
 	public static void defaultSSL() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
