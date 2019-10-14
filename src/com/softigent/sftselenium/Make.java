@@ -83,8 +83,11 @@ public final class Make {
 		if (config.getProperty("driver") == null || !DRIVERS.containsKey(config.getProperty("driver"))) {
 			config.setProperty("driver", getDriver(in));
 		}
-		File outputDir =  loadDrivers(in, config);
-		File driverFile = selectDriver(in, outputDir, config);
+		File outputDir, driverFile = null;
+		while(driverFile == null) {
+			outputDir =  loadDrivers(in, config);
+			driverFile = selectDriver(in, outputDir, config);
+		}
 		config.setProperty("driverPath", new File(config.getProperty("projectDir")).toURI().relativize(driverFile.toURI()).getPath());
 		File resources = new File(config.getProperty("projectDir"), "resources");
 		resources.mkdirs();
@@ -148,11 +151,15 @@ public final class Make {
 		String driver = config.getProperty("driver").trim();
 		String content = IOUtils.toString(input.toURI(), Charset.defaultCharset());
 		content = content.replaceAll("%PACKAGE%", config.getProperty("packageName", "").trim())
-				.replaceAll("%PROJECT%", config.getProperty("projectName", "").trim());
+				.replaceAll("%PROJECT%", config.getProperty("projectName", "").trim())
+				.replaceAll("%VERSION%", String.valueOf(BaseTest.GIT_VERSION) + '.' + BaseTest.GIT_PATCH);
 		if (isProperites) {
-			content = content.replaceAll("(driver=)(.*)", "$1" + driver)
-				.replaceAll("(driverOS=)(.*)", "$1" + config.getProperty("driverOS"))
-				.replaceAll("(" + config.getProperty("driverOS").substring(0, 3) + "_" + driver.toLowerCase() + "_driver_path=)(.*)", "$1" + config.getProperty("driverPath").trim());
+			content = content.replaceAll("(driver=)(.*)", "$1" + driver);
+			String os = config.getProperty("driverOS");
+			if(os != null) {
+				content = content.replaceAll("(driverOS=)(.*)", "$1" + os)
+						.replaceAll("(" + os.substring(0, 3) + "_" + driver.toLowerCase() + "_driver_path=)(.*)", "$1" + config.getProperty("driverPath").trim());
+			}
 		}
 		FileOutputStream fos = new FileOutputStream(output);
 		IOUtils.write(content, fos, Charset.defaultCharset());
@@ -286,17 +293,21 @@ public final class Make {
 	public static File selectDriver(final Scanner in, final File outputDir, final Properties config) {
 		File[] envs = outputDir.listFiles();
 		if (envs.length == 0) {
-			System.out.print("WARN: Cannot find drivers for your browser");
+			System.out.print("WARN: Cannot find drivers for your browser\n");
+			return null;
 		} else if (envs.length == 1) {
 			return envs[0];
 		}
-		for (int i = 0; i < envs.length; i++) {
-			if (envs[i].getName().contains(config.getProperty("driverOS"))) {
-				File file = envs[i];
-				if (file.isDirectory()) {
-					return file.listFiles()[0];
+		String os = config.getProperty("driverOS");
+		if (os != null) {
+			for (int i = 0; i < envs.length; i++) {
+				if (envs[i].getName().contains(os)) {
+					File file = envs[i];
+					if (file.isDirectory()) {
+						return file.listFiles()[0];
+					}
+					return file;
 				}
-				return file;
 			}
 		}
 		for (int i = 0; i < envs.length; i++) {

@@ -38,7 +38,7 @@ public class Element {
 	
 	public static List<Throwable> assertErrorCollector;
 	
-	private static Pattern TRIM = Pattern.compile("\\n|\\s", Pattern.MULTILINE);
+	private static Pattern TRIM = Pattern.compile("\\n|\\s|\\u00A0", Pattern.MULTILINE);
 	
 	final String JS_BUILD_CSS_SELECTOR =
 		"var n = []; function t(e) { var i = 1; p = e.parentNode; " +
@@ -658,11 +658,7 @@ public class Element {
 	
 	public Boolean assertText(String selector, String value, boolean useTrim) {
 		log.debug("Assert Text value=" + value + ", for selector: " + selector);
-		String str1 = getText(selector);
-		if (useTrim) {
-			return regExpString(TRIM.matcher(str1).replaceAll(""), TRIM.matcher(value).replaceAll(""));
-		}
-		return assertString(str1, value);
+		return assertString(getText(selector), value, useTrim);
 	}
 
 	public void setHTML(String selector, String value) {
@@ -1573,7 +1569,11 @@ public class Element {
 	}
 
 	public static Boolean assertString(String str1, String str2, boolean useTrim) {
-		return assertString(str1.trim(), str2.trim());
+		if (useTrim) {
+			str1 = TRIM.matcher(str1).replaceAll("");
+			str2 = TRIM.matcher(str2).replaceAll("");
+		}
+		return validateString(str1, str2, true);
 	}
 	
 	public static Boolean assertString(String str1, String str2) {
@@ -1612,11 +1612,11 @@ public class Element {
 	}
 
 	public static Boolean compareString(String str1, String str2) {
-		log.debug("compareString: '" + str1 + "' = '" + str2 + "'");
 		return regExpString(str1, str2);
 	}
 	
 	public static Boolean regExpString(String str, String regExp) {
+		log.debug("regExpString: '" + str + "' = '" + regExp + "'");
 		boolean isTrue;
 
 		if (str == null) {

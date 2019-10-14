@@ -49,6 +49,7 @@ public abstract class BaseTest {
 	protected CloseDriver doCloseDriver;
 	
 	public static final double GIT_VERSION = 8.0;
+	public static final int GIT_PATCH = 0;
 
 	@Rule
 	public TestName testName = new TestName();
