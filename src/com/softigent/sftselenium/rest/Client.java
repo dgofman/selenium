@@ -15,10 +15,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.net.ssl.SSLContext;
-
-import java.util.Set;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpClient;
@@ -412,10 +411,20 @@ public class Client {
 	}
 	
 	public static String keyVal(Object key, Object val) {
-		if (val instanceof String) {
-			return "\"" + key + "\": \"" + val + "\"";
-		} else if (val instanceof String[]) {
-			return "\"" + key + "\": " + new JSONArray((String[]) val);
+		if (val instanceof String || val instanceof Enum) {
+			return "\"" + key + "\": \"" + String.valueOf(val) + "\"";
+		} else if (val instanceof Object[]) {
+			Object[] values = (Object[]) val;
+			Object[] newValues = new Object[values.length];
+			for (int i = 0; i < values.length; i++) {
+				Object e = values[i];
+				if (e instanceof String || e instanceof Enum) {
+					newValues[i] = String.valueOf(e);
+				} else {
+					newValues[i] = e;
+				}
+			}
+			return  "\"" + key + "\": " + new JSONArray(newValues);
 		} else {
 			return "\"" + key + "\": " + val;
 		}
