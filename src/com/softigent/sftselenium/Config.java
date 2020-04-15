@@ -51,6 +51,7 @@ public class Config extends Properties {
 	protected DriverService driverService;
 	protected MutableCapabilities capabilities;
 
+	protected String env;
 	protected float actionDelay;
 	protected File snapshotDir;
 	protected int pageLoadTimeout;
@@ -78,6 +79,13 @@ public class Config extends Properties {
 
 	public Config(String propertyFile) {
 		super();
+		env = getProperty("env");
+		if (env != null) {
+			env = env + "_";
+		} else {
+			env = "";
+		}
+		
 		this.windowOffset = new Point(0, 0);
 		try {
 			String absPath = getAbsolutePath(propertyFile);
@@ -115,7 +123,15 @@ public class Config extends Properties {
 	}
 	
 	public String getProperty(String key) {
-		String value = System.getProperty(key);
+		String value = System.getProperty(env + key);
+		if (value != null) {
+			return value;
+		}
+		value = super.getProperty(env + key);
+		if (value != null) {
+			return value;
+		}
+		value = System.getProperty(key);
 		if (value != null) {
 			return value;
 		}
