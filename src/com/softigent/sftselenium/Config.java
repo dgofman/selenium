@@ -79,13 +79,6 @@ public class Config extends Properties {
 
 	public Config(String propertyFile) {
 		super();
-		env = getProperty("env");
-		if (env != null) {
-			env = env + "_";
-		} else {
-			env = "";
-		}
-		
 		this.windowOffset = new Point(0, 0);
 		try {
 			String absPath = getAbsolutePath(propertyFile);
@@ -105,6 +98,13 @@ public class Config extends Properties {
 			} catch (Exception e2) {
 				e2.printStackTrace();
 			}
+		}
+		
+		env = getProperty("env");
+		if (env != null) {
+			env = env + "_";
+		} else {
+			env = "";
 		}
 	}
 
