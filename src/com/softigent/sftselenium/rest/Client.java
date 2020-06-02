@@ -19,6 +19,7 @@ import java.util.Set;
 
 import javax.net.ssl.SSLContext;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
@@ -51,6 +52,7 @@ import com.mashape.unirest.http.utils.ClientFactory;
 import com.mashape.unirest.http.utils.ResponseUtils;
 import com.mashape.unirest.request.BaseRequest;
 import com.mashape.unirest.request.HttpRequest;
+import com.mashape.unirest.request.body.RequestBodyEntity;
 import com.softigent.sftselenium.CacheLogger;
 import com.softigent.sftselenium.Config;
 
@@ -280,11 +282,12 @@ public class Client {
 		HttpRequest request = rest.getHttpRequest();
 		request.header("correlation-id", getCorrelationId());
 		HttpRequestBase requestObj = prepareRequest(request);
-		HttpClient client = ClientFactory.getHttpClient(); // The
+		HttpClient client = ClientFactory.getHttpClient();
 		org.apache.http.HttpResponse response;
 		try {
 			response = client.execute(requestObj);
 			HttpResponse<T> httpResponse = new HttpResponse<T>(response, responseClass);
+			logger.info("Status code: " + httpResponse.getStatus());
 			requestObj.releaseConnection();
 			return httpResponse;
 		} catch (Exception e) {
@@ -374,7 +377,8 @@ public class Client {
 
 		// Set body
 		if (!(request.getHttpMethod() == HttpMethod.GET || request.getHttpMethod() == HttpMethod.HEAD)) {
-			if (request.getBody() != null) {
+			if (request.getBody() instanceof RequestBodyEntity && 
+				((RequestBodyEntity) request.getBody()).getBody() != null) {
 				HttpEntity entity = request.getBody().getEntity();
 				((HttpEntityEnclosingRequestBase) reqObj).setEntity(entity);
 			}
@@ -418,11 +422,14 @@ public class Client {
 			Object[] newValues = new Object[values.length];
 			for (int i = 0; i < values.length; i++) {
 				Object e = values[i];
-				if (e instanceof String || e instanceof Enum) {
+				if (e instanceof String || e instanceof Enum || e instanceof StringBuilder) {
 					newValues[i] = String.valueOf(e);
 				} else {
 					newValues[i] = e;
 				}
+			}
+			if (val instanceof StringBuilder[]) {		
+				return  "\"" + key + "\": [" +  StringUtils.join(newValues, ",") + "]";
 			}
 			return  "\"" + key + "\": " + new JSONArray(newValues);
 		} else {
