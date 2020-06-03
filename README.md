@@ -1,4 +1,4 @@
-#SFTSelenium
+# SFTSelenium
 
 ### Get started
   - Download repository:
@@ -16,7 +16,7 @@ java -jar target/sftselenium-jar-with-dependencies.jar
 
   - Goto your a newly created project and open in Eclipse or compile using mvn install command
 
-###Troubleshooting
+### Troubleshooting
 
 IE Drivers: http://selenium-release.storage.googleapis.com/index.html
 Chrome Drivers: https://sites.google.com/a/chromium.org/chromedriver/downloads
@@ -39,13 +39,13 @@ sudo yum install Xvfb firefox
 sudo Xvfb :10 -ac &
 sudo export DISPLAY=:10
 
-##"Failed to open connection to "session" message bus: Unable to autolaunch a dbus-daemon without a $DISPLAY for X11"
+#### "Failed to open connection to "session" message bus: Unable to autolaunch a dbus-daemon without a $DISPLAY for X11"
 sudo yum install dbus-x11
 export $(dbus-launch)
 
 TEST: dbus-send --session --print-reply --dest="org.freedesktop.DBus" /org/freedesktop/DBus  org.freedesktop.DBus.ListNames
 
-##Gtk-WARNING **: Locale not supported by C library.
+## Gtk-WARNING **: Locale not supported by C library.
 export LC_ALL="en_US"
 Optional:
 export LANG="en_US"
