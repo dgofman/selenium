@@ -2,6 +2,7 @@ package com.softigent.sftselenium;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -72,9 +73,21 @@ public class TestSuiteRunner {
 				report.openTest(info);
 			}
 
+			Class<?>[] suiteClassLst = null;
 			Suite.SuiteClasses annotation = (SuiteClasses) testSuiteRef.getAnnotation(Suite.SuiteClasses.class);
 			if (annotation != null) {
-				Class<?>[] suiteClassLst = annotation.value();
+				suiteClassLst = annotation.value();
+			} else {
+				Method method;
+				try {
+					method = testSuiteRef.getMethod("suite");
+					if (method != null) {
+						suiteClassLst = (Class<?>[]) method.invoke(null);
+					}
+				} catch (Exception e) {}
+			}
+			
+			if (suiteClassLst != null) {
 				totalTestCases = suiteClassLst.length;
 				for (Class<?> testSuite : suiteClassLst) {
 					log.info("Start: " + testSuite.getName());

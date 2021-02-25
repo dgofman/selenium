@@ -270,6 +270,7 @@ public class Config extends Properties {
 			copt.addArguments("--no-sandbox"); // Bypass OS security model, MUST BE THE VERY FIRST OPTION
 			copt.addArguments("--no-default-browser-check");
 			copt.addArguments("disable-infobars");
+			copt.addArguments("--allowed-ips");
 			copt.addArguments("--disable-extensions");
 			copt.addArguments("--disable-notifications");
 			copt.addArguments("--start-maximized");
