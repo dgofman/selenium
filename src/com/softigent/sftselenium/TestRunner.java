@@ -26,6 +26,7 @@ public abstract class TestRunner extends Runner {
 	}
 
 	public TestRunner(String[] args, ITestSuiteReport[] reports) {
+		ExtendedRunner.useDisplayNameMethod = false;
 		this.reports = reports;
 		List<TestRunnerInfo> suites = this.initialize(args);
 		try {

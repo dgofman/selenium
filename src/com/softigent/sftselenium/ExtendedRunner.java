@@ -1,14 +1,12 @@
 package com.softigent.sftselenium;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.junit.internal.builders.AllDefaultPossibilitiesBuilder;
 import org.junit.runner.Description;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
@@ -19,27 +17,19 @@ public class ExtendedRunner extends BlockJUnit4ClassRunner {
 	
 	public static Class<?> RunnerClass;
 	
+	public static boolean useDisplayNameMethod = true;
+	
 	protected RunnerBuilder runner;
-	protected boolean canUseSuiteMethod;
 
     public ExtendedRunner(Class<?> klass, RunnerBuilder runner) throws InitializationError {
         super(klass);
         this.runner = runner;
-        
         ExtendedRunner.RunnerClass = klass;
-
-        if (runner instanceof AllDefaultPossibilitiesBuilder) {
-        	try {
-		        Field f = runner.getClass().getDeclaredField("canUseSuiteMethod");
-		        f.setAccessible(true);
-		        this.canUseSuiteMethod = (Boolean) f.get(runner);
-        	} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {}
-        }
     }
 
     @Override
     protected Description describeChild(FrameworkMethod method) {
-    	if (canUseSuiteMethod) {
+    	if (useDisplayNameMethod) {
 	    	Class<?> clazz = getTestClass().getJavaClass();
 	    	Annotation annotation = null;
 	    	try {
@@ -50,8 +40,10 @@ public class ExtendedRunner extends BlockJUnit4ClassRunner {
 	    		annotation = method.getAnnotation(DisplayName.class);
 	    	}
 	        if (annotation != null) {
-	        	return Description.createTestDescription(clazz, ((DisplayName)annotation).value(), method.getAnnotations());
-	
+	        	String testName = ((DisplayName)annotation).value();
+	        	if (testName != null && !testName.isEmpty()) {
+	        		return Description.createTestDescription(clazz, ((DisplayName)annotation).value(), method.getAnnotations());
+	        	}
 	        }
     	}
         return super.describeChild(method);
