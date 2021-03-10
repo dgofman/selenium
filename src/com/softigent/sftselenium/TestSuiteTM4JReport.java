@@ -66,6 +66,8 @@ public class TestSuiteTM4JReport implements ITestSuiteReport {
 					}
 				});
 			}
+			
+		
 			results.add(result.toString() + "\n    }");
 		}
 	}
