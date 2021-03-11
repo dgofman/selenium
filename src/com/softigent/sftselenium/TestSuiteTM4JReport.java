@@ -16,15 +16,12 @@ import org.junit.runner.notification.Failure;
 
 public class TestSuiteTM4JReport implements ITestSuiteReport {
 
-	protected PrintWriter writer;
+	protected File reportFile;
 	protected List<String> results;
 
 	@Override
 	public void openDoc(TestRunnerInfo info, File reportDir) throws IOException {
-		writer = new PrintWriter(new File(reportDir, info.getFileName() + "-tm4j.json"), "UTF-8");
-		writer.println("{\n" + 
-				"  \"version\" : 1,\n" + 
-				"  \"executions\" : [ ");
+		reportFile = new File(reportDir, info.getFileName() + "-tm4j.json");
 		results = new ArrayList<>();
 	}
 	
@@ -97,8 +94,14 @@ public class TestSuiteTM4JReport implements ITestSuiteReport {
 	
 	@Override
 	public void closeDoc() throws IOException {
-		writer.println(String.join(",\n", results));
-		writer.println("  ]\n}");
-		writer.close();
+		if (results.size() > 0) {
+			PrintWriter writer = new PrintWriter(reportFile, "UTF-8");
+			writer.println("{\n" + 
+					"  \"version\" : 1,\n" + 
+					"  \"executions\" : [ ");
+			writer.println(String.join(",\n", results));
+			writer.println("  ]\n}");
+			writer.close();
+		}
 	}
 }

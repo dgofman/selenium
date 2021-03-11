@@ -17,14 +17,12 @@ import org.junit.runner.notification.Failure;
 
 public class TestSuiteCucumberReport implements ITestSuiteReport {
 
-	protected PrintWriter writer;
+	protected File reportFile;
 	protected List<String> results;
 
 	@Override
 	public void openDoc(TestRunnerInfo info, File reportDir) throws IOException {
-		writer = new PrintWriter(new File(reportDir, info.getFileName() + "-cucumber.json"), "UTF-8");
-		writer.println("[{\n" + 
-				"	\"elements\": [");
+		reportFile = new File(reportDir, info.getFileName() + "-cucumber.json");
 		results = new ArrayList<>();
 	}
 	
@@ -109,8 +107,13 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 	
 	@Override
 	public void closeDoc() throws IOException {
-		writer.println(String.join(",\n", results));
-		writer.println("	]\n}]");
-		writer.close();
+		if (results.size() > 0) {
+			PrintWriter writer = new PrintWriter(reportFile, "UTF-8");
+			writer.println("[{\n" + 
+					"	\"elements\": [");
+			writer.println(String.join(",\n", results));
+			writer.println("	]\n}]");
+			writer.close();
+		}
 	}
 }
