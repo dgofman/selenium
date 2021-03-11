@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -14,17 +15,16 @@ import org.junit.runner.Description;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
-public class TestSuiteTM4JReport implements ITestSuiteReport {
+public class TestSuiteCucumberReport implements ITestSuiteReport {
 
 	protected PrintWriter writer;
 	protected List<String> results;
 
 	@Override
 	public void openDoc(TestRunnerInfo info, File reportDir) throws IOException {
-		writer = new PrintWriter(new File(reportDir, info.getFileName() + "-tm4j.json"), "UTF-8");
-		writer.println("{\n" + 
-				"  \"version\" : 1,\n" + 
-				"  \"executions\" : [ ");
+		writer = new PrintWriter(new File(reportDir, info.getFileName() + "-cucumber.json"), "UTF-8");
+		writer.println("[{\n" + 
+				"	\"elements\": [");
 		results = new ArrayList<>();
 	}
 	
@@ -48,27 +48,39 @@ public class TestSuiteTM4JReport implements ITestSuiteReport {
 	public void addTest(TestRunnerInfo info, long time, List<Failure> failures, boolean ignored,
 			Description description) {
 		if (!ignored) {
-			StringBuffer result = new StringBuffer();
-			result.append("  {\n" + 
-					"    \"source\" : \"" + description.getClassName() + "." + description.getMethodName() + "\",\n" + 
-					"    \"result\" : \"" + (failures.size() == 0 ? "Passed" : "Failed") + "\"");
 			Collection<Annotation> annotations = description.getAnnotations();
 			if (annotations != null) {
 				annotations.forEach(annotation -> {
 					if (DisplayName.class.getName().equals(annotation.annotationType().getName())) {
 						DisplayName displayName = (DisplayName)annotation;
+						String name = "";
 						if (displayName.value() != null && !displayName.value().isEmpty()) {
-							result.append(",\n      \"name\" : \"" + displayName.value() + "\"");
+							name = displayName.value();
 						}
 						if (displayName.key() != null && !displayName.key().isEmpty()) {
-							result.append(",\n      \"key\" : \"" + displayName.key() + "\"");
+							String method = description.getClassName() + "." + description.getMethodName();
+							results.add("		{\n" + 
+							"			\"start_timestamp\": \"" + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'").format(new Date()) + "\",\n" + 
+							"			\"name\": \"" + name + " (" + method + ")\",\n" + 
+							"			\"type\": \"scenario\",\n" + 
+							"			\"keyword\": \"Scenario\",\n" + 
+							"			\"steps\": [{\n" + 
+							"				\"result\": {\n" + 
+							"					\"duration\": " + time + ",\n" + 
+							"					\"status\": \"" + (failures.size() == 0 ? "passed" : "failed")  + "\"\n" + 
+							"				},\n" + 
+							"				\"match\": {\n" + 
+							"					\"location\": \"" + method + "\"\n" + 
+							"				}\n" + 
+							"			}],\n" + 
+							"			\"tags\": [{\n" + 
+							"				\"name\": \"@TestCaseKey\\u003d" + displayName.key() + "\"\n" + 
+							"			}]\n" + 
+							"		}");
 						}
 					}
 				});
 			}
-			
-		
-			results.add(result.toString() + "\n    }");
 		}
 	}
 
@@ -98,7 +110,7 @@ public class TestSuiteTM4JReport implements ITestSuiteReport {
 	@Override
 	public void closeDoc() throws IOException {
 		writer.println(String.join(",\n", results));
-		writer.println("  ]\n}");
+		writer.println("	]\n}]");
 		writer.close();
 	}
 }
