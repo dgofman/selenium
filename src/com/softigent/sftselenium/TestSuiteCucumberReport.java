@@ -53,15 +53,15 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 				annotations.forEach(annotation -> {
 					if (DisplayName.class.getName().equals(annotation.annotationType().getName())) {
 						DisplayName displayName = (DisplayName)annotation;
-						String name = "";
+						String method = description.getClassName() + "." + description.getMethodName();
+						String name = method;
 						if (displayName.value() != null && !displayName.value().isEmpty()) {
-							name = displayName.value();
+							name += " (" + displayName.value() + ")";
 						}
 						if (displayName.key() != null && !displayName.key().isEmpty()) {
-							String method = description.getClassName() + "." + description.getMethodName();
 							results.add("		{\n" + 
 							"			\"start_timestamp\": \"" + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'").format(new Date()) + "\",\n" + 
-							"			\"name\": \"" + name + " (" + method + ")\",\n" + 
+							"			\"name\": \"" + name + "\",\n" + 
 							"			\"type\": \"scenario\",\n" + 
 							"			\"keyword\": \"Scenario\",\n" + 
 							"			\"steps\": [{\n" + 
