@@ -1,0 +1,5 @@
+echo ${{ secrets.MY_EQIX_VAR1 }}
+echo ${{ secrets.MY_EQIX_VAR1 }}
+echo ${{ secrets.MY_EQIX_VAR1 }}
+echo ${{ secrets.MY_EQIX_VAR1 }}
+echo ${{ secrets.MY_EQIX_VAR1 }}
