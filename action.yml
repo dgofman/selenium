@@ -1,3 +1,0 @@
-name: 'Test Action'
-description: 'Test Action for test the Equinix Plugin.'
-run: bats -v
