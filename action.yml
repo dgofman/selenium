@@ -1,4 +1,3 @@
 name: 'Test Action'
 description: 'Test Action for test the Equinix Plugin.'
-runs:
-  bats -v
+run: bats -v
