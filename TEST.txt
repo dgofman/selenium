@@ -1,5 +1,5 @@
 echo This is a line1 ${{ secrets.MY_EQIX_VAR1 }}
 echo This is a line2 ${{ MY_EQIX_VAR1 }}
 echo This is a line3 ${{ MY_EQIX_VAR2 }}
-echo This is a line4 ${{ MY_EQIX_VAR3 }}
-echo This is a line5 ${{ MY_EQIX_VAR4 }}
+echo This is a line4 ${MY_EQIX_VAR1}
+echo This is a line5 ${MY_EQIX_VAR2}
