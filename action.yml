@@ -1,2 +1,4 @@
 name: 'Test Action'
 description: 'Test Action for test the Equinix Plugin.'
+runs:
+  echo My Secret ${{ secrets.MY_EQIX_VAR1 }}
