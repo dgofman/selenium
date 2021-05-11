@@ -396,6 +396,17 @@ public class Client {
 		return str;
 	}
 	
+	//Example: createJsonArray(addJson1, addJson2, addJson3);
+	public static String createJsonArray(Object ...jsons) {
+		Object[] jsonArray = new Object[jsons.length];
+		for (int i = 0; i < jsons.length; i++) {
+			jsonArray[i] = jsons[i];
+		}
+		String json = "[" +  StringUtils.join(jsonArray, ",") + "]";
+		logger.info("JSON: " + json);
+		return json;
+	}
+		
 	//Example: createJson("key1": "val1", "key2": true, "key3": new JSONArray(new String[] {"1", "2", "3"}));
 	public static String createJson(Object ...keyval) {
 		String json = addJson(keyval).toString();
