@@ -64,11 +64,11 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 						}
 						if (displayName.key() != null && !displayName.key().isEmpty()) {
 							String linenumber = "0";
-							String lookup = "Lookup class: " + description.getClassName();
+							String lookup = description.getClassName();
 							try {
 						        CtClass cc = pool.get(description.getClassName());
 						        String[] ccInfo = getMethodInfo(cc, description.getMethodName());
-						        lookup = "Lookup class: " + ccInfo[0];
+						        lookup = ccInfo[0];
 						        linenumber = ccInfo[1];
 							} catch (NotFoundException e) {
 								e.printStackTrace();
@@ -88,7 +88,7 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 							"				},\n" + 
 							"				\"line\": " + linenumber  + ",\n" +
 							"				\"match\": {\n" + 
-							"					\"location\": \"" + method + "\"\n" + 
+							"					\"location\": \"" + lookup + "\"\n" + 
 							"				}\n" + 
 							"			}],\n" + 
 							"			\"tags\": [{\n" + 
