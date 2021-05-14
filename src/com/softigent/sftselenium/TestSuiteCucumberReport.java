@@ -86,6 +86,7 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 							"					\"status\": \"" + (failures.size() == 0 ? "passed" : "failed")  + "\"\n" + 
 							"				},\n" + 
 							"				\"keyword\": \"Step\",\n" +
+							"				\"name\": \"" + displayName.key() + "\",\n" + 
 							"				\"line\": " + linenumber  + ",\n" +
 							"				\"match\": {\n" + 
 							"					\"location\": \"" + lookup + "\"\n" + 
