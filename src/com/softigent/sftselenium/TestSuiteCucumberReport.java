@@ -76,9 +76,7 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 					        
 							results.add("		{\n" + 
 							"			\"start_timestamp\": \"" + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'").format(new Date()) + "\",\n" + 
-							"			\"name\": \"" + name + "\",\n" + 
-							"			\"description\": \"" + lookup  + "\",\n" +
-							"			\"line\": " + linenumber  + ",\n" +
+							"			\"name\": \"" + name + "\",\n" +
 							"			\"type\": \"scenario\",\n" + 
 							"			\"keyword\": \"Scenario\",\n" +
 							"			\"steps\": [{\n" + 
@@ -86,8 +84,8 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 							"					\"duration\": " + time + ",\n" + 
 							"					\"status\": \"" + (failures.size() == 0 ? "passed" : "failed")  + "\"\n" + 
 							"				},\n" + 
-							"				\"line\": " + linenumber  + ",\n" +
 							"				\"keyword\": \"Step\",\n" +
+							"				\"line\": " + linenumber  + ",\n" +
 							"				\"match\": {\n" + 
 							"					\"location\": \"" + lookup + "\"\n" + 
 							"				}\n" + 
@@ -131,7 +129,6 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 		if (results.size() > 0) {
 			PrintWriter writer = new PrintWriter(reportFile, "UTF-8");
 			writer.println("[{\n" + 
-					"	\"line\": 1,\n" +
 					"	\"elements\": [");
 			writer.println(String.join(",\n", results));
 			writer.println("	]\n}]");
