@@ -86,6 +86,7 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 							"					\"duration\": " + time + ",\n" + 
 							"					\"status\": \"" + (failures.size() == 0 ? "passed" : "failed")  + "\"\n" + 
 							"				},\n" + 
+							"				\"line\": " + linenumber  + ",\n" +
 							"				\"match\": {\n" + 
 							"					\"location\": \"" + method + "\"\n" + 
 							"				}\n" + 
@@ -129,6 +130,7 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 		if (results.size() > 0) {
 			PrintWriter writer = new PrintWriter(reportFile, "UTF-8");
 			writer.println("[{\n" + 
+					"	\"line\": 1,\n" +
 					"	\"elements\": [");
 			writer.println(String.join(",\n", results));
 			writer.println("	]\n}]");
