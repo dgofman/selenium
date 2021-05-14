@@ -15,6 +15,11 @@ import org.junit.runner.Description;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtMethod;
+import javassist.NotFoundException;
+
 public class TestSuiteCucumberReport implements ITestSuiteReport {
 
 	protected File reportFile;
@@ -45,6 +50,7 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 	@Override
 	public void addTest(TestRunnerInfo info, long time, List<Failure> failures, boolean ignored,
 			Description description) {
+		ClassPool pool = ClassPool.getDefault();
 		if (!ignored) {
 			Collection<Annotation> annotations = description.getAnnotations();
 			if (annotations != null) {
@@ -57,11 +63,24 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 							name += " (" + displayName.value() + ")";
 						}
 						if (displayName.key() != null && !displayName.key().isEmpty()) {
+							String linenumber = "0";
+							String lookup = "Lookup class: " + description.getClassName();
+							try {
+						        CtClass cc = pool.get(description.getClassName());
+						        String[] ccInfo = getMethodInfo(cc, description.getMethodName());
+						        lookup = "Lookup class: " + ccInfo[0];
+						        linenumber = ccInfo[1];
+							} catch (NotFoundException e) {
+								e.printStackTrace();
+							}
+					        
 							results.add("		{\n" + 
 							"			\"start_timestamp\": \"" + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'").format(new Date()) + "\",\n" + 
 							"			\"name\": \"" + name + "\",\n" + 
+							"			\"description\": \"" + lookup  + "\",\n" +
+							"			\"line\": " + linenumber  + ",\n" +
 							"			\"type\": \"scenario\",\n" + 
-							"			\"keyword\": \"Scenario\",\n" + 
+							"			\"keyword\": \"Scenario\",\n" +
 							"			\"steps\": [{\n" + 
 							"				\"result\": {\n" + 
 							"					\"duration\": " + time + ",\n" + 
@@ -114,6 +133,15 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 			writer.println(String.join(",\n", results));
 			writer.println("	]\n}]");
 			writer.close();
+		}
+	}
+	
+	String[] getMethodInfo(CtClass cc, String methodName) throws NotFoundException {
+		try {
+	        CtMethod methodX = cc.getDeclaredMethod(methodName);
+	        return new String[] {cc.getName(), String.valueOf(methodX.getMethodInfo().getLineNumber(0) - 1) };
+		} catch (NotFoundException e) {
+			return getMethodInfo(cc.getSuperclass(), methodName);
 		}
 	}
 }

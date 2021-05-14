@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.softigent</groupId>
 	<artifactId>sftselenium</artifactId>
-	<version>8.4.0</version>
+	<version>8.5.0</version>
 	<name>Selenium Framework</name>
 	<packaging>jar</packaging>
 	<url>https://github.com/dgofman/selenium</url>
@@ -130,6 +130,11 @@
 			<groupId>com.codeborne</groupId>
 			<artifactId>phantomjsdriver</artifactId>
 			<version>1.4.4</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.javassist</groupId>
+		    <artifactId>javassist</artifactId>
+		    <version>3.28.0-GA</version>
 		</dependency>
 	</dependencies>
 </project>

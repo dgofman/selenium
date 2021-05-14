@@ -48,7 +48,7 @@ public abstract class BaseTest {
 	
 	protected CloseDriver doCloseDriver;
 	
-	public static final double GIT_VERSION = 8.4;
+	public static final double GIT_VERSION = 8.5;
 	public static final int GIT_PATCH = 0;
 
 	@Rule
