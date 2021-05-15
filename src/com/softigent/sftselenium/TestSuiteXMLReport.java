@@ -52,10 +52,14 @@ public class TestSuiteXMLReport implements ITestSuiteReport {
 	public void openTest(TestRunnerInfo info) {
 		results = new ArrayList<>();
 	}
+	
+	@Override
+	public void testStarted(TestRunnerInfo info, long startTime, Description description) {
+	}
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public void addTest(TestRunnerInfo info, long time, List<Failure> failures, boolean ignored,
+	public void testFinished(TestRunnerInfo info, long time, List<Failure> failures, boolean ignored,
 			Description description) {
 		results.add("      <testcase classname=\"" + description.getClassName() + "\" name=\""
 				+ description.getMethodName() + "\" time=\"" + ((float) time) / 1000 + "\">");
@@ -86,11 +90,11 @@ public class TestSuiteXMLReport implements ITestSuiteReport {
 	}
 
 	@Override
-	public void addResult(TestRunnerInfo info, long time, Class<?> testCase, Result result, List<Failure> asserts,
+	public void addResult(TestRunnerInfo info, long time, Class<?> testSuite, Result result, List<Failure> asserts,
 			List<Failure> errors) {
 		writer.println("  <testsuite errors=\"" + errors.size() + "\" failures=\"" + asserts.size() + "\" skipped=\""
 				+ result.getIgnoreCount() + "\" tests=\"" + result.getRunCount() + "\" name=\""
-				+ testCase.getSimpleName() + "\" package=\"" + testCase.getPackage() + "\" time=\""
+				+ testSuite.getSimpleName() + "\" package=\"" + testSuite.getPackage() + "\" time=\""
 				+ ((float) time) / 1000 + "\" timestamp=\""
 				+ new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()) + "\">");
 		for (String testcase : results) {

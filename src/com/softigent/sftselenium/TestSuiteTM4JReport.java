@@ -40,9 +40,13 @@ public class TestSuiteTM4JReport implements ITestSuiteReport {
 	@Override
 	public void openTest(TestRunnerInfo info) {
 	}
+	
+	@Override
+	public void testStarted(TestRunnerInfo info, long startTime, Description description) {
+	}
 
 	@Override
-	public void addTest(TestRunnerInfo info, long time, List<Failure> failures, boolean ignored,
+	public void testFinished(TestRunnerInfo info, long time, List<Failure> failures, boolean ignored,
 			Description description) {
 		if (!ignored) {
 			StringBuffer result = new StringBuffer();
@@ -72,9 +76,9 @@ public class TestSuiteTM4JReport implements ITestSuiteReport {
 	@Override
 	public void closeTest(TestRunnerInfo info) {
 	}
-
+	
 	@Override
-	public void addResult(TestRunnerInfo info, long time, Class<?> testCase, Result result, List<Failure> asserts,
+	public void addResult(TestRunnerInfo info, long time, Class<?> testSuite, Result result, List<Failure> asserts,
 			List<Failure> errors) {
 	}
 

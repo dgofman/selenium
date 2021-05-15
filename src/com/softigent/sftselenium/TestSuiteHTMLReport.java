@@ -90,7 +90,11 @@ public class TestSuiteHTMLReport implements ITestSuiteReport {
 	}
 	
 	@Override
-	public void addTest(TestRunnerInfo info, long time, List<Failure> failures, boolean ignored, Description description) {
+	public void testStarted(TestRunnerInfo info, long startTime, Description description) {
+	}
+	
+	@Override
+	public void testFinished(TestRunnerInfo info, long time, List<Failure> failures, boolean ignored, Description description) {
 	}
 
 	@Override
@@ -99,11 +103,11 @@ public class TestSuiteHTMLReport implements ITestSuiteReport {
 	}
 	
 	@Override
-	public void addResult(TestRunnerInfo info, long time, Class<?> testCase, Result result, List<Failure> asserts, List<Failure> errors) {
-		writer.println("<li id='" + testCase.getName() + "' style='background: " + (result.wasSuccessful() ? "lightgreen" : 
+	public void addResult(TestRunnerInfo info, long time, Class<?> testSuite, Result result, List<Failure> asserts, List<Failure> errors) {
+		writer.println("<li id='" + testSuite.getName() + "' style='background: " + (result.wasSuccessful() ? "lightgreen" : 
 			errors.size() == 0 ? "orange" : "lightcoral") + "'>");
-		writer.println("<a href='#" + testCase.getName() + "_image'>");
-		writer.println("<h3>" + testCase.getName() + "</h3>");
+		writer.println("<a href='#" + testSuite.getName() + "_image'>");
+		writer.println("<h3>" + testSuite.getName() + "</h3>");
 		
 		writer.println("<p><b>Run Time</b>: " + TestSuiteRunner.getTime(time) + "</p>");
 		writer.println("<p><b>Tests Run Count</b>: " + result.getRunCount() + "</p>");
@@ -114,7 +118,7 @@ public class TestSuiteHTMLReport implements ITestSuiteReport {
 
 		writer.println("</a>");
 		writer.println("</li>");
-		writer.println("<script>window.testcase='" + testCase.getName()  + "'</script>");
+		writer.println("<script>window.testcase='" + testSuite.getName()  + "'</script>");
 		writer.flush();
 	}
 	

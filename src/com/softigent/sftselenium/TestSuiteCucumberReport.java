@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.text.SimpleDateFormat;
+import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -20,15 +21,34 @@ import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 
+class TestCase {
+	final long startTime;
+	final List<String> tests;
+	final List<String> tags;
+	final Description description;
+	
+	TestCase(long time, Description desc) {
+		startTime = time;
+		description = desc;
+		tests = new ArrayList<>();
+		tags  = new ArrayList<>();
+	}
+}
+
 public class TestSuiteCucumberReport implements ITestSuiteReport {
 
 	protected File reportFile;
-	protected List<String> results;
+	protected PrintWriter writer;
+	protected List<String> testsuites;
+	protected Map<String, TestCase> testcases;
+	
 
 	@Override
 	public void openDoc(TestRunnerInfo info, File reportDir) throws IOException {
 		reportFile = new File(reportDir, info.getFileName() + "-cucumber.json");
-		results = new ArrayList<>();
+		writer = new PrintWriter(reportFile, "UTF-8");
+		testsuites = new ArrayList<>();
+		testcases  = new LinkedHashMap<>();
 	}
 	
 
@@ -46,11 +66,19 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 	@Override
 	public void openTest(TestRunnerInfo info) {
 	}
+	
+	@Override
+	public void testStarted(TestRunnerInfo info, long startTime, Description description) {
+		if (!testcases.containsKey(description.getClassName())) {
+			testcases.put(description.getClassName(), new TestCase(startTime, description));
+		}
+	}
 
 	@Override
-	public void addTest(TestRunnerInfo info, long time, List<Failure> failures, boolean ignored,
+	public void testFinished(TestRunnerInfo info, long time, List<Failure> failures, boolean ignored,
 			Description description) {
 		ClassPool pool = ClassPool.getDefault();
+		TestCase testcase =  testcases.get(description.getClassName());
 		if (!ignored) {
 			Collection<Annotation> annotations = description.getAnnotations();
 			if (annotations != null) {
@@ -63,28 +91,26 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 							name += " (" + displayName.value() + ")";
 						}
 						if (displayName.key() != null && !displayName.key().isEmpty()) {
-							int classLinenumber = 0;
 							String stepLinenumber = "0";
 							String lookup = description.getClassName();
 							try {
 						        CtClass cc = pool.get(description.getClassName());
-						        if (cc.getConstructors().length > 0) {
-						        	classLinenumber = cc.getConstructors()[0].getMethodInfo().getLineNumber(0);
-						        }
 						        String[] ccInfo = getMethodInfo(cc, description.getMethodName());
 						        lookup = ccInfo[0];
 						        stepLinenumber = ccInfo[1];
 							} catch (NotFoundException e) {
 								e.printStackTrace();
 							}
-					        
-							results.add("		{\n" + 
-							"			\"start_timestamp\": \"" + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'").format(new Date()) + "\",\n" + 
-							"			\"keyword\": \"Class\",\n" +
-							"			\"type\": \"test\",\n" +
-							"			\"name\": \"" + description.getClassName() + "\",\n" + 
-							"			\"line\": " + classLinenumber  + ",\n" +
-							"			\"steps\": [{\n" + 
+							if (displayName.key() != null && !displayName.key().equals("")) {
+								name +=  " - " + displayName.key();
+								String tag = "			{\n" + 
+										"				\"name\": \"@Step\\u003d" + displayName.key() + "\"\n" + 
+										"			}";
+								if (!testcase.tags.contains(tag)) {
+									testcase.tags.add(tag);
+								}
+							}
+							testcase.tests.add("\t\t\t{\n" + 
 							"				\"keyword\": \"Method\",\n" +
 							"				\"name\": \"" + name + "\",\n" + 
 							"				\"line\": " + stepLinenumber  + ",\n" +
@@ -95,11 +121,7 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 							"					\"duration\": " + time + ",\n" + 
 							"					\"status\": \"" + (failures.size() == 0 ? "passed" : "failed")  + "\"\n" + 
 							"				}\n" + 
-							"			}],\n" + 
-							"			\"tags\": [{\n" + 
-							"				\"name\": \"@TestCaseKey\\u003d" + displayName.key() + "\"\n" + 
-							"			}]\n" + 
-							"		}");
+							"\t\t\t}");
 						}
 					}
 				});
@@ -112,8 +134,44 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 	}
 
 	@Override
-	public void addResult(TestRunnerInfo info, long time, Class<?> testCase, Result result, List<Failure> asserts,
+	public void addResult(TestRunnerInfo info, long time, Class<?> testSuite, Result result, List<Failure> asserts,
 			List<Failure> errors) {
+		ClassPool pool = ClassPool.getDefault();
+		List<String> elements = new ArrayList<>();
+		for (String className : testcases.keySet()) {
+			TestCase testcase = testcases.get(className);
+			int classLinenumber = 0;
+			try {
+				
+		        CtClass cc = pool.get(className);
+		        if (cc.getConstructors().length > 0) {
+		        	classLinenumber = cc.getConstructors()[0].getMethodInfo().getLineNumber(0);
+		        }
+			} catch (NotFoundException e) {
+				e.printStackTrace();
+			}
+			elements.add("		{\n" + 
+			"\t\t\t\"start_timestamp\": \"" + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'").format(testcase.startTime) + "\",\n" + 
+			"\t\t\t\"keyword\": \"Class\",\n" +
+			"\t\t\t\"type\": \"test\",\n" +
+			"\t\t\t\"name\": \"" + className + "\",\n" + 
+			"\t\t\t\"line\": " + classLinenumber  + ",\n" +
+			"\t\t\t\"steps\": [\n" +
+					String.join(",\n", testcase.tests) +
+					"\n		],\n" +
+					"		\"tags\": [\n" + 
+					String.join(",\n", testcase.tags) +
+					"\n		]}");			
+		}
+		
+		
+		testsuites.add("\t{\n" +
+				"\t\t\"name\": \"" + testSuite.getSimpleName() + "\",\n" +
+				"\t\t\"uri\": \"" +  testSuite.getName() + "\",\n" +
+				"\t\t\"elements\": [\n" +
+			String.join(",\n", elements) +
+		"\n\t]}");
+		testcases.clear();
 	}
 
 	@Override
@@ -132,16 +190,10 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 	
 	@Override
 	public void closeDoc() throws IOException {
-		if (results.size() > 0) {
-			PrintWriter writer = new PrintWriter(reportFile, "UTF-8");
-			writer.println("[{\n" +
-					"	\"name\": \"" + reportFile.getName() + "\",\n" +
-					"	\"uri\": \"file:" + reportFile.getAbsolutePath() + "\",\n" +
-					"	\"elements\": [");
-			writer.println(String.join(",\n", results));
-			writer.println("	]\n}]");
-			writer.close();
-		}
+		writer.println("[");
+		writer.println(String.join(",\n", testsuites));
+		writer.println("]");
+		writer.close();
 	}
 	
 	String[] getMethodInfo(CtClass cc, String methodName) throws NotFoundException {

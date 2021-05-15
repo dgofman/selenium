@@ -208,13 +208,16 @@ class JUnitRunListener extends RunListener {
 	public void testStarted(Description description) throws Exception {
 		startTime = System.currentTimeMillis();
 		failures = new ArrayList<Failure>();
+		for (ITestSuiteReport report : openReports) {
+			report.testStarted(info, startTime, description);
+		}
     }
 	
 	@Override
 	public void testFinished(Description description) throws Exception {
 		long time = System.currentTimeMillis() - startTime;
 		for (ITestSuiteReport report : openReports) {
-			report.addTest(info, time, failures, false, description);
+			report.testFinished(info, time, failures, false, description);
 		}
 	}
 	
@@ -232,7 +235,7 @@ class JUnitRunListener extends RunListener {
     public void testIgnored(Description description) throws Exception {
 		long time = System.currentTimeMillis() - startTime;
 		for (ITestSuiteReport report : openReports) {
-			report.addTest(info, time, new ArrayList<Failure>(), true, description);
+			report.testFinished(info, time, new ArrayList<Failure>(), true, description);
 		}
     }
 }
