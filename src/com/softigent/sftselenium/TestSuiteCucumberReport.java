@@ -166,6 +166,7 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 		
 		
 		testsuites.add("\t{\n" +
+				"\t\t\"keyword\": \"Suite\",\n" +
 				"\t\t\"name\": \"" + testSuite.getSimpleName() + "\",\n" +
 				"\t\t\"uri\": \"" +  testSuite.getName() + "\",\n" +
 				"\t\t\"elements\": [\n" +
