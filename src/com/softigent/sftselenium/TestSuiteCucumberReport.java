@@ -86,7 +86,6 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 							"					\"status\": \"" + (failures.size() == 0 ? "passed" : "failed")  + "\"\n" + 
 							"				},\n" + 
 							"				\"keyword\": \"Step\",\n" +
-							"				\"name\": \"" + displayName.key() + "\",\n" + 
 							"				\"line\": " + linenumber  + ",\n" +
 							"				\"match\": {\n" + 
 							"					\"location\": \"" + lookup + "\"\n" + 
@@ -130,7 +129,9 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 	public void closeDoc() throws IOException {
 		if (results.size() > 0) {
 			PrintWriter writer = new PrintWriter(reportFile, "UTF-8");
-			writer.println("[{\n" + 
+			writer.println("[{\n" +
+					"	\"name\": \"" + reportFile.getName() + "\",\n" +
+					"	\"uri\": \"file:" + reportFile.getAbsolutePath() + "\",\n" +
 					"	\"elements\": [");
 			writer.println(String.join(",\n", results));
 			writer.println("	]\n}]");
