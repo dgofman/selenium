@@ -57,41 +57,42 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 				annotations.forEach(annotation -> {
 					if (DisplayName.class.getName().equals(annotation.annotationType().getName())) {
 						DisplayName displayName = (DisplayName)annotation;
-						String method = description.getClassName() + "." + description.getMethodName();
+						String method = description.getMethodName();
 						String name = method;
 						if (displayName.value() != null && !displayName.value().isEmpty()) {
 							name += " (" + displayName.value() + ")";
 						}
 						if (displayName.key() != null && !displayName.key().isEmpty()) {
-							String classLinenumber = "0";
+							int classLinenumber = 0;
 							String stepLinenumber = "0";
 							String lookup = description.getClassName();
 							try {
 						        CtClass cc = pool.get(description.getClassName());
-						        String[] ccInfo1 = getMethodInfo(cc, description.getClassName());
-						        classLinenumber = ccInfo1[1];
-						        String[] ccInfo2 = getMethodInfo(cc, description.getMethodName());
-						        lookup = ccInfo2[0];
-						        stepLinenumber = ccInfo2[1];
+						        if (cc.getConstructors().length > 0) {
+						        	classLinenumber = cc.getConstructors()[0].getMethodInfo().getLineNumber(0);
+						        }
+						        String[] ccInfo = getMethodInfo(cc, description.getMethodName());
+						        lookup = ccInfo[0];
+						        stepLinenumber = ccInfo[1];
 							} catch (NotFoundException e) {
 								e.printStackTrace();
 							}
 					        
 							results.add("		{\n" + 
 							"			\"start_timestamp\": \"" + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'").format(new Date()) + "\",\n" + 
-							"			\"name\": \"" + name + "\",\n" + 
+							"			\"keyword\": \"Class\",\n" +
+							"			\"name\": \"" + description.getClassName() + "\",\n" + 
 							"			\"line\": " + classLinenumber  + ",\n" +
-							"			\"type\": \"scenario\",\n" + 
-							"			\"keyword\": \"Scenario\",\n" +
 							"			\"steps\": [{\n" + 
-							"				\"result\": {\n" + 
-							"					\"duration\": " + time + ",\n" + 
-							"					\"status\": \"" + (failures.size() == 0 ? "passed" : "failed")  + "\"\n" + 
-							"				},\n" + 
-							"				\"keyword\": \"Step\",\n" +
+							"				\"keyword\": \"Method\",\n" +
+							"				\"name\": \"" + name + "\",\n" + 
 							"				\"line\": " + stepLinenumber  + ",\n" +
 							"				\"match\": {\n" + 
 							"					\"location\": \"" + lookup + "\"\n" + 
+							"				},\n" + 
+							"				\"result\": {\n" + 
+							"					\"duration\": " + time + ",\n" + 
+							"					\"status\": \"" + (failures.size() == 0 ? "passed" : "failed")  + "\"\n" + 
 							"				}\n" + 
 							"			}],\n" + 
 							"			\"tags\": [{\n" + 
