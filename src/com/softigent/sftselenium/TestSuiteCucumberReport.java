@@ -81,6 +81,7 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 							results.add("		{\n" + 
 							"			\"start_timestamp\": \"" + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'").format(new Date()) + "\",\n" + 
 							"			\"keyword\": \"Class\",\n" +
+							"			\"type\": \"test\",\n" +
 							"			\"name\": \"" + description.getClassName() + "\",\n" + 
 							"			\"line\": " + classLinenumber  + ",\n" +
 							"			\"steps\": [{\n" + 
