@@ -104,7 +104,7 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 							if (displayName.key() != null && !displayName.key().equals("")) {
 								name +=  " - " + displayName.key();
 								String tag = "			{\n" + 
-										"				\"name\": \"@Step\\u003d" + displayName.key() + "\"\n" + 
+										"				\"name\": \"@TestCaseKey\\u003d" + displayName.key() + "\"\n" + 
 										"			}";
 								if (!testcase.tags.contains(tag)) {
 									testcase.tags.add(tag);
