@@ -63,13 +63,16 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 							name += " (" + displayName.value() + ")";
 						}
 						if (displayName.key() != null && !displayName.key().isEmpty()) {
-							String linenumber = "0";
+							String classLinenumber = "0";
+							String stepLinenumber = "0";
 							String lookup = description.getClassName();
 							try {
 						        CtClass cc = pool.get(description.getClassName());
-						        String[] ccInfo = getMethodInfo(cc, description.getMethodName());
-						        lookup = ccInfo[0];
-						        linenumber = ccInfo[1];
+						        String[] ccInfo1 = getMethodInfo(cc, description.getClassName());
+						        classLinenumber = ccInfo1[1];
+						        String[] ccInfo2 = getMethodInfo(cc, description.getMethodName());
+						        lookup = ccInfo2[0];
+						        stepLinenumber = ccInfo2[1];
 							} catch (NotFoundException e) {
 								e.printStackTrace();
 							}
@@ -77,6 +80,7 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 							results.add("		{\n" + 
 							"			\"start_timestamp\": \"" + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'").format(new Date()) + "\",\n" + 
 							"			\"name\": \"" + name + "\",\n" + 
+							"			\"line\": " + classLinenumber  + ",\n" +
 							"			\"type\": \"scenario\",\n" + 
 							"			\"keyword\": \"Scenario\",\n" +
 							"			\"steps\": [{\n" + 
@@ -85,7 +89,7 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 							"					\"status\": \"" + (failures.size() == 0 ? "passed" : "failed")  + "\"\n" + 
 							"				},\n" + 
 							"				\"keyword\": \"Step\",\n" +
-							"				\"line\": " + linenumber  + ",\n" +
+							"				\"line\": " + stepLinenumber  + ",\n" +
 							"				\"match\": {\n" + 
 							"					\"location\": \"" + lookup + "\"\n" + 
 							"				}\n" + 
