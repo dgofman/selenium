@@ -119,10 +119,10 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 							"				},\n" + 
 							"				\"result\": {\n";
 							if (failures.size() > 0) {
-								step += "					\"error_message\": " + failures.get(0).getMessage().replaceAll("\n",  "\\n").replaceAll("\"",  "'") + ",\n";
+								step += "					\"error_message\": \"" + failures.get(0).getMessage().replaceAll("\n",  "\\n").replaceAll("\"",  "'") + "\",\n";
 							}
-							step += "					\"duration\": " + time + ",\n" + 
-							"					\"status\": \"" + (failures.size() == 0 ? "passed" : "failed")  + "\"\n" +
+								step += "					\"status\": \"" + (failures.size() == 0 ? "passed" : "failed")  + "\"\n," +
+										"					\"duration\": " + time + "\n" + 
 							"				}\n" + 
 							"\t\t\t}";
 							testcase.tests.add(step);
