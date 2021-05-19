@@ -110,7 +110,7 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 									testcase.tags.add(tag);
 								}
 							}
-							testcase.tests.add("\t\t\t{\n" + 
+							String step = "\t\t\t{\n" + 
 							"				\"keyword\": \"Method\",\n" +
 							"				\"name\": \"" + name + "\",\n" + 
 							"				\"line\": " + stepLinenumber  + ",\n" +
@@ -119,9 +119,13 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 							"				},\n" + 
 							"				\"result\": {\n" + 
 							"					\"duration\": " + time + ",\n" + 
-							"					\"status\": \"" + (failures.size() == 0 ? "passed" : "failed")  + "\"\n" + 
-							"				}\n" + 
-							"\t\t\t}");
+							"					\"status\": \"" + (failures.size() == 0 ? "passed" : "failed")  + "\"\n";
+							if (failures.size() > 0) {
+								step += "					\"error_message\": " + failures.get(0).getMessage().replaceAll("\n",  "\\n").replaceAll("\"",  "'") + ",\n";
+							}
+							step += "				}\n" + 
+							"\t\t\t}";
+							testcase.tests.add(step);
 						}
 					}
 				});
