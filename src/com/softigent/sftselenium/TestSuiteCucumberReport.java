@@ -117,13 +117,13 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 							"				\"match\": {\n" + 
 							"					\"location\": \"" + lookup + "\"\n" + 
 							"				},\n" + 
-							"				\"result\": {\n" + 
-							"					\"duration\": " + time + ",\n" + 
-							"					\"status\": \"" + (failures.size() == 0 ? "passed" : "failed")  + "\"\n";
+							"				\"result\": {\n";
 							if (failures.size() > 0) {
 								step += "					\"error_message\": " + failures.get(0).getMessage().replaceAll("\n",  "\\n").replaceAll("\"",  "'") + ",\n";
 							}
-							step += "				}\n" + 
+							step += "					\"duration\": " + time + ",\n" + 
+							"					\"status\": \"" + (failures.size() == 0 ? "passed" : "failed")  + "\"\n" +
+							"				}\n" + 
 							"\t\t\t}";
 							testcase.tests.add(step);
 						}
