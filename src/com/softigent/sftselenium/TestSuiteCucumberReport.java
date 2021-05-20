@@ -144,28 +144,30 @@ public class TestSuiteCucumberReport implements ITestSuiteReport {
 		List<String> elements = new ArrayList<>();
 		for (String className : testcases.keySet()) {
 			TestCase testcase = testcases.get(className);
-			int classLinenumber = 0;
-			try {
-				
-		        CtClass cc = pool.get(className);
-		        if (cc.getConstructors().length > 0) {
-		        	classLinenumber = cc.getConstructors()[0].getMethodInfo().getLineNumber(0);
-		        }
-			} catch (NotFoundException e) {
-				e.printStackTrace();
+			if (testcase.tests.size() > 0) {
+				int classLinenumber = 0;
+				try {
+					
+			        CtClass cc = pool.get(className);
+			        if (cc.getConstructors().length > 0) {
+			        	classLinenumber = cc.getConstructors()[0].getMethodInfo().getLineNumber(0);
+			        }
+				} catch (NotFoundException e) {
+					e.printStackTrace();
+				}
+				elements.add("		{\n" + 
+				"\t\t\t\"start_timestamp\": \"" + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'").format(testcase.startTime) + "\",\n" + 
+				"\t\t\t\"keyword\": \"Class\",\n" +
+				"\t\t\t\"type\": \"test\",\n" +
+				"\t\t\t\"name\": \"" + className + "\",\n" + 
+				"\t\t\t\"line\": " + classLinenumber  + ",\n" +
+				"\t\t\t\"steps\": [\n" +
+						String.join(",\n", testcase.tests) +
+						"\n		],\n" +
+						"		\"tags\": [\n" + 
+						String.join(",\n", testcase.tags) +
+						"\n		]}");
 			}
-			elements.add("		{\n" + 
-			"\t\t\t\"start_timestamp\": \"" + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'").format(testcase.startTime) + "\",\n" + 
-			"\t\t\t\"keyword\": \"Class\",\n" +
-			"\t\t\t\"type\": \"test\",\n" +
-			"\t\t\t\"name\": \"" + className + "\",\n" + 
-			"\t\t\t\"line\": " + classLinenumber  + ",\n" +
-			"\t\t\t\"steps\": [\n" +
-					String.join(",\n", testcase.tests) +
-					"\n		],\n" +
-					"		\"tags\": [\n" + 
-					String.join(",\n", testcase.tags) +
-					"\n		]}");			
 		}
 		
 		
