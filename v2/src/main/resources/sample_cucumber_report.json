@@ -1,0 +1,136 @@
+[
+  {
+    "keyword": "Suite",
+    "projectKey": "seleniumAGL",
+    "name": "Testing Report",
+    "uri": "com.softigent.selenium.core.test.CucumberReport",
+    "line": 28,
+    "elements": [
+      {
+        "start_timestamp": "2021-08-23T15:07:01.537Z",
+        "keyword": "Class",
+        "type": "test",
+        "name": "softigent.selenium.psim.adaptor.CardHolderIT - seleniumAGL-T1857",
+        "line": 22,
+        "steps": [
+          {
+            "keyword": "Method",
+            "name": "testGetUsersByInvalidIbx (Get CardHolder by Invalid IBX) - seleniumAGL-T1857",
+            "line": 191,
+            "match": {
+              "location": "softigent.selenium.psim.adaptor.CardHolderIT"
+            },
+            "result": {
+              "error_message": "com.consol.citrus.exceptions.TestCaseFailedException: Validation failed: Values not equal for header element 'citrus_http_reason_phrase', expected 'INTERNAL_SERVER_ERROR' but was 'SERVICE_UNAVAILABLE'",
+              "status": "failed",
+              "duration": 47
+            }
+          },
+          {
+            "keyword": "Method",
+            "name": "testGetUsersByIbx (Get CardHolder by IBX) - seleniumAGL-T1857",
+            "line": 30,
+            "match": {
+              "location": "softigent.selenium.psim.adaptor.CardHolderIT::testGetUsersByIbx"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 293852
+            }
+          },
+          {
+            "keyword": "Method",
+            "name": "testGetUsersDocumentByActivationDate (Get CardHolder by IBX) - seleniumAGL-T1857",
+            "line": 112,
+            "match": {
+              "location": "softigent.selenium.psim.adaptor.CardHolderIT.testGetUsersDocumentByActivationDate"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 36085
+            }
+          },
+          {
+            "keyword": "Method",
+            "name": "testGetUsersByIbxAndActivationDate (Get CardHolder by IBX) - seleniumAGL-T1857",
+            "line": 71,
+            "match": {
+              "location": "softigent.selenium.psim.adaptor.CardHolderIT.testGetUsersByIbxAndActivationDate"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 413277
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@TestCaseKey\u003dseleniumAGL-T1857"
+          }
+        ]
+      },
+      {
+        "start_timestamp": "2021-08-23T15:22:53.281Z",
+        "keyword": "Class",
+        "type": "test",
+        "name": "softigent.selenium.psim.adaptor.AdaptorTests - seleniumAGL-T1858",
+        "line": 13,
+        "steps": [
+          {
+            "keyword": "Method",
+            "name": "Test21 (Activities) - seleniumAGL-T1858",
+            "line": 248,
+            "match": {
+              "location": "softigent.selenium.psim.adaptor.AdaptorTests"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 32532
+            }
+          },
+          {
+            "keyword": "Method",
+            "name": "Test3 (Negative Activity Document no size) - seleniumAGL-T1858",
+            "line": 72,
+            "match": {
+              "location": "softigent.selenium.psim.adaptor.AdaptorTests"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 31
+            }
+          },
+          {
+            "keyword": "Method",
+            "name": "Test2 (Activity Document with Bookmark) - seleniumAGL-T1858",
+            "line": 60,
+            "match": {
+              "location": "softigent.selenium.psim.adaptor.AdaptorTests"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 40785
+            }
+          },
+          {
+            "keyword": "Method",
+            "name": "Test1 (Activity Document pagination) - seleniumAGL-T1858",
+            "line": 46,
+            "match": {
+              "location": "softigent.selenium.psim.adaptor.AdaptorTests"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 41951
+            }
+          }
+        ],
+        "tags": [
+          {
+            "name": "@TestCaseKey\u003dseleniumAGL-T1858"
+          }
+        ]
+      }
+    ]
+  }
+]

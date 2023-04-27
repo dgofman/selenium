@@ -1,1 +1,4 @@
 **/target/
+v2/.settings/org.eclipse.jdt.core.prefs
+v2/reports/
+v2/test-output/
