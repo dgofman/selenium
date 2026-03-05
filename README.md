@@ -1,56 +1,348 @@
-# SFTSelenium
+# Selenium Automation Framework
 
-### Get started
-  - Download repository:
+A lightweight **Java Selenium automation framework** designed for
+building scalable UI test automation with clean abstractions, reusable
+components, and flexible reporting.
 
-```
-git clone https://github.com/dgofman/selenium.git
+------------------------------------------------------------------------
+
+# Overview
+
+This framework provides a structured way to build Selenium UI automation
+using reusable components and a lightweight runner.
+
+Main capabilities:
+
+-   Selenium WebDriver integration
+-   Cross‑browser support
+-   Page abstraction using **Container / Element**
+-   Suite execution
+-   HTML / XML / JSON reporting
+-   Screenshot capture
+-   Headless browser support
+-   CI/CD friendly output formats
+
+------------------------------------------------------------------------
+
+# Architecture
+
+Framework components:
+
+Test Suite\
+│\
+├── TestRunner\
+│\
+├── Connector (WebDriver management)\
+│\
+├── Config (framework configuration)\
+│\
+├── Container (page abstraction)\
+│\
+└── Element (UI element wrapper)
+
+This separation keeps tests clean and maintainable.
+
+------------------------------------------------------------------------
+
+# Key Components
+
+## Config
+
+Responsible for framework configuration:
+
+-   driver selection
+-   headless execution
+-   screenshot location
+-   framework properties
+
+Example:
+
+``` java
+Config config = new Config().initDefaultProperties()
+    .setProperty("driver", "chrome")
+    .setProperty("headless", "true");
 ```
 
-  - Run installer (selenium/install.cmd) or command line:
+------------------------------------------------------------------------
+
+## Connector
+
+Handles WebDriver lifecycle:
+
+-   driver initialization
+-   browser control
+-   navigation
+
+Example:
+
+``` java
+connector.getDriver().get("https://google.com");
 ```
-cd selenium
+
+------------------------------------------------------------------------
+
+## Container
+
+Represents a **page or page section**.
+
+Encapsulates:
+
+-   element lookup
+-   waiting utilities
+-   component logic
+
+Example:
+
+``` java
+public class LoginPage extends Container {
+
+    Element username = $(By.id("username"));
+    Element password = $(By.id("password"));
+    Element loginBtn = $(By.id("login"));
+
+    public void login(String user, String pass) {
+        username.setValue(user);
+        password.setValue(pass);
+        loginBtn.click();
+    }
+}
+```
+
+------------------------------------------------------------------------
+
+## Element
+
+Wrapper around Selenium WebElement.
+
+Provides helper methods:
+
+-   click()
+-   setValue()
+-   waitVisible()
+-   waitClickable()
+
+Example:
+
+``` java
+Element searchBox = $(By.name("q"));
+searchBox.setValue("selenium");
+```
+
+------------------------------------------------------------------------
+
+# Running Tests
+
+## Build Project
+
+``` bash
+mvn clean install
+```
+
+------------------------------------------------------------------------
+
+## Run Tests
+
+``` bash
+mvn test
+```
+
+------------------------------------------------------------------------
+
+## Run Jar (legacy mode)
+
+``` bash
 mvn clean compile assembly:single
 java -jar target/sftselenium-jar-with-dependencies.jar
 ```
 
-  - Goto your a newly created project and open in Eclipse or compile using mvn install command
+------------------------------------------------------------------------
 
-### Troubleshooting
+# Example Test
 
-IE Drivers: http://selenium-release.storage.googleapis.com/index.html
-Chrome Drivers: https://sites.google.com/a/chromium.org/chromedriver/downloads
-Firefox Drivers: https://github.com/mozilla/geckodriver/releases
+``` java
+public class TestUI extends BasedTestUI {
 
-### Install Chrome Engine on Red Hat
-cat /proc/version
-https://chromium.woolyss.com/
-wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
-yum install ./google-chrome-stable_current_*.rpm -y
-rm google-chrome-stable_current_*.rpm
-export CHROME_PATH=/usr/bin/google-chrome
+    private final String BASE_URL = "https://www.google.com/";
 
+    public TestUI() {
+        super(new Config().initDefaultProperties());
+    }
 
-### Install FireFox Engine on Red Hat
-wget -O- "https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=en-US" | sudo tar -jx -C /usr/local/
-sudo ln -s /usr/local/firefox/firefox /usr/bin/firefox
-or
-sudo yum install Xvfb firefox
-sudo Xvfb :10 -ac &
-sudo export DISPLAY=:10
+    @Test
+    public void TestGoogleImages() throws Exception {
 
-#### "Failed to open connection to "session" message bus: Unable to autolaunch a dbus-daemon without a $DISPLAY for X11"
-sudo yum install dbus-x11
-export $(dbus-launch)
+        connector.getDriver().get(BASE_URL + "/imghp");
 
-TEST: dbus-send --session --print-reply --dest="org.freedesktop.DBus" /org/freedesktop/DBus  org.freedesktop.DBus.ListNames
+        waitPageLoad(BASE_URL + ".*");
 
-## Gtk-WARNING **: Locale not supported by C library.
-export LC_ALL="en_US"
-Optional:
-export LANG="en_US"
-export LANGUAGE="en_NZ"
-export C_CTYPE="en_US"
-export LC_NUMERIC=
-export LC_TIME=en"en_US"
+        body.wait(1);
 
+        config.createSnapshot();
+
+        body.wait(1);
+    }
+}
+```
+
+------------------------------------------------------------------------
+
+# Reporting
+
+The framework supports multiple report formats.
+
+### HTML
+
+Human readable execution report.
+
+Shows:
+
+-   passed tests
+-   failed tests
+-   execution time
+-   screenshots
+
+------------------------------------------------------------------------
+
+### XML
+
+Machine readable format used by CI systems:
+
+-   Jenkins
+-   GitHub Actions
+-   TeamCity
+
+------------------------------------------------------------------------
+
+### Cucumber JSON
+
+Compatible with Cucumber reporting tools.
+
+------------------------------------------------------------------------
+
+### TM4J JSON
+
+Supports export for **TM4J (Test Management for Jira)**.
+
+Example:
+
+``` java
+@DisplayName(value="Verify Login", key="QA-123")
+```
+
+------------------------------------------------------------------------
+
+# Screenshots
+
+Snapshots can be captured during test execution.
+
+Example:
+
+``` java
+config.createSnapshot();
+```
+
+Useful for:
+
+-   debugging
+-   CI artifacts
+-   test reports
+
+------------------------------------------------------------------------
+
+# Project Structure
+
+    selenium
+    │
+    ├── src/com/softigent/sftselenium
+    │
+    │   ├── Config.java
+    │   ├── Connector.java
+    │   ├── Container.java
+    │   ├── Element.java
+    │   ├── TestRunner.java
+    │   ├── TestSuiteRunner.java
+    │   └── Reports
+    │
+    ├── v2/
+    │   ├── pom.xml
+    │   └── tests
+    │
+    └── README.md
+
+------------------------------------------------------------------------
+
+# Dependencies
+
+Main libraries used:
+
+-   Selenium 4
+-   WebDriverManager
+-   JUnit / TestNG
+-   Apache POI
+-   CSV utilities
+-   PDFBox
+-   Gson
+
+These allow building tests with:
+
+-   data‑driven inputs
+-   file validation
+-   API integration
+-   document validation
+
+------------------------------------------------------------------------
+
+# CI/CD Integration
+
+Example GitHub Actions pipeline:
+
+``` yaml
+name: Selenium Tests
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+
+      - name: Run Tests
+        run: mvn test
+```
+
+------------------------------------------------------------------------
+
+# Best Practices
+
+Recommended usage:
+
+-   Use **Page Objects via Container**
+-   Keep selectors inside page classes
+-   Keep assertions in test classes
+-   Avoid raw WebDriver calls in tests
+
+------------------------------------------------------------------------
+
+# Contributing
+
+Pull requests are welcome.
+
+Suggested improvements:
+
+-   additional report types
+-   better CI integration
+-   new browser support
+-   improved wait utilities
+
+------------------------------------------------------------------------
+
+# License
+
+MIT License
